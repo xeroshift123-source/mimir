@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'dart:html' as html;
 import 'dart:js_util' as js_util;
 
+import 'package:mimir/utils/clipboard_image.dart';
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/models/nikke.dart';
 import 'package:mimir/providers/nikke_provider.dart';
@@ -396,20 +397,26 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                                   tooltip: '클립보드에 복사',
                                   icon: const Icon(Icons.copy),
                                   onPressed: () async {
-                                    if (_fiveSquadsPngCache == null) {
+                                    try {
                                       final bytes =
                                           await _captureFiveSquadsPng();
-                                      setState(
-                                          () => _fiveSquadsPngCache = bytes);
+
+                                      final copied =
+                                          await copyPngImageToClipboard(bytes);
+
+                                      if (copied) {
+                                        if (mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                                content:
+                                                    Text('클립보드에 이미지가 복사됐어!')),
+                                          );
+                                        }
+                                      }
+                                    } catch (e) {
+                                      debugPrint('캡쳐 실패: $e');
                                     }
-
-                                    await _copyPngToClipboardWeb(
-                                        _fiveSquadsPngCache!);
-
-                                    if (!mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('복사완료!')),
-                                    );
                                   },
                                 ),
                               IconButton(
