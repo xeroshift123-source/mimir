@@ -9,4 +9,4 @@ flutter --version
 flutter config --enable-web
 
 flutter pub get
-flutter build web --release --web-renderer canvaskit
+flutter build web --release
