@@ -1,20 +1,12 @@
-import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'dart:html' as html;
-import 'dart:js_util' as js_util;
 
-import 'package:mimir/utils/image_clipboard_factory.dart';
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/models/nikke.dart';
 import 'package:mimir/providers/nikke_provider.dart';
-import 'package:mimir/web/capture_marker_web.dart';
-import 'package:mimir/web/web_capture.dart';
 import 'package:mimir/widgets/nikke_card.dart';
 
 import 'package:provider/provider.dart';
@@ -35,12 +27,6 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   List<List<String?>>? _pendingSquadsIds;
   bool _restoredOnce = false;
   final GlobalKey _deckCaptureKey = GlobalKey();
-  final GlobalKey _fiveSquadsCaptureKey = GlobalKey();
-  Uint8List? _fiveSquadsPngCache;
-  static const _kCaptureMarkerViewType = 'capture-marker-view';
-  static const _kCaptureMarkerElementId = 'mimir-capture-marker';
-  bool _isCapturingFive = false;
-  String? _captureFiveError;
 
   /// 스쿼드 5개 × 슬롯 5개
   /// _squads[스쿼드번호][슬롯번호] = Nikke?
@@ -58,10 +44,6 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   @override
   void initState() {
     super.initState();
-    if (kIsWeb) {
-      registerCaptureMarkerView(
-          _kCaptureMarkerViewType, _kCaptureMarkerElementId);
-    }
 
     // 첫 프레임 이후에 저장된 덱 불러오기
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -195,140 +177,40 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     _saveDeckToLocal();
   }
 
-  Future<Uint8List> _captureFiveSquadsPng() async {
-    // ✅ 최소 1~2프레임 기다려서 layout/paint 완료 보장
-    await WidgetsBinding.instance.endOfFrame;
-    await WidgetsBinding.instance.endOfFrame;
-
-    final boundary = _fiveSquadsCaptureKey.currentContext?.findRenderObject()
-        as RenderRepaintBoundary?;
-
-    if (boundary == null) {
-      throw Exception('캡쳐 대상 RenderRepaintBoundary를 찾지 못했습니다.');
-    }
-
-    // ✅ 아직 paint가 안 끝났으면 조금 더 기다렸다가 재시도 (최대 몇 번)
-    int tries = 0;
-    while (boundary.debugNeedsPaint && tries < 10) {
-      tries++;
-      await Future.delayed(const Duration(milliseconds: 16));
-      await WidgetsBinding.instance.endOfFrame;
-    }
-
-    if (boundary.debugNeedsPaint) {
-      throw Exception('캡쳐 대상이 아직 페인트되지 않았습니다. (debugNeedsPaint=true)');
-    }
-
-    final pixelRatio = math.min(
-      3.0,
-      MediaQuery.of(context).devicePixelRatio,
-    );
-
-    final image = await boundary.toImage(pixelRatio: pixelRatio);
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    if (byteData == null) throw Exception('PNG 인코딩 실패');
-
-    return byteData.buffer.asUint8List();
-  }
-
-  Future<void> _copyFiveSquadsToClipboard() async {
-    try {
-      final Uint8List bytes = await _captureFiveSquadsPng();
-
-      final clipboard = getImageClipboard();
-      await clipboard.copyImage(bytes);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('클립보드에 이미지 복사 완료!')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('클립보드 복사 실패: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _copyPngToClipboardWeb(Uint8List pngBytes) async {
-    if (!kIsWeb) return;
-
-    final nav = html.window.navigator;
-
-    // navigator.clipboard 존재 여부
-    final clipboard = js_util.getProperty(nav, 'clipboard');
-    if (clipboard == null) {
-      throw Exception('이 브라우저는 Clipboard API를 지원하지 않습니다.');
-    }
-
-    // ClipboardItem 생성 가능 여부
-    final clipboardItemCtor = js_util.getProperty(html.window, 'ClipboardItem');
-    if (clipboardItemCtor == null) {
-      throw Exception('ClipboardItem을 지원하지 않는 브라우저입니다.');
-    }
-
-    // Blob 만들기
-    final blob = html.Blob([pngBytes], 'image/png');
-
-    // new ClipboardItem({ 'image/png': blob })
-    final item = js_util.callConstructor(
-      clipboardItemCtor,
-      [
-        js_util.jsify({'image/png': blob})
-      ],
-    );
-
-    // await navigator.clipboard.write([item])
-    final promise = js_util.callMethod(clipboard, 'write', [
-      [item]
-    ]);
-
-    await js_util.promiseToFuture(promise);
-  }
-
-// ✅ “미리보기에서 보이는 크기”를 고정할 뷰포트 크기(원하는 대로 조절)
-  static const double _kPreviewViewportW = 520;
-  static const double _kPreviewViewportH = 980;
-
   Widget _buildFiveSquadsShareCanvas() {
     // 한눈에 보기 좋은 고정 사이즈 (필요하면 바꿔도 됨)
     const double w = 600;
     const double h = 1150;
 
-    return RepaintBoundary(
-      key: _fiveSquadsCaptureKey,
-      child: SizedBox(
-        width: w,
-        height: h,
-        child: Material(
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: SingleChildScrollView(
-              // ✅ 추가
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ...List.generate(_squads.length, (index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: _ShareSquadPanel(
-                        title: _squadNames[index],
-                        isActive: index == _activeSquadIndex,
-                        slots: _squads[index],
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Made with Mimir',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(fontSize: 12, color: Colors.black45),
-                  ),
-                ],
-              ),
+    return SizedBox(
+      width: w,
+      height: h,
+      child: Material(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: SingleChildScrollView(
+            // ✅ 추가
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ...List.generate(_squads.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _ShareSquadPanel(
+                      title: _squadNames[index],
+                      isActive: index == _activeSquadIndex,
+                      slots: _squads[index],
+                    ),
+                  );
+                }),
+                const SizedBox(height: 10),
+                const Text(
+                  'Made with Mimir',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(fontSize: 12, color: Colors.black45),
+                ),
+              ],
             ),
           ),
         ),
@@ -338,194 +220,73 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
   Future<void> _showFiveSquadsPreviewDialog() async {
     try {
-      _fiveSquadsPngCache = null; // 매번 새로 뽑고 싶으면 유지
       await showDialog(
         context: context,
         barrierDismissible: true,
         barrierColor: Colors.black.withOpacity(0.25),
         builder: (context) {
           final mq = MediaQuery.of(context);
+          final isMobile = mq.size.width < 600;
 
-          const headerH = 48.0;
-          const dividerH = 1.0;
-          const padV = 16 + 24; // content padding (top+bottom)
-          const padH = 16 + 16; // content padding (left+right)
+          final dialogW = isMobile
+              ? mq.size.width - 12.0
+              : math.min(mq.size.width - 24.0, 640.0);
 
-          // 목표 다이얼로그 크기 = (고정 뷰포트) + (패딩/헤더)
-          const targetW = _kPreviewViewportW + padH;
-          const targetH = _kPreviewViewportH + headerH + dividerH + padV;
+          final dialogH =
+              isMobile ? mq.size.height - 36.0 : mq.size.height * 0.90;
 
-          // 화면 밖으로 나가면 그 안으로만 clamp
-          final dialogW = math.min(mq.size.width - 24.0, targetW);
-          final dialogH = math.min(mq.size.height - 36.0, targetH);
-
-          return StatefulBuilder(
-            builder: (context, setLocalState) {
-              Future<void> ensurePng() async {
-                if (_fiveSquadsPngCache != null) return;
-                if (_isCapturingFive) return; // ✅ 중복 방지
-                if (_captureFiveError != null) return; // ✅ 실패 후 무한 재시도 방지
-
-                _isCapturingFive = true;
-                try {
-                  await Future.delayed(const Duration(milliseconds: 16));
-                  final bytes = await _captureFiveSquadsPng();
-                  setLocalState(() {
-                    _fiveSquadsPngCache = bytes;
-                  });
-                } catch (e) {
-                  setLocalState(() {
-                    _captureFiveError = e.toString();
-                  });
-                } finally {
-                  _isCapturingFive = false;
-                }
-              }
-
-              // 다이얼로그가 그려진 직후 캡쳐 시작
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ensurePng();
-              });
-
-              return PopScope(
-                canPop: true,
-                onPopInvoked: (didPop) {
-                  if (!didPop) Navigator.of(context).pop();
-                },
-                child: Dialog(
-                  insetPadding: const EdgeInsets.all(12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  child: SizedBox(
-                    width: dialogW,
-                    height: dialogH,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 48,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            children: [
-                              const Expanded(
-                                child: Text('미리보기',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600)),
-                              ),
-                              if (kIsWeb)
-                                IconButton(
-                                  tooltip: '클립보드에 복사',
-                                  icon: const Icon(Icons.copy),
-                                  onPressed: _copyFiveSquadsToClipboard,
-                                ),
-                              IconButton(
-                                icon: const Icon(Icons.close, size: 18),
-                                onPressed: () => Navigator.of(context).pop(),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Divider(height: 1),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                            child: Center(
-                              child: _captureFiveError != null
-                                  ? Center(
-                                      child: Text(
-                                        '미리보기 생성 실패:\n$_captureFiveError',
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : _fiveSquadsPngCache == null
-                                      ? Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // ✅ “캡쳐용 캔버스”를 아주 작게라도 실제로 렌더링
-                                            // (이게 있어야 boundary가 존재해서 캡쳐가 가능)
-                                            Opacity(
-                                              opacity: 0.01, // ✅ 0.0 말고 아주 조금만
-                                              child: IgnorePointer(
-                                                child:
-                                                    _buildFiveSquadsShareCanvas(),
-                                              ),
-                                            ),
-                                            const CircularProgressIndicator(),
-                                          ],
-                                        )
-                                      : LayoutBuilder(
-                                          builder: (context, c) {
-                                            // ✅ “보여줄 영역(뷰포트)” 고정 + 화면보다 크면 자동 축소(clamp)
-                                            final viewportW = math.min(
-                                                _kPreviewViewportW, c.maxWidth);
-                                            final viewportH = math.min(
-                                                _kPreviewViewportH,
-                                                c.maxHeight);
-
-                                            return SizedBox(
-                                              width: viewportW,
-                                              height: viewportH,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                child: ColoredBox(
-                                                  color: Colors.white,
-                                                  child: Stack(
-                                                    children: [
-                                                      // 1) 실제 미리보기 이미지
-                                                      Center(
-                                                        child: Image.memory(
-                                                          _fiveSquadsPngCache!,
-                                                          fit: BoxFit.contain,
-                                                        ),
-                                                      ),
-
-                                                      // 2) 캡쳐 마커 (웹에서만)
-                                                      if (kIsWeb)
-                                                        const Positioned.fill(
-                                                          child: IgnorePointer(
-                                                            child: HtmlElementView(
-                                                                viewType:
-                                                                    _kCaptureMarkerViewType),
-                                                          ),
-                                                        ),
-
-                                                      // 3) “꾹 눌러 저장” (모바일/데스크톱 대응)
-                                                      Positioned.fill(
-                                                        child: Material(
-                                                          color: Colors
-                                                              .transparent,
-                                                          child: InkWell(
-                                                            onLongPress: kIsWeb
-                                                                ? null
-                                                                : () async {
-                                                                    await captureByElementId(
-                                                                      elementId:
-                                                                          _kCaptureMarkerElementId,
-                                                                      fileName:
-                                                                          'mimir-deck.png',
-                                                                    );
-                                                                  },
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+          return PopScope(
+            canPop: true, // ✅ 시스템 back 허용
+            onPopInvoked: (didPop) {
+              // didPop이 false인 케이스에서도 확실히 닫고 싶으면 아래 한 줄 유지
+              if (!didPop) Navigator.of(context).pop();
             },
+            child: Dialog(
+              insetPadding: const EdgeInsets.all(12),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              child: SizedBox(
+                width: dialogW,
+                height: dialogH,
+                child: Column(
+                  children: [
+                    // 상단 타이틀 바(네가 원한 X 포함)
+                    Container(
+                      height: 48,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: Text('미리보기',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w600)),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 18),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 1),
+
+                    // 내용
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                        child: Center(
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child: _buildFiveSquadsShareCanvas(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       );
