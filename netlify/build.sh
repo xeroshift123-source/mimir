@@ -2,6 +2,7 @@
 set -e
 
 # Flutter 설치
+rm -rf flutter
 git clone https://github.com/flutter/flutter.git -b stable --depth 1
 export PATH="$PWD/flutter/bin:$PATH"
 
