@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'dart:html' as html;
 import 'dart:js_util' as js_util;
 
-import 'package:mimir/utils/clipboard_image.dart';
+import 'package:mimir/utils/image_clipboard_factory.dart';
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/models/nikke.dart';
 import 'package:mimir/providers/nikke_provider.dart';
@@ -231,6 +231,27 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     return byteData.buffer.asUint8List();
   }
 
+  Future<void> _copyFiveSquadsToClipboard() async {
+    try {
+      final Uint8List bytes = await _captureFiveSquadsPng();
+
+      final clipboard = getImageClipboard();
+      await clipboard.copyImage(bytes);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('클립보드에 이미지 복사 완료!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('클립보드 복사 실패: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _copyPngToClipboardWeb(Uint8List pngBytes) async {
     if (!kIsWeb) return;
 
@@ -396,28 +417,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                                 IconButton(
                                   tooltip: '클립보드에 복사',
                                   icon: const Icon(Icons.copy),
-                                  onPressed: () async {
-                                    try {
-                                      final bytes =
-                                          await _captureFiveSquadsPng();
-
-                                      final copied =
-                                          await copyPngImageToClipboard(bytes);
-
-                                      if (copied) {
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content:
-                                                    Text('클립보드에 이미지가 복사됐어!')),
-                                          );
-                                        }
-                                      }
-                                    } catch (e) {
-                                      debugPrint('캡쳐 실패: $e');
-                                    }
-                                  },
+                                  onPressed: _copyFiveSquadsToClipboard,
                                 ),
                               IconButton(
                                 icon: const Icon(Icons.close, size: 18),
