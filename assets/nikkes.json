@@ -33,7 +33,7 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Abnormal",
-    "ability": [],
+    "ability": ["웡줌마"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -59,7 +59,7 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["바니드"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -280,7 +280,7 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["빵순이"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -449,7 +449,7 @@
     "element": "Water",
     "weaponType": "MG",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["힐", "닌닌"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -501,7 +501,7 @@
     "element": "Water",
     "weaponType": "SG",
     "company": "Pilgrim",
-    "ability": [],
+    "ability": ["수로시"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -514,7 +514,7 @@
     "element": "Fire",
     "weaponType": "SG",
     "company": "Missilis",
-    "ability": [],
+    "ability": ["드황"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -566,7 +566,7 @@
     "element": "Water",
     "weaponType": "MG",
     "company": "Missilis",
-    "ability": [],
+    "ability": ["수레그"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -813,7 +813,7 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Elysion",
-    "ability": ["버스트 쿨타임 감소", "버쿨감"],
+    "ability": ["버스트 쿨타임 감소", "버쿨감", "수헬름"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1073,7 +1073,7 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["클이든"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1151,7 +1151,7 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["수어리"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1177,7 +1177,7 @@
     "element": "Water",
     "weaponType": "MG",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["메스트"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1268,7 +1268,7 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["바밀크"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1307,7 +1307,7 @@
     "element": "Fire",
     "weaponType": "MG",
     "company": "Pilgrim",
-    "ability": [],
+    "ability": ["모엥"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1567,7 +1567,7 @@
     "element": "Water",
     "weaponType": "AR",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["프바"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1580,7 +1580,7 @@
     "element": "Electric",
     "weaponType": "SG",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["메프바"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1749,7 +1749,7 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Pilgrim",
-    "ability": [],
+    "ability": ["레후"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1762,7 +1762,7 @@
     "element": "Fire",
     "weaponType": "MG",
     "company": "Abnormal",
-    "ability": [],
+    "ability": ["작레이"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1788,7 +1788,7 @@
     "element": "Wind",
     "weaponType": "MG",
     "company": "Abnormal",
-    "ability": [],
+    "ability": ["풍레이"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1827,7 +1827,7 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["수산나"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1918,7 +1918,7 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["수쿠라"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1931,7 +1931,7 @@
     "element": "Electric",
     "weaponType": "AR",
     "company": "Pilgrim",
-    "ability": [],
+    "ability": ["홍북이"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1944,7 +1944,7 @@
     "element": "Wind",
     "weaponType": "RL",
     "company": "Pilgrim",
-    "ability": [],
+    "ability": ["흑련"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1983,7 +1983,7 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Pilgrim",
-    "ability": ["스화"],
+    "ability": ["스화", "백설"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1996,7 +1996,7 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Pilgrim",
-    "ability": ["스화"],
+    "ability": ["스화", "농설"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -2022,7 +2022,7 @@
     "element": "Iron",
     "weaponType": "SG",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["바소다"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -2282,7 +2282,7 @@
     "element": "Fire",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["클디젤"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -2308,7 +2308,7 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Pilgrim",
-    "ability": ["스화"],
+    "ability": ["스화", "각설"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
