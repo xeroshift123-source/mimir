@@ -2312,5 +2312,18 @@
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
+  },
+  {
+    "id": "label",
+    "name": "레이블",
+    "imageUrl": "assets/nikke/label.webp",
+    "burst": "1",
+    "element": "Iron",
+    "weaponType": "AR",
+    "company": "Elysion",
+    "ability": ["보호막"],
+    "coolTime": 20,
+    "squadNum": 0,  
+    "rank": "SSR"
   }
 ]
