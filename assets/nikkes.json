@@ -2329,12 +2329,12 @@
   {
     "id": "velvet",
     "name": "벨벳",
-    "imageUrl": "assets/nikke/label.velvet",
+    "imageUrl": "assets/nikke/velvet.webp",
     "burst": "2",
     "element": "Wind",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["섹스"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
