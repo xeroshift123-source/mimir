@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Image.asset(
-                  "assets/images/raids/only_one.webp",
+                  "assets/images/raids/altruia.webp",
                   width: double.infinity,
                   height: 400,
                   fit: BoxFit.cover,
@@ -62,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                             border: Border.all(color: Colors.red.shade200),
                           ),
                           child: const Text(
-                            "SEASON 33",
+                            "SEASON 34",
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -73,7 +73,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      "온리 원 (Only One)",
+                      "앨트루이아",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -86,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                         Icon(Icons.schedule, size: 18, color: Colors.grey),
                         SizedBox(width: 6),
                         Text(
-                          "1/8(목) 12:00 ~ 1/15(목) 04:59",
+                          "2/19(목) 12:00 ~ 2/26(목) 04:59",
                           style: TextStyle(fontSize: 13, color: Colors.grey),
                         ),
                       ],
@@ -99,15 +99,15 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         _chip(
                           iconPath:
-                              "assets/icons/elements/icon-elements-Fire.webp",
+                              "assets/icons/elements/icon-elements-Electric.webp",
                           title: "보스 속성",
-                          value: "작열",
+                          value: "전격",
                         ),
                         _chip(
                           iconPath:
-                              "assets/icons/elements/icon-elements-Water.webp",
+                              "assets/icons/elements/icon-elements-Iron.webp",
                           title: "약점 속성",
-                          value: "수냉",
+                          value: "철갑",
                         ),
                       ],
                     ),

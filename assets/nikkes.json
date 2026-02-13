@@ -33,7 +33,7 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Abnormal",
-    "ability": ["웡줌마"],
+    "ability": ["웡줌마", "힐", "방어력 무시 데미지", "방무뎀"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -98,7 +98,7 @@
     "element": "Water",
     "weaponType": "SMG",
     "company": "Tetra",
-    "ability": ["버스트 재진입"],
+    "ability": ["버스트 재진입","바니스"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -124,7 +124,7 @@
     "element": "Water",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["힐"],
+    "ability": ["힐","메앵"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -150,7 +150,7 @@
     "element": "Electric",
     "weaponType": "SG",
     "company": "Tetra",
-    "ability": ["막탄"],
+    "ability": ["막탄","수니스"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -215,7 +215,7 @@
     "element": "Wind",
     "weaponType": "MG",
     "company": "Abnormal",
-    "ability": [],
+    "ability": ["받는데미지증가", "받뎀증"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -267,7 +267,7 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": ["힐"],
+    "ability": ["힐", "받는데미지증가", "받뎀증"],
     "coolTime": 60,
     "squadNum": 0,  
     "rank": "SSR"
@@ -280,7 +280,7 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["빵순이"],
+    "ability": ["빵순이","받는데미지증가", "받뎀증"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -540,7 +540,7 @@
     "element": "Electric",
     "weaponType": "SR",
     "company": "Missilis",
-    "ability": [],
+    "ability": ["방어력 무시 데미지", "방무뎀"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -605,7 +605,7 @@
     "element": "Fire",
     "weaponType": "MG",
     "company": "Elysion",
-    "ability": ["힐"],
+    "ability": ["힐","방어력 무시 데미지", "방무뎀", "받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -657,7 +657,7 @@
     "element": "Fire",
     "weaponType": "SR",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["방어력 무시 데미지", "방무뎀", "받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -670,7 +670,7 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Abnormal",
-    "ability": [],
+    "ability": ["받는데미지증가", "받뎀증"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -683,7 +683,7 @@
     "element": "Electric",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -722,7 +722,7 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["방어력 무시 데미지", "방무뎀"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -813,7 +813,7 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Elysion",
-    "ability": ["버스트 쿨타임 감소", "버쿨감", "수헬름"],
+    "ability": ["버스트 쿨타임 감소", "버쿨감", "수헬름", "받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -878,7 +878,7 @@
     "element": "Electric",
     "weaponType": "SG",
     "company": "Pilgrim",
-    "ability": [],
+    "ability": ["받는데미지증가", "받뎀증"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -891,7 +891,7 @@
     "element": "Iron",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1021,7 +1021,7 @@
     "element": "Wind",
     "weaponType": "SMG",
     "company": "Pilgrim",
-    "ability": ["버스트 쿨타임 감소", "버쿨감", "세이렌"],
+    "ability": ["버스트 쿨타임 감소", "버쿨감", "세이렌","받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1047,7 +1047,7 @@
     "element": "Water",
     "weaponType": "MG",
     "company": "Tetra",
-    "ability": ["클루드"],
+    "ability": ["클루드", "받는데미지증가", "받뎀증"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1411,7 +1411,7 @@
     "element": "Fire",
     "weaponType": "SMG",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1489,7 +1489,7 @@
     "element": "Iron",
     "weaponType": "SMG",
     "company": "Tetra",
-    "ability": [],
+    "ability": ["받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1788,7 +1788,7 @@
     "element": "Wind",
     "weaponType": "MG",
     "company": "Abnormal",
-    "ability": ["풍레이"],
+    "ability": ["풍레이","받는데미지증가", "받뎀증"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1827,7 +1827,7 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": ["수산나"],
+    "ability": ["수산나", "받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -1970,7 +1970,7 @@
     "element": "Electric",
     "weaponType": "AR",
     "company": "Missilis",
-    "ability": [],
+    "ability": ["받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -2191,7 +2191,7 @@
     "element": "Fire",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": [],
+    "ability": ["방어력 무시 데미지", "방무뎀"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -2282,7 +2282,7 @@
     "element": "Fire",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["클디젤"],
+    "ability": ["클디젤","받는데미지증가", "받뎀증"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -2295,7 +2295,7 @@
     "element": "Fire",
     "weaponType": "SG",
     "company": "Elysion",
-    "ability": ["클리드"],
+    "ability": ["클리드", "받는데미지증가", "받뎀증"],
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
@@ -2308,7 +2308,7 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Pilgrim",
-    "ability": ["스화", "각설"],
+    "ability": ["스화", "각설","받는데미지증가", "받뎀증"],
     "coolTime": 40,
     "squadNum": 0,  
     "rank": "SSR"
@@ -2325,5 +2325,57 @@
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SSR"
+  },
+  {
+    "id": "velvet",
+    "name": "벨벳",
+    "imageUrl": "assets/nikke/label.velvet",
+    "burst": "2",
+    "element": "Wind",
+    "weaponType": "SR",
+    "company": "Tetra",
+    "ability": [],
+    "coolTime": 20,
+    "squadNum": 0,  
+    "rank": "SSR"
+  },
+  {
+    "id": "chisato",
+    "name": "치사토",
+    "imageUrl": "assets/nikke/chisato.webp",
+    "burst": "3",
+    "element": "Iron",
+    "weaponType": "SMG",
+    "company": "Abnormal",
+    "ability": ["방어력 무시 데미지", "방무뎀"],
+    "coolTime": 40,
+    "squadNum": 0,  
+    "rank": "SSR"
+  },
+  {
+    "id": "takina",
+    "name": "타키나",
+    "imageUrl": "assets/nikke/takina.webp",
+    "burst": "2",
+    "element": "Iron",
+    "weaponType": "SR",
+    "company": "Abnormal",
+    "ability": ["방어력 무시 데미지", "방무뎀","받는데미지증가", "받뎀증"],
+    "coolTime": 20,
+    "squadNum": 0,  
+    "rank": "SSR"
+  },
+  {
+    "id": "kurumi",
+    "name": "쿠루미",
+    "imageUrl": "assets/nikke/kurumi.webp",
+    "burst": "1",
+    "element": "Iron",
+    "weaponType": "SR",
+    "company": "Abnormal",
+    "ability": [],
+    "coolTime": 20,
+    "squadNum": 0,  
+    "rank": "SR"
   }
 ]
