@@ -210,14 +210,8 @@ class HomeScreen extends StatelessWidget {
                         flex: 1,
                         child: SizedBox(
                           height: 56,
-                          child: OutlinedButton.icon(
+                          child: OutlinedButton(
                             onPressed: () => _openCalculator(context),
-                            icon: const Icon(Icons.calculate_outlined),
-                            label: const Text(
-                              "계산기",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600),
-                            ),
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(
                                   color: Colors.orange, width: 1.5),
@@ -225,6 +219,11 @@ class HomeScreen extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
+                            ),
+                            child: const Text(
+                              "계산기",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ),
