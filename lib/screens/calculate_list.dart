@@ -213,7 +213,7 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
       children: [
         const Divider(height: 24),
         _buildCharacterInputRow(
-          label: "에이다 윙",
+          label: "에이다",
           imagePath: "assets/nikke/ada.webp",
           color: Colors.orange,
           atkCtrl: _adaAtkController,
@@ -360,7 +360,7 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
                   fontSize: 13,
                   color: Colors.black87)),
           const SizedBox(height: 10),
-          _resRow("에이다 윙", _formatter.format(adaVal.toInt()), adaStronger,
+          _resRow("에이다", _formatter.format(adaVal.toInt()), adaStronger,
               Colors.orange),
           const SizedBox(height: 4),
           _resRow("아인", _formatter.format(einVal.toInt()), !adaStronger,
