@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/deck_builder.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -168,17 +169,24 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+// ✅ 계산기 화면으로 이동 (가상의 routeName 사용)
+  void _openCalculator(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CalculateListScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "니케 솔레 덱 편집기",
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
+          "니케 덱 빌딩 도우미 MIMIR!",
+          style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
         ),
         backgroundColor: Colors.orange,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -190,18 +198,62 @@ class HomeScreen extends StatelessWidget {
                 // ✅ 레이드 요약 영역
                 _buildRaidSummaryCard(context),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 32), // 간격을 조금 더 넓혔습니다.
 
-                // ✅ 기존 버튼 (더 존재감 있게)
-                SizedBox(
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () => _openDeckBuilder(context),
-                    child: const Text(
-                      "덱 구성 시작하기",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                    ),
+                // ✅ 버튼 그룹 (계산기 & 덱 구성)
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Row(
+                    children: [
+                      // 🧮 계산기 버튼 (조금 더 보조적인 느낌)
+                      Expanded(
+                        flex: 1,
+                        child: SizedBox(
+                          height: 56,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _openCalculator(context),
+                            icon: const Icon(Icons.calculate_outlined),
+                            label: const Text(
+                              "계산기",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                  color: Colors.orange, width: 1.5),
+                              foregroundColor: Colors.orange,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // ⚔️ 덱 구성 시작 버튼 (메인 액션)
+                      Expanded(
+                        flex: 2, // 메인 버튼을 더 넓게 설정
+                        child: SizedBox(
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: () => _openDeckBuilder(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              "덱 구성 시작",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
