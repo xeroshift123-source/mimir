@@ -165,11 +165,27 @@ class ScarletLibCalculatorForm extends StatelessWidget {
   const ScarletLibCalculatorForm({super.key});
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 20),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
       child: Center(
-          child:
-              Text("추후 추가 예정입니다...ㅎㅎ;;", style: TextStyle(color: Colors.grey))),
+        child: Column(
+          children: [
+            Image.asset(
+              "assets/nikke/naga.webp",
+              width: double.infinity,
+              height: 400,
+              fit: BoxFit.cover,
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+            const Text(
+              "추후 추가 예정입니다...ㅎㅎ;;\n여긴 나가주세요",
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
