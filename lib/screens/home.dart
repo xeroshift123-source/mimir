@@ -45,7 +45,7 @@ class HomeScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          "현재 솔로 레이드",
+                          "마지막 솔로 레이드",
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -89,8 +89,9 @@ class HomeScreen extends StatelessWidget {
                         Text(
                           "2/19(목) 12:00 ~ 2/26(목) 04:59",
                           style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.red), //color: Colors.grey),
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
