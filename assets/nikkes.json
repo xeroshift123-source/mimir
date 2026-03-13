@@ -2377,5 +2377,18 @@
     "coolTime": 20,
     "squadNum": 0,  
     "rank": "SR"
+  },
+  {
+    "id": "eh",
+    "name": "E.H.",
+    "imageUrl": "assets/nikke/eh.webp",
+    "burst": "3",
+    "element": "Wind",
+    "weaponType": "SMG",
+    "company": "Elysion",
+    "ability": ["EH","eh","두쫀쿠","엘리시온하퍼"],
+    "coolTime": 40,
+    "squadNum": 0,  
+    "rank": "SSR"
   }
 ]
