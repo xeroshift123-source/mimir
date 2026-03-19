@@ -2392,9 +2392,9 @@
     "rank": "SSR"
   },
   {
-    "id": "arcana_fortue_mate",
+    "id": "arcana_fortune_mate",
     "name": "아르카나 : 포츈 메이트",
-    "imageUrl": "assets/nikke/arcana_fortue_mate.webp",
+    "imageUrl": "assets/nikke/arcana_fortune_mate.webp",
     "burst": "2",
     "element": "Fire",
     "weaponType": "SG",
