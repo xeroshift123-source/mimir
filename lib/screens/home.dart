@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Image.asset(
-                  "assets/images/raids/ddugi.png",
+                  "assets/images/raids/wigobi.png",
                   width: double.infinity,
                   height: 400,
                   fit: BoxFit.cover,
@@ -63,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                             border: Border.all(color: Colors.red.shade200),
                           ),
                           child: const Text(
-                            "SEASON 35",
+                            "SEASON 36",
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -74,7 +74,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      "크리스탈 체임버",
+                      "에고비스타",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -87,7 +87,7 @@ class HomeScreen extends StatelessWidget {
                         Icon(Icons.schedule, size: 18, color: Colors.grey),
                         SizedBox(width: 6),
                         Text(
-                          "3/20(금) 12:00 ~ 3/27(금) 4:59",
+                          "4/30(목) 12:00 ~ 5/07(목) 4:59",
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.grey,
@@ -103,15 +103,15 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         _chip(
                           iconPath:
-                              "assets/icons/elements/icon-elements-Wind.webp",
+                              "assets/icons/elements/icon-elements-Water.webp",
                           title: "보스 속성",
-                          value: "풍압",
+                          value: "수냉",
                         ),
                         _chip(
                           iconPath:
-                              "assets/icons/elements/icon-elements-Fire.webp",
+                              "assets/icons/elements/icon-elements-Electric.webp",
                           title: "약점 속성",
-                          value: "작열",
+                          value: "전격",
                         ),
                       ],
                     ),
