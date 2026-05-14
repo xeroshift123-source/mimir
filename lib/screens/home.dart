@@ -45,7 +45,7 @@ class HomeScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          "다음 솔로 레이드",
+                          "지난 솔로 레이드",
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
