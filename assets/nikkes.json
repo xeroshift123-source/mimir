@@ -9,7 +9,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -22,7 +22,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -33,9 +33,16 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Abnormal",
-    "ability": ["웡줌마", "힐", "방어력 무시 데미지", "방무뎀","시전자 기준 공격력","시공증"],
+    "ability": [
+      "웡줌마",
+      "힐",
+      "방어력 무시 데미지",
+      "방무뎀",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -48,7 +55,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 0,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -59,9 +66,15 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["바니드","시전자 기준 공격력","시공증","관통뎀","관통데미지"],
+    "ability": [
+      "바니드",
+      "시전자 기준 공격력",
+      "시공증",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -74,7 +87,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -85,9 +98,12 @@
     "element": "Fire",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -98,9 +114,12 @@
     "element": "Water",
     "weaponType": "SMG",
     "company": "Tetra",
-    "ability": ["버스트 재진입","바니스"],
+    "ability": [
+      "버스트 재진입",
+      "바니스"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -113,7 +132,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -124,9 +143,14 @@
     "element": "Water",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["힐","메앵","시전자 기준 공격력", "시공증"],
+    "ability": [
+      "힐",
+      "메앵",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -139,7 +163,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -150,9 +174,14 @@
     "element": "Electric",
     "weaponType": "SG",
     "company": "Tetra",
-    "ability": ["막탄","수니스","시전자 기준 공격력","시공증"],
+    "ability": [
+      "막탄",
+      "수니스",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -165,7 +194,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 60,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -176,9 +205,15 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["버스트 쿨타임 감소", "버쿨감","정실","시전자 기준 공격력", "시공증"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감",
+      "정실",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -191,7 +226,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -202,9 +237,13 @@
     "element": "Fire",
     "weaponType": "AR",
     "company": "Abnormal",
-    "ability": ["관통뎀","관통데미지","작스카"],
+    "ability": [
+      "관통뎀",
+      "관통데미지",
+      "작스카"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -215,9 +254,13 @@
     "element": "Wind",
     "weaponType": "MG",
     "company": "Abnormal",
-    "ability": ["받는데미지증가", "받뎀증","풍스카"],
+    "ability": [
+      "받는데미지증가",
+      "받뎀증",
+      "풍스카"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -230,7 +273,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -243,7 +286,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -256,7 +299,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -267,9 +310,13 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": ["힐", "받는데미지증가", "받뎀증"],
+    "ability": [
+      "힐",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 60,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -280,9 +327,13 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["빵순이","받는데미지증가", "받뎀증"],
+    "ability": [
+      "빵순이",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -295,7 +346,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -308,7 +359,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -319,9 +370,13 @@
     "element": "Iron",
     "weaponType": "SMG",
     "company": "Pilgrim",
-    "ability": ["버스트 재진입","시전자 기준 공격력","시공증"],
+    "ability": [
+      "버스트 재진입",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -332,9 +387,11 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Pilgrim",
-    "ability": ["렐루"],
+    "ability": [
+      "렐루"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -347,7 +404,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -358,9 +415,12 @@
     "element": "Electric",
     "weaponType": "MG",
     "company": "Tetra",
-    "ability": ["시전자 기준 공격력", "시공증"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -373,7 +433,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -386,7 +446,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -397,9 +457,15 @@
     "element": "Iron",
     "weaponType": "MG",
     "company": "Pilgrim",
-    "ability": ["시전자 기준 공격력", "시공증", "방어막","도발","무적"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증",
+      "방어막",
+      "도발",
+      "무적"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -412,7 +478,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -425,7 +491,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -438,7 +504,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -449,9 +515,12 @@
     "element": "Water",
     "weaponType": "MG",
     "company": "Elysion",
-    "ability": ["힐", "닌닌"],
+    "ability": [
+      "힐",
+      "닌닌"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -462,9 +531,12 @@
     "element": "Wind",
     "weaponType": "MG",
     "company": "Elysion",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -475,9 +547,12 @@
     "element": "Wind",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["버스트 쿨타임 감소", "버쿨감"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -488,9 +563,15 @@
     "element": "Water",
     "weaponType": "AR",
     "company": "Pilgrim",
-    "ability": ["버스트 쿨타임 감소", "버쿨감", "막탄","관통뎀","관통데미지"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감",
+      "막탄",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -501,9 +582,14 @@
     "element": "Water",
     "weaponType": "SG",
     "company": "Pilgrim",
-    "ability": ["수로시","관통뎀","관통데미지","펠릿"],
+    "ability": [
+      "수로시",
+      "관통뎀",
+      "관통데미지",
+      "펠릿"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -514,9 +600,11 @@
     "element": "Fire",
     "weaponType": "SG",
     "company": "Missilis",
-    "ability": ["드황"],
+    "ability": [
+      "드황"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -527,9 +615,19 @@
     "element": "Fire",
     "weaponType": "SR",
     "company": "Elysion",
-    "ability": ["버스트 쿨타임 감소", "버쿨감", "동디", "동D", "내아내임","시전자 기준 공격력", "시공증","관통뎀","관통데미지"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감",
+      "동디",
+      "동D",
+      "내아내임",
+      "시전자 기준 공격력",
+      "시공증",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -540,9 +638,12 @@
     "element": "Electric",
     "weaponType": "SR",
     "company": "Missilis",
-    "ability": ["방어력 무시 데미지", "방무뎀"],
+    "ability": [
+      "방어력 무시 데미지",
+      "방무뎀"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -553,9 +654,12 @@
     "element": "Electric",
     "weaponType": "MG",
     "company": "Missilis",
-    "ability": ["시전자 기준 공격력","시공증"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -566,9 +670,13 @@
     "element": "Water",
     "weaponType": "MG",
     "company": "Missilis",
-    "ability": ["수레그","시전자 기준 공격력","시공증"],
+    "ability": [
+      "수레그",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -581,7 +689,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -594,7 +702,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -605,9 +713,17 @@
     "element": "Fire",
     "weaponType": "MG",
     "company": "Elysion",
-    "ability": ["힐","방어력 무시 데미지", "방무뎀", "받는데미지증가", "받뎀증","시전자 기준 공격력", "시공증"],
+    "ability": [
+      "힐",
+      "방어력 무시 데미지",
+      "방무뎀",
+      "받는데미지증가",
+      "받뎀증",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -620,7 +736,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -633,7 +749,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -646,7 +762,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -657,9 +773,14 @@
     "element": "Fire",
     "weaponType": "SR",
     "company": "Elysion",
-    "ability": ["방어력 무시 데미지", "방무뎀", "받는데미지증가", "받뎀증"],
+    "ability": [
+      "방어력 무시 데미지",
+      "방무뎀",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -670,9 +791,12 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Abnormal",
-    "ability": ["받는데미지증가", "받뎀증"],
+    "ability": [
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -683,9 +807,14 @@
     "element": "Electric",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["받는데미지증가", "받뎀증","시전자 기준 공격력", "시공증"],
+    "ability": [
+      "받는데미지증가",
+      "받뎀증",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -698,7 +827,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -711,7 +840,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -722,9 +851,12 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["방어력 무시 데미지", "방무뎀"],
+    "ability": [
+      "방어력 무시 데미지",
+      "방무뎀"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -735,9 +867,13 @@
     "element": "Fire",
     "weaponType": "AR",
     "company": "Pilgrim",
-    "ability": ["버스트 충전","관통뎀","관통데미지"],
+    "ability": [
+      "버스트 충전",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -750,7 +886,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -761,9 +897,12 @@
     "element": "Water",
     "weaponType": "AR",
     "company": "Elysion",
-    "ability": ["시전자 기준 공격력", "시공증"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -776,7 +915,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -787,9 +926,12 @@
     "element": "Electric",
     "weaponType": "SR",
     "company": "Pilgrim",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -800,9 +942,13 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Elysion",
-    "ability": ["힐","버스트 충전","방최창"],
+    "ability": [
+      "힐",
+      "버스트 충전",
+      "방최창"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -813,9 +959,15 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Elysion",
-    "ability": ["버스트 쿨타임 감소", "버쿨감", "수헬름", "받는데미지증가", "받뎀증"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감",
+      "수헬름",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -828,7 +980,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -841,7 +993,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -854,7 +1006,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -867,7 +1019,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -878,9 +1030,12 @@
     "element": "Electric",
     "weaponType": "SG",
     "company": "Pilgrim",
-    "ability": ["받는데미지증가", "받뎀증"],
+    "ability": [
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -891,9 +1046,12 @@
     "element": "Iron",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["받는데미지증가", "받뎀증"],
+    "ability": [
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -906,7 +1064,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -919,7 +1077,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -930,9 +1088,11 @@
     "element": "Electric",
     "weaponType": "SMG",
     "company": "Elysion",
-    "ability": ["막탄"],
+    "ability": [
+      "막탄"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -945,7 +1105,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -956,9 +1116,12 @@
     "element": "Iron",
     "weaponType": "RL",
     "company": "Missilis",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -971,7 +1134,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -982,9 +1145,11 @@
     "element": "Wind",
     "weaponType": "SR",
     "company": "Pilgrim",
-    "ability": ["리버렐루"],
+    "ability": [
+      "리버렐루"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -997,7 +1162,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1008,9 +1173,12 @@
     "element": "Iron",
     "weaponType": "SMG",
     "company": "Missilis",
-    "ability": ["버스트 쿨타임 감소", "버쿨감"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1021,9 +1189,15 @@
     "element": "Wind",
     "weaponType": "SMG",
     "company": "Pilgrim",
-    "ability": ["버스트 쿨타임 감소", "버쿨감", "세이렌","받는데미지증가", "받뎀증"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감",
+      "세이렌",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1036,7 +1210,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1047,9 +1221,13 @@
     "element": "Water",
     "weaponType": "MG",
     "company": "Tetra",
-    "ability": ["클루드", "받는데미지증가", "받뎀증"],
+    "ability": [
+      "클루드",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1062,7 +1240,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1073,9 +1251,13 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["클이든","시전자 기준 공격력", "시공증"],
+    "ability": [
+      "클이든",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1086,9 +1268,12 @@
     "element": "Water",
     "weaponType": "SMG",
     "company": "Abnormal",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1099,9 +1284,11 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Missilis",
-    "ability": ["힐"],
+    "ability": [
+      "힐"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1112,9 +1299,11 @@
     "element": "Iron",
     "weaponType": "SG",
     "company": "Elysion",
-    "ability": ["힐"],
+    "ability": [
+      "힐"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1125,9 +1314,14 @@
     "element": "Electric",
     "weaponType": "SR",
     "company": "Abnormal",
-    "ability": ["시전자 기준 공격력", "시공증","관통뎀","관통데미지"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1140,7 +1334,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1151,9 +1345,11 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["수어리"],
+    "ability": [
+      "수어리"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1166,7 +1362,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1177,9 +1373,13 @@
     "element": "Water",
     "weaponType": "MG",
     "company": "Elysion",
-    "ability": ["메스트","시공증", "시전자 기준 공격력"],
+    "ability": [
+      "메스트",
+      "시공증",
+      "시전자 기준 공격력"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1190,9 +1390,12 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Missilis",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1205,7 +1408,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1216,9 +1419,12 @@
     "element": "Iron",
     "weaponType": "SMG",
     "company": "Tetra",
-    "ability": ["시전자 기준 공격력","시공증"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1231,7 +1437,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1244,7 +1450,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1255,9 +1461,12 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1268,9 +1477,13 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["바밀크","관통뎀","관통데미지"],
+    "ability": [
+      "바밀크",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1283,7 +1496,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1296,7 +1509,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1307,9 +1520,11 @@
     "element": "Fire",
     "weaponType": "MG",
     "company": "Pilgrim",
-    "ability": ["모엥"],
+    "ability": [
+      "모엥"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1320,9 +1535,13 @@
     "element": "Electric",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": ["시전자 기준 공격력","시공증","도발"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증",
+      "도발"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1335,7 +1554,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1348,7 +1567,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1359,9 +1578,15 @@
     "element": "Electric",
     "weaponType": "SG",
     "company": "Missilis",
-    "ability": ["힐","시전자 기준 공격력","시공증","관통뎀","관통데미지"],
+    "ability": [
+      "힐",
+      "시전자 기준 공격력",
+      "시공증",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1372,9 +1597,13 @@
     "element": "Wind",
     "weaponType": "SMG",
     "company": "Pilgrim",
-    "ability": ["힐","시전자 기준 공격력","시공증"],
+    "ability": [
+      "힐",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1387,7 +1616,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1400,7 +1629,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1411,9 +1640,12 @@
     "element": "Fire",
     "weaponType": "SMG",
     "company": "Tetra",
-    "ability": ["받는데미지증가", "받뎀증"],
+    "ability": [
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1426,7 +1658,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1437,9 +1669,12 @@
     "element": "Fire",
     "weaponType": "SR",
     "company": "Pilgrim",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1452,7 +1687,7 @@
     "company": "Pilgrim",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1463,9 +1698,12 @@
     "element": "Wind",
     "weaponType": "SG",
     "company": "Tetra",
-    "ability": ["시전자 기준 공격력","시공증"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1478,7 +1716,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1489,9 +1727,12 @@
     "element": "Iron",
     "weaponType": "SMG",
     "company": "Tetra",
-    "ability": ["받는데미지증가", "받뎀증"],
+    "ability": [
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1504,7 +1745,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1517,7 +1758,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1530,7 +1771,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1543,7 +1784,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1556,7 +1797,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1567,9 +1808,11 @@
     "element": "Water",
     "weaponType": "AR",
     "company": "Elysion",
-    "ability": ["프바"],
+    "ability": [
+      "프바"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1580,9 +1823,11 @@
     "element": "Electric",
     "weaponType": "SG",
     "company": "Elysion",
-    "ability": ["메프바"],
+    "ability": [
+      "메프바"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1595,7 +1840,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -1608,7 +1853,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -1621,7 +1866,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -1634,7 +1879,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1647,7 +1892,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1660,7 +1905,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1673,7 +1918,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1686,7 +1931,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1697,9 +1942,14 @@
     "element": "Fire",
     "weaponType": "MG",
     "company": "Elysion",
-    "ability": ["버스트 쿨타임 감소", "버쿨감","시전자 기준 공격력","시공증"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1710,9 +1960,11 @@
     "element": "Iron",
     "weaponType": "RL",
     "company": "Pilgrim",
-    "ability": ["힐"],
+    "ability": [
+      "힐"
+    ],
     "coolTime": 60,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1725,7 +1977,7 @@
     "company": "Pilgrim",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1738,7 +1990,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1749,9 +2001,17 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Pilgrim",
-    "ability": ["레후","관통뎀","관통데미지","시공증","시전자 기준 공격력","버쿨감","버스트 쿨타임 감소"],
-    "coolTime": 40, 
-    "squadNum": 0,  
+    "ability": [
+      "레후",
+      "관통뎀",
+      "관통데미지",
+      "시공증",
+      "시전자 기준 공격력",
+      "버쿨감",
+      "버스트 쿨타임 감소"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1762,9 +2022,11 @@
     "element": "Fire",
     "weaponType": "MG",
     "company": "Abnormal",
-    "ability": ["작레이"],
+    "ability": [
+      "작레이"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1777,7 +2039,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1788,9 +2050,15 @@
     "element": "Wind",
     "weaponType": "MG",
     "company": "Abnormal",
-    "ability": ["풍레이","받는데미지증가", "받뎀증","시전자 기준 공격력","시공증"],
+    "ability": [
+      "풍레이",
+      "받는데미지증가",
+      "받뎀증",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1803,7 +2071,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1816,7 +2084,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1827,9 +2095,13 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": ["수산나", "받는데미지증가", "받뎀증"],
+    "ability": [
+      "수산나",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1840,9 +2112,15 @@
     "element": "Electric",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["버스트 쿨타임 감소", "버쿨감","시전자 기준 공격력","시공증","힐"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감",
+      "시전자 기준 공격력",
+      "시공증",
+      "힐"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1855,7 +2133,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1868,7 +2146,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1881,7 +2159,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1894,7 +2172,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -1905,9 +2183,12 @@
     "element": "Fire",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["버스트 쿨타임 감소", "버쿨감"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1918,9 +2199,11 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": ["수쿠라"],
+    "ability": [
+      "수쿠라"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1931,9 +2214,11 @@
     "element": "Electric",
     "weaponType": "AR",
     "company": "Pilgrim",
-    "ability": ["홍북이"],
+    "ability": [
+      "홍북이"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1944,9 +2229,11 @@
     "element": "Wind",
     "weaponType": "RL",
     "company": "Pilgrim",
-    "ability": ["흑련"],
+    "ability": [
+      "흑련"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1959,7 +2246,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1970,9 +2257,12 @@
     "element": "Electric",
     "weaponType": "AR",
     "company": "Missilis",
-    "ability": ["받는데미지증가", "받뎀증"],
+    "ability": [
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1983,9 +2273,14 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Pilgrim",
-    "ability": ["스화", "백설","관통뎀","관통데미지"],
+    "ability": [
+      "스화",
+      "백설",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -1996,9 +2291,12 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Pilgrim",
-    "ability": ["스화", "농설"],
+    "ability": [
+      "스화",
+      "농설"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2011,7 +2309,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2022,9 +2320,11 @@
     "element": "Iron",
     "weaponType": "SG",
     "company": "Tetra",
-    "ability": ["바소다"],
+    "ability": [
+      "바소다"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2037,7 +2337,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -2050,7 +2350,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -2063,7 +2363,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0, 
+    "squadNum": 0,
     "rank": "R"
   },
   {
@@ -2076,7 +2376,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2087,9 +2387,12 @@
     "element": "Water",
     "weaponType": "SG",
     "company": "Elysion",
-    "ability": ["버스트 쿨타임 감소", "버쿨감"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2100,9 +2403,13 @@
     "element": "Wind",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["시전자 기준 공격력","시공증","힐"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증",
+      "힐"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2115,7 +2422,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2126,9 +2433,13 @@
     "element": "Iron",
     "weaponType": "RL",
     "company": "Tetra",
-    "ability": ["버스트 재진입","도발","방어막"],
+    "ability": [
+      "버스트 재진입",
+      "도발",
+      "방어막"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2139,9 +2450,12 @@
     "element": "Water",
     "weaponType": "AR",
     "company": "Missilis",
-    "ability": ["시전자 기준 공격력","시공증"],
+    "ability": [
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2154,7 +2468,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2167,7 +2481,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2180,7 +2494,7 @@
     "company": "Elysion",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2191,9 +2505,12 @@
     "element": "Fire",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["방어력 무시 데미지", "방무뎀"],
+    "ability": [
+      "방어력 무시 데미지",
+      "방무뎀"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2206,7 +2523,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2217,9 +2534,12 @@
     "element": "Wind",
     "weaponType": "SMG",
     "company": "Tetra",
-    "ability": ["버스트 쿨타임 감소", "버쿨감"],
+    "ability": [
+      "버스트 쿨타임 감소",
+      "버쿨감"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2232,7 +2552,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2245,7 +2565,7 @@
     "company": "Tetra",
     "ability": [],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2258,7 +2578,7 @@
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2269,9 +2589,12 @@
     "element": "Electric",
     "weaponType": "SG",
     "company": "Elysion",
-    "ability": ["관통뎀","관통데미지"],
+    "ability": [
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2282,9 +2605,13 @@
     "element": "Fire",
     "weaponType": "RL",
     "company": "Elysion",
-    "ability": ["클디젤","받는데미지증가", "받뎀증"],
+    "ability": [
+      "클디젤",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2295,9 +2622,15 @@
     "element": "Fire",
     "weaponType": "SG",
     "company": "Elysion",
-    "ability": ["클리드", "받는데미지증가", "받뎀증","시전자 기준 공격력","시공증"],
+    "ability": [
+      "클리드",
+      "받는데미지증가",
+      "받뎀증",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2308,9 +2641,16 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Pilgrim",
-    "ability": ["스화", "각설","받는데미지증가", "받뎀증","관통뎀","관통데미지"],
+    "ability": [
+      "스화",
+      "각설",
+      "받는데미지증가",
+      "받뎀증",
+      "관통뎀",
+      "관통데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2321,9 +2661,11 @@
     "element": "Iron",
     "weaponType": "AR",
     "company": "Elysion",
-    "ability": ["보호막"],
+    "ability": [
+      "보호막"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2334,9 +2676,13 @@
     "element": "Wind",
     "weaponType": "SR",
     "company": "Tetra",
-    "ability": ["섹스","시전자 기준 공격력","시공증"],
+    "ability": [
+      "섹스",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2347,9 +2693,12 @@
     "element": "Iron",
     "weaponType": "SMG",
     "company": "Abnormal",
-    "ability": ["방어력 무시 데미지", "방무뎀"],
+    "ability": [
+      "방어력 무시 데미지",
+      "방무뎀"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2360,9 +2709,14 @@
     "element": "Iron",
     "weaponType": "SR",
     "company": "Abnormal",
-    "ability": ["방어력 무시 데미지", "방무뎀","받는데미지증가", "받뎀증"],
+    "ability": [
+      "방어력 무시 데미지",
+      "방무뎀",
+      "받는데미지증가",
+      "받뎀증"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2375,7 +2729,7 @@
     "company": "Abnormal",
     "ability": [],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SR"
   },
   {
@@ -2386,9 +2740,14 @@
     "element": "Wind",
     "weaponType": "SMG",
     "company": "Elysion",
-    "ability": ["EH","eh","두쫀쿠","엘리시온하퍼"],
+    "ability": [
+      "EH",
+      "eh",
+      "두쫀쿠",
+      "엘리시온하퍼"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2399,9 +2758,19 @@
     "element": "Fire",
     "weaponType": "SG",
     "company": "Elysion",
-    "ability": ["불알","정실","교르카나","작르카나","교복","시전자 기준 공격력","시공증","탄충","펠릿"],
+    "ability": [
+      "불알",
+      "정실",
+      "교르카나",
+      "작르카나",
+      "교복",
+      "시전자 기준 공격력",
+      "시공증",
+      "탄충",
+      "펠릿"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2412,9 +2781,12 @@
     "element": "Water",
     "weaponType": "SR",
     "company": "Missilis",
-    "ability": ["마망","힐"],
+    "ability": [
+      "마망",
+      "힐"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2425,9 +2797,18 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Tetra",
-    "ability": ["돌니스","버스트 재진입","버쿨감","버스트 충전","시전자 기준 공격력","시공증","힐","폭발"],
+    "ability": [
+      "돌니스",
+      "버스트 재진입",
+      "버쿨감",
+      "버스트 충전",
+      "시전자 기준 공격력",
+      "시공증",
+      "힐",
+      "폭발데미지"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2438,22 +2819,27 @@
     "element": "Electric",
     "weaponType": "RL",
     "company": "Missilis",
-    "ability": ["네오네온"],
+    "ability": [
+      "네오네온"
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
     "id": "mint",
     "name": "민트",
-    "imageUrl": "assets/nikke/mint.png",
+    "imageUrl": "assets/nikke/mint.webp",
     "burst": "2",
     "element": "Iron",
     "weaponType": "RL",
     "company": "Tetra",
-    "ability": ["시공증","폭발"],
+    "ability": [
+      "시공증",
+      "폭발데미지"
+    ],
     "coolTime": 20,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   },
   {
@@ -2464,9 +2850,11 @@
     "element": "Water",
     "weaponType": "RL",
     "company": "Tetra",
-    "ability": [""],
+    "ability": [
+      ""
+    ],
     "coolTime": 40,
-    "squadNum": 0,  
+    "squadNum": 0,
     "rank": "SSR"
   }
 ]
