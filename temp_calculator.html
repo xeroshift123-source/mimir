@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리버렐리오 계산기</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>리버렐리오 버프 대상 계산기</h1>
+        <div class="character-section">
+            <h2>리버렐리오</h2>
+            <div class="input-group">
+                <label>기본 공격력</label>
+                <input type="number" id="reverberio-base" placeholder="예: 10000" min="0">
+            </div>
+            <div class="input-group">
+                <label>장비 오버로드 수치 합 (%)</label>
+                <input type="number" id="reverberio-equipment" placeholder="예: 30" min="0" step="0.01">
+            </div>
+        </div>
+
+        <div class="character-section">
+            <h2>흑련</h2>
+            <div class="input-group">
+                <label>기본 공격력</label>
+                <input type="number" id="blacklotus-base" placeholder="예: 10000" min="0">
+            </div>
+            <div class="input-group">
+                <label>장비 오버로드 수치 합 (%)</label>
+                <input type="number" id="blacklotus-equipment" placeholder="예: 30" min="0" step="0.01">
+            </div>
+        </div>
+
+        <div class="buffer-section">
+            <h2>버퍼 설정</h2>
+            <div class="checkbox-group">
+                <input type="checkbox" id="rita-check">
+                <label for="rita-check">리타 사용 (공격력 +80.42%)</label>
+            </div>
+           <div class="checkbox-group">
+                <input type="checkbox" id="crown-check">
+                <label for="crown-check">크라운 사용 (흑련에게 시공증 +64.51%, 선흑련 첫버스트 한정)</label>
+            </div>
+            <div>
+                <label>크라운 체크해서 안되면<br>
+                    1. 크라운 안쓸 때도 흑련이 먹는지 확인 (여전히 리버렐리오가 먹는다 > ㅈ됨. 돈 박아야함)
+                    <br>
+                    2. 그게 아니라면 리버렐리오를 선버하던가, 흑련 선버스트했을 때만 손해보면 됨<br>
+                    근데 어차피 어지간하면 마앵이랑 같이 쓸 걸?
+                </label>
+            </div>
+            <div class="crown-input" id="crown-input-div">
+                <div class="input-group">
+                    <label>크라운 공격력</label>
+                    <input type="number" id="crown-attack" placeholder="예: 8000" min="0">
+                </div>
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculate()">계산하기</button>
+
+        <div class="result" id="result">
+            <h3>계산 결과</h3>
+            <div class="result-detail">
+                <strong>리버렐리오 최종 공격력:</strong> <span id="reverberio-final">0</span>
+            </div>
+            <div class="result-detail">
+                <strong>흑련 최종 공격력:</strong> <span id="blacklotus-final">0</span>
+            </div>
+            <div class="winner" id="winner-text"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
+

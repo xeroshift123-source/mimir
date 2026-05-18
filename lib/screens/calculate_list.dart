@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mimir/widgets/ein_ada_form.dart';
 import 'package:mimir/widgets/nayuta_helm_form.dart';
+import 'package:mimir/widgets/scarlet_lib_form.dart';
 
 class CalculateListScreen extends StatefulWidget {
   static const routeName = '/calculate-list';
@@ -161,31 +162,3 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
   }
 }
 
-class ScarletLibCalculatorForm extends StatelessWidget {
-  const ScarletLibCalculatorForm({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Center(
-        child: Column(
-          children: [
-            Image.asset(
-              "assets/nikke/naga.webp",
-              width: double.infinity,
-              height: 400,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            const Text(
-              "추후 추가 예정입니다...ㅎㅎ;;\n여긴 나가주세요",
-              style: TextStyle(color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

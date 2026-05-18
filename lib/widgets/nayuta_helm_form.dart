@@ -30,6 +30,7 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
   bool extraHasMiranda = false;
 
   String resultMessage = "수치를 입력하고 계산하기를 눌러주세요.";
+  String needOverloadMessage = "";
   bool isError = false;
   final NumberFormat _formatter = NumberFormat('#,###');
 
@@ -104,15 +105,32 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       }
 
       if (maxAtk == resNayutaFinal) {
-        resultMessage = "✅ 정상: 나유타의 최종 공격력이 가장 높습니다.";
         isError = false;
+        double secondMaxAtk = resHelmFinal;
+        String secondRival = "헬름";
+        double secondRivalBase = hBase;
+        
+        if (_extraNikkeType != null && resExtraFinal > resHelmFinal) {
+          secondMaxAtk = resExtraFinal;
+          secondRival = (_extraNikkeType == 'clud') ? "클루드" : "일반 니케";
+          secondRivalBase = eBase;
+        }
+
+        double margin = resNayutaFinal - secondMaxAtk;
+        double nayutaAllowedDecrease = (margin / nBase) * 100;
+        double rivalAllowedIncrease = (margin / secondRivalBase) * 100;
+
+        resultMessage = "✅ 정상: 나유타의 최종 공격력이 가장 높습니다.";
+        needOverloadMessage = "💡 현재 상태 기준 여유 수치\n"
+            "• 나유타 오버공증: ${nayutaAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
+            "• $secondRival 오버공증: ${rivalAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
       } else {
         isError = true;
         double currentTotalBuff =
             nOver + nayutaSkill2 + (nayutaHasMiranda ? mirandaVal : 0);
         double neededOver = ((maxAtk / nBase) - 1 - currentTotalBuff) * 100;
-        resultMessage =
-            "❌ 경고: $rival이 나유타보다 높습니다!\n나유타의 오버공증이 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
+        resultMessage = "❌ 경고: $rival이 나유타보다 높습니다!";
+        needOverloadMessage = "나유타의 오버공증이 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
       }
     });
   }
@@ -403,11 +421,24 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
                 color: isError ? Colors.red.shade200 : Colors.green.shade200)),
-        child: Text(resultMessage,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: isError ? Colors.red.shade800 : Colors.green.shade800,
-                fontWeight: FontWeight.bold,
-                fontSize: 13)));
+        child: Column(
+          children: [
+            Text(resultMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: isError ? Colors.red.shade800 : Colors.green.shade800,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13)),
+            if (needOverloadMessage.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(needOverloadMessage,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: isError ? Colors.red.shade900 : Colors.green.shade900,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12)),
+            ]
+          ],
+        ));
   }
 }

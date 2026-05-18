@@ -34,6 +34,7 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
   List<String> bufferedNikkes = []; // 미란다 버프를 받는 니케 명단
 
   String resultMessage = "수치를 입력하고 계산하기를 눌러주세요.";
+  String needOverloadMessage = "";
   bool isError = false;
   final NumberFormat _formatter = NumberFormat('#,###');
 
@@ -103,13 +104,34 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
       // 3. 상태 메시지 및 에러 판정
       if (_useTakina && bufferedNikkes.contains('타키나')) {
         isError = true;
-        resultMessage = "❌ 타키나가 미란다 버프를 탈취 중입니다! (타키나 수치를 낮추십시오)";
+        resultMessage = "❌ 타키나가 미란다 버프를 탈취 중입니다!";
+        double targetDiff = targetTakina - min(targetAda, targetEin);
+        double neededDecrease = (targetDiff / tAtk) * 100;
+        // 타키나를 낮추거나 다른 애들을 올려야 함
+        needOverloadMessage = "타키나의 오버공증을 최소 ${neededDecrease.toStringAsFixed(2)}% 낮추거나 딜러들의 오버공증을 높여야 합니다.";
       } else if (resEinOnAdaB > resAdaOnAdaB) {
         isError = true;
         resultMessage = "⚠️ 에이다 버스트 시 아인의 공격력이 더 높습니다.";
+        double margin = resEinOnAdaB - resAdaOnAdaB;
+        double neededIncrease = (margin / aAtk) * 100;
+        needOverloadMessage = "에이다의 오버공증이 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.";
       } else {
         isError = false;
         resultMessage = "✅ 모든 버프 타겟팅 및 위계가 정상입니다.";
+        
+        double marginBurst = resAdaOnAdaB - resEinOnAdaB;
+        double adaAllowedDecrease = (marginBurst / aAtk) * 100;
+        double einAllowedIncrease = (marginBurst / eAtk) * 100;
+
+        needOverloadMessage = "💡 현재 상태 기준 여유 수치\n"
+            "• 에이다 오버공증: ${adaAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
+            "• 아인 오버공증: ${einAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
+
+        if (_useTakina) {
+          double marginTarget = min(targetAda, targetEin) - targetTakina;
+          double takinaAllowedIncrease = (marginTarget / tAtk) * 100;
+          needOverloadMessage += "\n• 타키나 오버공증: ${takinaAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
+        }
       }
     });
   }
@@ -419,12 +441,25 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
                 color: isError ? Colors.red.shade200 : Colors.green.shade200)),
-        child: Text(resultMessage,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: isError ? Colors.red.shade800 : Colors.green.shade800,
-                fontWeight: FontWeight.bold,
-                fontSize: 13)));
+        child: Column(
+          children: [
+            Text(resultMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: isError ? Colors.red.shade800 : Colors.green.shade800,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13)),
+            if (needOverloadMessage.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(needOverloadMessage,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: isError ? Colors.red.shade900 : Colors.green.shade900,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12)),
+            ]
+          ],
+        ));
   }
 
   // --- 다이얼로그 함수부 ---

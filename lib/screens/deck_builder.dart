@@ -1,8 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:path_provider/path_provider.dart';
+import 'package:pasteboard/pasteboard.dart';
 
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/models/nikke.dart';
@@ -27,6 +38,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   List<List<String?>>? _pendingSquadsIds;
   bool _restoredOnce = false;
   final GlobalKey _deckCaptureKey = GlobalKey();
+  final GlobalKey _previewCaptureKey = GlobalKey();
 
   /// 스쿼드 5개 × 슬롯 5개
   /// _squads[스쿼드번호][슬롯번호] = Nikke?
@@ -177,43 +189,82 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     _saveDeckToLocal();
   }
 
-  Widget _buildFiveSquadsShareCanvas() {
-    // 한눈에 보기 좋은 고정 사이즈 (필요하면 바꿔도 됨)
-    const double w = 600;
-    const double h = 1150;
+  Future<Uint8List?> _capturePreview() async {
+    try {
+      final boundary = _previewCaptureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return null;
+      final image = await boundary.toImage(pixelRatio: 2.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      debugPrint('Capture error: $e');
+      return null;
+    }
+  }
 
-    return SizedBox(
+  Future<void> _downloadPreview() async {
+    final bytes = await _capturePreview();
+    if (bytes == null) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
+      return;
+    }
+
+    if (kIsWeb) {
+      final blob = html.Blob([bytes], 'image/png');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', 'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png')
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    } else {
+      final result = await ImageGallerySaver.saveImage(bytes, name: "mimir_deck_${DateTime.now().millisecondsSinceEpoch}");
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('갤러리에 저장되었습니다!')));
+    }
+  }
+
+  Future<void> _copyToClipboard() async {
+    final bytes = await _capturePreview();
+    if (bytes == null) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
+      return;
+    }
+
+    try {
+      await Pasteboard.writeImage(bytes);
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('클립보드에 복사되었습니다!')));
+    } catch (e) {
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('클립보드 복사 실패: $e')));
+    }
+  }
+
+  Widget _buildFiveSquadsShareCanvas() {
+    const double w = 600;
+
+    return Container(
       width: w,
-      height: h,
-      child: Material(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: SingleChildScrollView(
-            // ✅ 추가
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ...List.generate(_squads.length, (index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _ShareSquadPanel(
-                      title: _squadNames[index],
-                      isActive: index == _activeSquadIndex,
-                      slots: _squads[index],
-                    ),
-                  );
-                }),
-                const SizedBox(height: 10),
-                const Text(
-                  'Made with Mimir',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(fontSize: 12, color: Colors.black45),
-                ),
-              ],
-            ),
+      color: Colors.white,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ...List.generate(_squads.length, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: _ShareSquadPanel(
+                title: _squadNames[index],
+                isActive: index == _activeSquadIndex,
+                slots: _squads[index],
+              ),
+            );
+          }),
+          const SizedBox(height: 10),
+          const Text(
+            'Made with Mimir',
+            textAlign: TextAlign.right,
+            style: TextStyle(fontSize: 12, color: Colors.black45),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -236,9 +287,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
               isMobile ? mq.size.height - 36.0 : mq.size.height * 0.90;
 
           return PopScope(
-            canPop: true, // ✅ 시스템 back 허용
+            canPop: true,
             onPopInvoked: (didPop) {
-              // didPop이 false인 케이스에서도 확실히 닫고 싶으면 아래 한 줄 유지
               if (!didPop) Navigator.of(context).pop();
             },
             child: Dialog(
@@ -250,7 +300,6 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                 height: dialogH,
                 child: Column(
                   children: [
-                    // 상단 타이틀 바(네가 원한 X 포함)
                     Container(
                       height: 48,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -271,16 +320,42 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     ),
                     const Divider(height: 1),
 
-                    // 내용
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                         child: Center(
                           child: FittedBox(
                             fit: BoxFit.contain,
-                            child: _buildFiveSquadsShareCanvas(),
+                            child: RepaintBoundary(
+                              key: _previewCaptureKey,
+                              child: _buildFiveSquadsShareCanvas(),
+                            ),
                           ),
                         ),
+                      ),
+                    ),
+                    
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            icon: const Icon(Icons.content_copy),
+                            label: const Text('클립보드 복사'),
+                            onPressed: _copyToClipboard,
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.download),
+                            label: const Text('이미지 다운로드'),
+                            onPressed: _downloadPreview,
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -1493,28 +1568,34 @@ class _ShareSquadPanel extends StatelessWidget {
         border: Border.all(color: Colors.black12, width: 2),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            title,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w900),
+          SizedBox(
+            width: 70,
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
           ),
-          const SizedBox(height: 10),
-          Row(
-            children: List.generate(slots.length, (i) {
-              final nikke = slots[i];
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: _ShareSlotThumb(
-                    nikke: nikke,
-                    displayIndex: i + 1, // ✅ 1~5로 표시
+          const SizedBox(width: 8),
+          Expanded(
+            child: Row(
+              children: List.generate(slots.length, (i) {
+                final nikke = slots[i];
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: _ShareSlotThumb(
+                      nikke: nikke,
+                      displayIndex: i + 1, // ✅ 1~5로 표시
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
         ],
       ),
@@ -1559,3 +1640,4 @@ class _ShareSlotThumb extends StatelessWidget {
     );
   }
 }
+
