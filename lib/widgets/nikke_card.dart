@@ -163,7 +163,7 @@ class NikkeCard extends StatelessWidget {
                                 SizedBox(height: 4 * scale),
                                 Text(
                                   assignedSquadName ??
-                                      'Squad ${assignedSquadIndex! + 1}',
+                                      '${assignedSquadIndex! + 1}번덱',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(

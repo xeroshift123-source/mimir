@@ -22,7 +22,7 @@ class MimirApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'mimir',
+        title: 'MIMIR - 니케 덱빌딩 도우미',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),

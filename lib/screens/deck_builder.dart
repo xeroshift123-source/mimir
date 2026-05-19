@@ -47,7 +47,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     (_) => List<Nikke?>.filled(5, null, growable: false),
   );
 
-  final List<String> _squadNames = List.generate(5, (i) => 'Squad ${i + 1}');
+  final List<String> _squadNames = List.generate(5, (i) => '${i + 1}번덱');
   static const _kSquadNamesKey = 'deck_builder_squad_names';
 
   /// 지금 니케를 채워넣을 대상 스쿼드 인덱스 (0 = Squad 1)

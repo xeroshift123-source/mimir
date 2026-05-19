@@ -1,11 +1,11 @@
 {
-    "name": "mimir",
-    "short_name": "mimir",
+    "name": "Mimir - 니케 계산기",
+    "short_name": "Mimir",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "승리의 여신: 니케(NIKKE) 덱 및 데미지 계산기 웹앱입니다.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
