@@ -2007,8 +2007,8 @@ class _ShareSquadPanel extends StatelessWidget {
                     children: [
                       Row(
                         children: List.generate(5, (colIndex) {
-                          if (colIndex < slots.length) {
-                            final nikke = slots[colIndex];
+                          if (colIndex < activeNikkes.length) {
+                            final nikke = activeNikkes[colIndex];
                             return Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -2023,13 +2023,13 @@ class _ShareSquadPanel extends StatelessWidget {
                           }
                         }),
                       ),
-                      if (slots.length > 5) ...[
+                      if (activeNikkes.length > 5) ...[
                         const SizedBox(height: 6),
                         Row(
                           children: List.generate(5, (colIndex) {
                             final actualIndex = colIndex + 5;
-                            if (actualIndex < slots.length) {
-                              final nikke = slots[actualIndex];
+                            if (actualIndex < activeNikkes.length) {
+                              final nikke = activeNikkes[actualIndex];
                               return Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 3),
