@@ -57,7 +57,7 @@ class NikkeCard extends StatelessWidget {
               duration: const Duration(milliseconds: 150),
               padding: EdgeInsets.all(2 * scale),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10 * scale),
+                borderRadius: BorderRadius.circular(5 * scale),
                 border: isSelected && !isAssigned
                     ? Border.all(
                         color: Colors.lightBlueAccent, width: 3 * scale)
@@ -66,7 +66,7 @@ class NikkeCard extends StatelessWidget {
               child: Card(
                 clipBehavior: Clip.antiAlias,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8 * scale),
+                  borderRadius: BorderRadius.circular(4 * scale),
                 ),
                 elevation: isSelected ? 6 : 2,
                 child: Stack(
@@ -113,9 +113,27 @@ class NikkeCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 13 * scale,
+                            fontSize: 15 * scale,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
+                            shadows: [
+                              Shadow(
+                                offset: const Offset(-1.0, -1.0),
+                                color: Colors.black.withOpacity(0.8),
+                              ),
+                              Shadow(
+                                offset: const Offset(1.0, -1.0),
+                                color: Colors.black.withOpacity(0.8),
+                              ),
+                              Shadow(
+                                offset: const Offset(1.0, 1.0),
+                                color: Colors.black.withOpacity(0.8),
+                              ),
+                              Shadow(
+                                offset: const Offset(-1.0, 1.0),
+                                color: Colors.black.withOpacity(0.8),
+                              ),
+                            ],
                           ),
                         ),
                       ),

@@ -2,11 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/deck_builder.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _selectedWeakness = '수냉';
+
+  static const Map<String, String> _elementIconMap = {
+    '전격': 'assets/icons/elements/icon-elements-Electric.webp',
+    '철갑': 'assets/icons/elements/icon-elements-Iron.webp',
+    '작열': 'assets/icons/elements/icon-elements-Fire.webp',
+    '수냉': 'assets/icons/elements/icon-elements-Water.webp',
+    '풍압': 'assets/icons/elements/icon-elements-Wind.webp',
+  };
+
   void _openDeckBuilder(BuildContext context) {
-    Navigator.pushNamed(context, DeckBuilderScreen.routeName);
+    Navigator.pushNamed(
+      context,
+      DeckBuilderScreen.routeName,
+      arguments: _selectedWeakness,
+    );
   }
 
   // ✅ 레이드 요약 카드 위젯
@@ -28,10 +47,9 @@ class HomeScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Image.asset(
-                  "assets/images/raids/wigobi.png",
+                  "assets/images/raids/ultra.webp",
                   width: double.infinity,
-                  height: 400,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 ),
               ),
 
@@ -45,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          "지난 솔로 레이드",
+                          "다음 솔로 레이드",
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -63,7 +81,7 @@ class HomeScreen extends StatelessWidget {
                             border: Border.all(color: Colors.red.shade200),
                           ),
                           child: const Text(
-                            "SEASON 36",
+                            "SEASON 37",
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -74,7 +92,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      "에고비스타",
+                      "울트라",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -84,13 +102,13 @@ class HomeScreen extends StatelessWidget {
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.schedule, size: 18, color: Colors.grey),
+                        Icon(Icons.schedule, size: 18, color: Colors.black),
                         SizedBox(width: 6),
                         Text(
-                          "4/30(목) 12:00 ~ 5/07(목) 4:59",
+                          "5/28(목) 12:00 ~ 6/4(목) 4:59",
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey,
+                            color: Colors.black,
                           ),
                         ),
                       ],
@@ -103,15 +121,15 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         _chip(
                           iconPath:
-                              "assets/icons/elements/icon-elements-Water.webp",
+                              "assets/icons/elements/icon-elements-fire.webp",
                           title: "보스 속성",
-                          value: "수냉",
+                          value: "작열",
                         ),
                         _chip(
-                          iconPath:
+                          iconPath: _elementIconMap[_selectedWeakness] ??
                               "assets/icons/elements/icon-elements-Electric.webp",
                           title: "약점 속성",
-                          value: "전격",
+                          value: _selectedWeakness,
                         ),
                       ],
                     ),
@@ -201,7 +219,70 @@ class HomeScreen extends StatelessWidget {
                 // ✅ 레이드 요약 영역
                 _buildRaidSummaryCard(context),
 
-                const SizedBox(height: 32), // 간격을 조금 더 넓혔습니다.
+                const SizedBox(height: 24),
+
+                // 🎯 솔로 레이드 보스 약점 속성 선택 Dropdown
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border:
+                          Border.all(color: Colors.orange.shade300, width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedWeakness,
+                        icon: const Icon(Icons.arrow_drop_down,
+                            color: Colors.orange, size: 28),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        isExpanded: true,
+                        dropdownColor: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              _selectedWeakness = newValue;
+                            });
+                          }
+                        },
+                        items: <String>['전격', '철갑', '작열', '수냉', '풍압']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  _elementIconMap[value]!,
+                                  width: 20,
+                                  height: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Text('공략 약점 속성: $value'),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
 
                 // ✅ 버튼 그룹 (계산기 & 덱 구성)
                 ConstrainedBox(

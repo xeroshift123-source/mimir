@@ -35,10 +35,24 @@ class DeckBuilderScreen extends StatefulWidget {
 class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   String? _selectedNikkeId;
   bool _isNikkeSheetOpen = false;
+  String? _weaknessElement;
   List<List<String?>>? _pendingSquadsIds;
   bool _restoredOnce = false;
   final GlobalKey _deckCaptureKey = GlobalKey();
   final GlobalKey _previewCaptureKey = GlobalKey();
+
+  bool _hasCandidate = false;
+  List<Nikke?> _candidateSquad = [null];
+  List<String?>? _pendingCandidateIds;
+
+  void _updateCandidateSquadSlots() {
+    final active = _candidateSquad.whereType<Nikke>().toList();
+    if (active.length < 10) {
+      _candidateSquad = [...active, null];
+    } else {
+      _candidateSquad = active.sublist(0, 10);
+    }
+  }
 
   /// 스쿼드 5개 × 슬롯 5개
   /// _squads[스쿼드번호][슬롯번호] = Nikke?
@@ -73,31 +87,36 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     if (_restoredOnce) return;
     final nikkeList = context.watch<NikkeProvider>().nikkeList;
     if (nikkeList.isEmpty) return;
-    if (_pendingSquadsIds == null) {
-      _restoredOnce = true;
-      return;
-    }
 
     final mapById = {for (final n in nikkeList) n.id: n};
 
-    final restoredSquads = _pendingSquadsIds!
-        .map((squadIds) =>
-            squadIds.map((id) => id == null ? null : mapById[id]).toList())
-        .toList();
-
     setState(() {
-      // 길이/슬롯 수가 다를 수도 있으니 방어적으로 적용
-      for (int s = 0; s < _squads.length && s < restoredSquads.length; s++) {
-        for (int i = 0;
-            i < _squads[s].length && i < restoredSquads[s].length;
-            i++) {
-          _squads[s][i] = restoredSquads[s][i];
+      if (_pendingSquadsIds != null) {
+        final restoredSquads = _pendingSquadsIds!
+            .map((squadIds) =>
+                squadIds.map((id) => id == null ? null : mapById[id]).toList())
+            .toList();
+
+        for (int s = 0; s < _squads.length && s < restoredSquads.length; s++) {
+          for (int i = 0;
+              i < _squads[s].length && i < restoredSquads[s].length;
+              i++) {
+            _squads[s][i] = restoredSquads[s][i];
+          }
         }
+      }
+
+      if (_pendingCandidateIds != null) {
+        _candidateSquad = _pendingCandidateIds!
+            .map((id) => id == null ? null : mapById[id])
+            .toList();
+        _updateCandidateSquadSlots();
       }
     });
 
     _restoredOnce = true;
     _pendingSquadsIds = null;
+    _pendingCandidateIds = null;
   }
 
   /// 왼쪽 니케 카드 클릭 시 → 선택만 처리
@@ -182,9 +201,29 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
   void _resetSquad(int squadIndex) {
     setState(() {
-      for (int i = 0; i < _squads[squadIndex].length; i++) {
-        _squads[squadIndex][i] = null;
+      if (squadIndex == 5) {
+        _candidateSquad = [null];
+      } else {
+        for (int i = 0; i < _squads[squadIndex].length; i++) {
+          _squads[squadIndex][i] = null;
+        }
       }
+    });
+    _saveDeckToLocal();
+  }
+
+  void _addCandidate() {
+    setState(() {
+      _hasCandidate = true;
+      _candidateSquad = [null];
+    });
+    _saveDeckToLocal();
+  }
+
+  void _removeCandidate() {
+    setState(() {
+      _hasCandidate = false;
+      _candidateSquad = [null];
     });
     _saveDeckToLocal();
   }
@@ -237,32 +276,50 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     }
   }
 
-  Widget _buildFiveSquadsShareCanvas() {
+  Widget _buildFiveSquadsShareCanvas(String weaknessElement) {
     const double w = 600;
 
     return Container(
       width: w,
-      color: Colors.white,
-      padding: const EdgeInsets.all(12),
+      color: const Color(0xFF090A0F),
+      padding: const EdgeInsets.all(10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ...List.generate(_squads.length, (index) {
+            final isLastWithoutCandidate = !_hasCandidate && index == _squads.length - 1;
             return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: EdgeInsets.only(bottom: isLastWithoutCandidate ? 0 : 8),
               child: _ShareSquadPanel(
                 title: _squadNames[index],
                 isActive: index == _activeSquadIndex,
                 slots: _squads[index],
+                weaknessElement: weaknessElement,
               ),
             );
           }),
+          if (_hasCandidate)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 0),
+              child: _ShareSquadPanel(
+                title: '후보 덱',
+                isActive: _activeSquadIndex == 5,
+                slots: _candidateSquad,
+                weaknessElement: weaknessElement,
+                isCandidate: true,
+              ),
+            ),
           const SizedBox(height: 10),
           const Text(
             'Made with Mimir',
             textAlign: TextAlign.right,
-            style: TextStyle(fontSize: 12, color: Colors.black45),
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white38,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.5,
+            ),
           ),
         ],
       ),
@@ -295,10 +352,13 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
               insetPadding: const EdgeInsets.all(12),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
-              child: SizedBox(
-                width: dialogW,
-                height: dialogH,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: dialogW,
+                  maxHeight: dialogH,
+                ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
                       height: 48,
@@ -320,15 +380,15 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     ),
                     const Divider(height: 1),
 
-                    Expanded(
+                    Flexible(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                         child: Center(
                           child: FittedBox(
                             fit: BoxFit.contain,
                             child: RepaintBoundary(
                               key: _previewCaptureKey,
-                              child: _buildFiveSquadsShareCanvas(),
+                              child: _buildFiveSquadsShareCanvas(_weaknessElement ?? '전격'),
                             ),
                           ),
                         ),
@@ -378,7 +438,9 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   /// - 선택된 니케가 없으면: 해당 슬롯 비우기
   void _onSquadSlotTap(int squadIndex, int slotIndex) {
     setState(() {
-      final current = _squads[squadIndex][slotIndex];
+      final current = squadIndex == 5
+          ? _candidateSquad[slotIndex]
+          : _squads[squadIndex][slotIndex];
 
       if (_selectedNikkeId != null) {
         final nikkeList = context.read<NikkeProvider>().nikkeList;
@@ -392,8 +454,18 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
             }
           }
         }
+        for (int i = 0; i < _candidateSquad.length; i++) {
+          if (_candidateSquad[i]?.id == selected.id) {
+            _candidateSquad[i] = null;
+          }
+        }
 
-        _squads[squadIndex][slotIndex] = selected;
+        if (squadIndex == 5) {
+          _candidateSquad[slotIndex] = selected;
+          _updateCandidateSquadSlots();
+        } else {
+          _squads[squadIndex][slotIndex] = selected;
+        }
 
         // 한 번 배치했으면 선택 해제
         _selectedNikkeId = null;
@@ -402,7 +474,12 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
         _isNikkeSheetOpen = true;
       } else {
         if (current != null) {
-          _squads[squadIndex][slotIndex] = null;
+          if (squadIndex == 5) {
+            _candidateSquad[slotIndex] = null;
+            _updateCandidateSquadSlots();
+          } else {
+            _squads[squadIndex][slotIndex] = null;
+          }
         }
       }
     });
@@ -417,14 +494,28 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     int toSlotIndex,
   ) {
     setState(() {
-      final fromNikke = _squads[fromSquadIndex][fromSlotIndex];
-      final toNikke = _squads[toSquadIndex][toSlotIndex];
+      final fromNikke = fromSquadIndex == 5
+          ? _candidateSquad[fromSlotIndex]
+          : _squads[fromSquadIndex][fromSlotIndex];
+      final toNikke = toSquadIndex == 5
+          ? _candidateSquad[toSlotIndex]
+          : _squads[toSquadIndex][toSlotIndex];
 
-      _squads[fromSquadIndex][fromSlotIndex] = toNikke;
-      _squads[toSquadIndex][toSlotIndex] = fromNikke;
+      if (fromSquadIndex == 5) {
+        _candidateSquad[fromSlotIndex] = toNikke;
+      } else {
+        _squads[fromSquadIndex][fromSlotIndex] = toNikke;
+      }
 
-      // 드래그 후 왼쪽 선택 상태는 유지하거나 해제하고 싶으면 여기서 조정 가능
-      // _selectedNikkeId = null;
+      if (toSquadIndex == 5) {
+        _candidateSquad[toSlotIndex] = fromNikke;
+      } else {
+        _squads[toSquadIndex][toSlotIndex] = fromNikke;
+      }
+
+      if (fromSquadIndex == 5 || toSquadIndex == 5) {
+        _updateCandidateSquadSlots();
+      }
     });
 
     _saveDeckToLocal();
@@ -444,6 +535,11 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
     await prefs.setString(_kSquadsKey, jsonEncode(squadsAsIds));
     await prefs.setInt(_kActiveKey, _activeSquadIndex);
+
+    // 후보 덱 저장
+    await prefs.setBool('deck_builder_has_candidate', _hasCandidate);
+    final candidateAsIds = _candidateSquad.map((n) => n?.id).toList();
+    await prefs.setString('deck_builder_candidate_squad', jsonEncode(candidateAsIds));
   }
 
   Future<void> _loadDeckFromLocal() async {
@@ -463,6 +559,18 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
     if (savedActive != null) _activeSquadIndex = savedActive;
 
+    // 후보 덱 로드
+    final savedHasCandidate = prefs.getBool('deck_builder_has_candidate');
+    if (savedHasCandidate != null) {
+      _hasCandidate = savedHasCandidate;
+    }
+
+    final rawCandidate = prefs.getString('deck_builder_candidate_squad');
+    if (rawCandidate != null) {
+      final decodedCandidate = (jsonDecode(rawCandidate) as List).cast<String?>();
+      _pendingCandidateIds = decodedCandidate;
+    }
+
     if (raw == null) return;
 
     final decoded = (jsonDecode(raw) as List)
@@ -477,6 +585,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   @override
   Widget build(BuildContext context) {
     final nikkeList = context.watch<NikkeProvider>().nikkeList;
+    _weaknessElement ??= (ModalRoute.of(context)?.settings.arguments as String?) ?? '전격';
 
     // 각 니케가 몇 번 스쿼드에 배치되어 있는지 계산
     final Map<String, int> assignedSquadMap = {};
@@ -485,6 +594,11 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
         if (nikke != null) {
           assignedSquadMap[nikke.id] = s;
         }
+      }
+    }
+    for (final nikke in _candidateSquad) {
+      if (nikke != null) {
+        assignedSquadMap[nikke.id] = 5;
       }
     }
 
@@ -569,6 +683,10 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                   onSwapSlots: _onSlotSwap,
                   onEditName: _setSquadName,
                   onResetSquad: _resetSquad,
+                  hasCandidate: _hasCandidate,
+                  candidateSquad: _candidateSquad,
+                  onAddCandidate: _addCandidate,
+                  onRemoveCandidate: _removeCandidate,
                 ),
               ),
             ),
@@ -604,6 +722,10 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     onSwapSlots: _onSlotSwap,
                     onEditName: _setSquadName,
                     onResetSquad: _resetSquad,
+                    hasCandidate: _hasCandidate,
+                    candidateSquad: _candidateSquad,
+                    onAddCandidate: _addCandidate,
+                    onRemoveCandidate: _removeCandidate,
                   ),
                 ),
               ),
@@ -960,8 +1082,9 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                     (widget.selectedNikkeId != null &&
                         widget.selectedNikkeId != nikke.id);
 
-                final String? squadName =
-                    (squadIndex == null) ? null : widget.squadNames[squadIndex];
+                final String? squadName = (squadIndex == null)
+                    ? null
+                    : (squadIndex == 5 ? '후보 덱' : widget.squadNames[squadIndex]);
 
                 return NikkeCard(
                   nikke: nikke,
@@ -1146,6 +1269,10 @@ class SquadPanel extends StatelessWidget {
   final void Function(int fromSquad, int fromSlot, int toSquad, int toSlot)?
       onSwapSlots;
   final ValueChanged<int>? onResetSquad;
+  final bool hasCandidate;
+  final List<Nikke?> candidateSquad;
+  final VoidCallback? onAddCandidate;
+  final VoidCallback? onRemoveCandidate;
 
   const SquadPanel({
     super.key,
@@ -1157,29 +1284,94 @@ class SquadPanel extends StatelessWidget {
     this.onEditName,
     this.onSwapSlots,
     this.onResetSquad,
+    required this.hasCandidate,
+    required this.candidateSquad,
+    this.onAddCandidate,
+    this.onRemoveCandidate,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
-      child: ListView.separated(
-        itemCount: squads.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+      child: ListView.builder(
+        itemCount: squads.length + 1,
         itemBuilder: (context, index) {
-          final slots = squads[index];
+          if (index == squads.length) {
+            // 후보군 섹션
+            if (hasCandidate) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: SquadCard(
+                  name: '후보 덱',
+                  isActive: activeSquadIndex == 5,
+                  hasWarning: false,
+                  slots: candidateSquad,
+                  squadIndex: 5,
+                  onHeaderTap: () => onHeaderTap?.call(5),
+                  onSlotTap: (slotIndex) => onSlotTap?.call(5, slotIndex),
+                  onSwapSlots: onSwapSlots,
+                  onNameChanged: null, // 후보 덱은 이름 변경 필요 없음
+                  onReset: () => onResetSquad?.call(5),
+                  onDelete: onRemoveCandidate,
+                ),
+              );
+            } else {
+              return Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: Card(
+                    elevation: 1,
+                    margin: EdgeInsets.zero,
+                    clipBehavior: Clip.antiAlias,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF1B1D2A)
+                        : const Color(0xFFF0F4FA),
+                    child: InkWell(
+                      onTap: onAddCandidate,
+                      child: Center(
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white.withOpacity(0.08)
+                                : Colors.black.withOpacity(0.05),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.add,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white70
+                                : Colors.black87,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
 
-          return SquadCard(
-            name: squadNames[index],
-            isActive: index == activeSquadIndex,
-            hasWarning: false,
-            slots: slots,
-            squadIndex: index,
-            onHeaderTap: () => onHeaderTap?.call(index),
-            onSlotTap: (slotIndex) => onSlotTap?.call(index, slotIndex),
-            onSwapSlots: onSwapSlots,
-            onNameChanged: (newName) => onEditName?.call(index, newName),
-            onReset: () => onResetSquad?.call(index),
+          final slots = squads[index];
+          return Padding(
+            padding: EdgeInsets.only(bottom: index == squads.length - 1 ? 0 : 12),
+            child: SquadCard(
+              name: squadNames[index],
+              isActive: index == activeSquadIndex,
+              hasWarning: false,
+              slots: slots,
+              squadIndex: index,
+              onHeaderTap: () => onHeaderTap?.call(index),
+              onSlotTap: (slotIndex) => onSlotTap?.call(index, slotIndex),
+              onSwapSlots: onSwapSlots,
+              onNameChanged: (newName) => onEditName?.call(index, newName),
+              onReset: () => onResetSquad?.call(index),
+            ),
           );
         },
       ),
@@ -1192,6 +1384,7 @@ class SquadCard extends StatefulWidget {
   final bool isActive;
   final bool hasWarning;
   final VoidCallback? onReset;
+  final VoidCallback? onDelete;
   final List<Nikke?> slots;
   final VoidCallback? onHeaderTap;
   final ValueChanged<int>? onSlotTap;
@@ -1209,6 +1402,7 @@ class SquadCard extends StatefulWidget {
     this.isActive = false,
     this.hasWarning = false,
     this.onReset,
+    this.onDelete,
     this.onHeaderTap,
     this.onSlotTap,
     this.squadIndex,
@@ -1369,6 +1563,12 @@ class _SquadCardState extends State<SquadCard> {
                     if (widget.hasWarning)
                       const Icon(Icons.error_outline,
                           color: Colors.red, size: 24),
+                    if (widget.onDelete != null)
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                        tooltip: '후보군 제거',
+                        onPressed: widget.onDelete,
+                      ),
                     IconButton(
                       icon: const Icon(Icons.refresh),
                       tooltip: '스쿼드 초기화',
@@ -1381,25 +1581,61 @@ class _SquadCardState extends State<SquadCard> {
             const SizedBox(height: 8),
 
             // 슬롯 5개 (기존 그대로)
-            Row(
-              children: List.generate(widget.slots.length, (slotIndex) {
-                final nikke = widget.slots[slotIndex];
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: _SquadSlot(
-                      squadIndex: widget.squadIndex ?? 0,
-                      slotIndex: slotIndex,
-                      displayIndex: slotIndex + 1,
-                      nikke: nikke,
-                      onTap: widget.onSlotTap == null
-                          ? null
-                          : () => widget.onSlotTap!(slotIndex),
-                      onSwap: widget.onSwapSlots,
-                    ),
+            Column(
+              children: [
+                Row(
+                  children: List.generate(5, (colIndex) {
+                    if (colIndex < widget.slots.length) {
+                      final nikke = widget.slots[colIndex];
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: _SquadSlot(
+                            squadIndex: widget.squadIndex ?? 0,
+                            slotIndex: colIndex,
+                            displayIndex: colIndex + 1,
+                            nikke: nikke,
+                            onTap: widget.onSlotTap == null
+                                ? null
+                                : () => widget.onSlotTap!(colIndex),
+                            onSwap: widget.onSwapSlots,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return const Expanded(child: SizedBox());
+                    }
+                  }),
+                ),
+                if (widget.slots.length > 5) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: List.generate(5, (colIndex) {
+                      final actualIndex = colIndex + 5;
+                      if (actualIndex < widget.slots.length) {
+                        final nikke = widget.slots[actualIndex];
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: _SquadSlot(
+                              squadIndex: widget.squadIndex ?? 0,
+                              slotIndex: actualIndex,
+                              displayIndex: actualIndex + 1,
+                              nikke: nikke,
+                              onTap: widget.onSlotTap == null
+                                  ? null
+                                  : () => widget.onSlotTap!(actualIndex),
+                              onSwap: widget.onSwapSlots,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const Expanded(child: SizedBox());
+                      }
+                    }),
                   ),
-                );
-              }),
+                ],
+              ],
             ),
           ],
         ),
@@ -1553,49 +1789,278 @@ class _ShareSquadPanel extends StatelessWidget {
   final String title;
   final bool isActive;
   final List<Nikke?> slots;
+  final String weaknessElement;
+  final bool isCandidate;
 
   const _ShareSquadPanel({
     required this.title,
     required this.isActive,
     required this.slots,
+    required this.weaknessElement,
+    this.isCandidate = false,
   });
+
+  Widget _buildBadge({
+    required String text,
+    required bool isActive,
+    required Color themeColor,
+    required Color textColor,
+  }) {
+    if (isActive) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 2.5),
+        decoration: BoxDecoration(
+          color: themeColor.withOpacity(0.12),
+          border: Border.all(color: themeColor.withOpacity(0.8), width: 1.2),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 2.5),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.01),
+          border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.2),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+            color: Colors.white.withOpacity(0.2),
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildDynamicBadge(String text) {
+    const goldColor = Color(0xFFFFA000);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+      decoration: BoxDecoration(
+        color: goldColor.withOpacity(0.12),
+        border: Border.all(color: goldColor.withOpacity(0.8), width: 1.2),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFFFC107),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final activeNikkes = slots.whereType<Nikke>().toList();
+
+    // 1. 고정 키워드 로직
+    final Map<String, ElementType> elementKoreanToEnum = {
+      '철갑': ElementType.Iron,
+      '수냉': ElementType.Water,
+      '전격': ElementType.Electric,
+      '작열': ElementType.Fire,
+      '풍압': ElementType.Wind,
+    };
+    final targetEnum = elementKoreanToEnum[weaknessElement] ?? ElementType.Electric;
+    final bool hasWeaknessMatch = activeNikkes.any((n) => n.element == targetEnum);
+    final bool hasCooldownReduction = activeNikkes.any((n) => n.ability.contains("버스트 쿨타임 감소"));
+
+    // 2. 동적 키워드 로직
+    final List<String> dynamicTags = [];
+    if (activeNikkes.any((n) => n.ability.contains("힐"))) {
+      dynamicTags.add("힐");
+    }
+    if (activeNikkes.any((n) => n.name == "토브")) {
+      dynamicTags.add("샷건");
+    }
+    if (activeNikkes.where((n) => n.ability.contains("방어력무시데미지")).length >= 2) {
+      dynamicTags.add("방무뎀");
+    }
+    if (activeNikkes.where((n) => n.ability.contains("관통데미지")).length >= 2) {
+      dynamicTags.add("관통뎀");
+    }
+    if (activeNikkes.where((n) => n.ability.contains("받는데미지증가")).length >= 2) {
+      dynamicTags.add("받뎀증");
+    }
+    if (activeNikkes.where((n) => n.ability.contains("분배데미지")).length >= 2) {
+      dynamicTags.add("분배뎀");
+    }
+    if (activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
+      dynamicTags.add("재장전");
+    }
+
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black12, width: 2),
-        borderRadius: BorderRadius.circular(14),
+        color: const Color(0xFF11141B),
+        border: Border.all(color: const Color(0xFF1E2330), width: 1),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 70,
-            child: Text(
-              title,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              style: const TextStyle(fontWeight: FontWeight.w900),
+            width: isCandidate ? 70 : 90,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Container(
+                      width: 3.5,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF19AFF4),
+                        borderRadius: BorderRadius.circular(1.5),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(
+                        title,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (!isCandidate) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildBadge(
+                          text: "속성저지",
+                          isActive: hasWeaknessMatch,
+                          themeColor: const Color(0xFF4CAF50),
+                          textColor: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: _buildBadge(
+                          text: "버쿨감",
+                          isActive: hasCooldownReduction,
+                          themeColor: const Color(0xFF4CAF50),
+                          textColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Container(
+                    height: 0.8,
+                    color: Colors.white.withOpacity(0.06),
+                  ),
+                  const SizedBox(height: 5),
+                  if (dynamicTags.isNotEmpty)
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: dynamicTags.map((tag) {
+                        return _buildDynamicBadge(tag);
+                      }).toList(),
+                    ),
+                ],
+              ],
             ),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Row(
-              children: List.generate(slots.length, (i) {
-                final nikke = slots[i];
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: _ShareSlotThumb(
-                      nikke: nikke,
-                      displayIndex: i + 1, // ✅ 1~5로 표시
-                    ),
-                  ),
-                );
-              }),
+          if (!isCandidate) ...[
+            const SizedBox(width: 8),
+            const _VerticalDottedLine(
+              height: 110,
+              color: Colors.white12,
+              dashHeight: 3,
+              gap: 3,
+              strokeWidth: 1,
             ),
+            const SizedBox(width: 12),
+          ] else ...[
+            const SizedBox(width: 41),
+          ],
+          Expanded(
+            child: isCandidate
+                ? Column(
+                    children: [
+                      Row(
+                        children: List.generate(5, (colIndex) {
+                          if (colIndex < slots.length) {
+                            final nikke = slots[colIndex];
+                            return Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 3),
+                                child: _ShareSlotThumb(
+                                  nikke: nikke,
+                                  displayIndex: colIndex + 1,
+                                ),
+                              ),
+                            );
+                          } else {
+                            return const Expanded(child: SizedBox());
+                          }
+                        }),
+                      ),
+                      if (slots.length > 5) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          children: List.generate(5, (colIndex) {
+                            final actualIndex = colIndex + 5;
+                            if (actualIndex < slots.length) {
+                              final nikke = slots[actualIndex];
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                                  child: _ShareSlotThumb(
+                                    nikke: nikke,
+                                    displayIndex: actualIndex + 1,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return const Expanded(child: SizedBox());
+                            }
+                          }),
+                        ),
+                      ],
+                    ],
+                  )
+                : Row(
+                    children: List.generate(slots.length, (i) {
+                      final nikke = slots[i];
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: _ShareSlotThumb(
+                            nikke: nikke,
+                            displayIndex: i + 1,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
           ),
         ],
       ),
@@ -1610,21 +2075,23 @@ class _ShareSlotThumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // NikkeCard가 기본적으로 aspectRatio 0.75를 쓰고 있으니
-    // 빈 슬롯도 동일한 비율로 맞춰주는 게 “형식 통일”에 좋음.
     if (nikke == null) {
       return AspectRatio(
         aspectRatio: 0.75,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.grey.shade400),
-            color: Colors.black.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: Colors.white12),
+            color: Colors.white.withOpacity(0.02),
           ),
           alignment: Alignment.center,
           child: Text(
             '$displayIndex',
-            style: TextStyle(color: Colors.grey.shade500),
+            style: const TextStyle(
+              color: Colors.white24,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       );
@@ -1632,12 +2099,76 @@ class _ShareSlotThumb extends StatelessWidget {
 
     return NikkeCard(
       nikke: nikke!,
-      onTap: null, // 캡쳐용이므로 클릭 X
+      onTap: null,
       isSelected: false,
       isDimmed: false,
       assignedSquadIndex: null,
       showAssignedOverlay: false,
     );
   }
+}
+
+class _VerticalDottedLine extends StatelessWidget {
+  final double height;
+  final Color color;
+  final double dashHeight;
+  final double strokeWidth;
+  final double gap;
+
+  const _VerticalDottedLine({
+    this.height = double.infinity,
+    this.color = Colors.white24,
+    this.dashHeight = 3,
+    this.strokeWidth = 1,
+    this.gap = 3,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(strokeWidth, height),
+      painter: _DottedLinePainter(
+        color: color,
+        dashHeight: dashHeight,
+        strokeWidth: strokeWidth,
+        gap: gap,
+      ),
+    );
+  }
+}
+
+class _DottedLinePainter extends CustomPainter {
+  final Color color;
+  final double dashHeight;
+  final double strokeWidth;
+  final double gap;
+
+  _DottedLinePainter({
+    required this.color,
+    required this.dashHeight,
+    required this.strokeWidth,
+    required this.gap,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double startY = 0;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    while (startY < size.height) {
+      canvas.drawLine(
+        Offset(size.width / 2, startY),
+        Offset(size.width / 2, math.min(startY + dashHeight, size.height)),
+        paint,
+      );
+      startY += dashHeight + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 

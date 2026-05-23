@@ -7,7 +7,9 @@
     "element": "Fire",
     "weaponType": "AR",
     "company": "Abnormal",
-    "ability": [],
+    "ability": [
+      "분배데미지"
+    ],
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR"
@@ -36,7 +38,7 @@
     "ability": [
       "웡줌마",
       "힐",
-      "방어력 무시 데미지",
+      "방어력무시데미지",
       "방무뎀",
       "시전자 기준 공격력",
       "시공증"
@@ -85,7 +87,9 @@
     "element": "Wind",
     "weaponType": "SR",
     "company": "Elysion",
-    "ability": [],
+    "ability": [
+      "재장전속도증가"
+    ],
     "coolTime": 20,
     "squadNum": 0,
     "rank": "SSR"
@@ -147,7 +151,10 @@
       "힐",
       "메앵",
       "시전자 기준 공격력",
-      "시공증"
+      "시공증",
+      "분배데미지",
+      "분배뎀",
+      "재장전속도증가"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -178,7 +185,8 @@
       "막탄",
       "수니스",
       "시전자 기준 공격력",
-      "시공증"
+      "시공증",
+      "재장전속도증가"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -330,7 +338,8 @@
     "ability": [
       "빵순이",
       "받는데미지증가",
-      "받뎀증"
+      "받뎀증",
+      "분배데미지"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -462,7 +471,8 @@
       "시공증",
       "방어막",
       "도발",
-      "무적"
+      "무적",
+      "재장전속도증가"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -476,7 +486,9 @@
     "element": "Water",
     "weaponType": "RL",
     "company": "Tetra",
-    "ability": [],
+    "ability": [
+      "분배데미지"
+    ],
     "coolTime": 20,
     "squadNum": 0,
     "rank": "SSR"
@@ -517,7 +529,10 @@
     "company": "Elysion",
     "ability": [
       "힐",
-      "닌닌"
+      "닌닌",
+      "시전자 기준 공격력",
+      "시공증",
+      "분배데미지"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -568,7 +583,8 @@
       "버쿨감",
       "막탄",
       "관통뎀",
-      "관통데미지"
+      "관통데미지",
+      "분배데미지"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -639,7 +655,7 @@
     "weaponType": "SR",
     "company": "Missilis",
     "ability": [
-      "방어력 무시 데미지",
+      "방어력무시데미지",
       "방무뎀"
     ],
     "coolTime": 40,
@@ -656,7 +672,8 @@
     "company": "Missilis",
     "ability": [
       "시전자 기준 공격력",
-      "시공증"
+      "시공증",
+      "분배데미지"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -715,7 +732,7 @@
     "company": "Elysion",
     "ability": [
       "힐",
-      "방어력 무시 데미지",
+      "방어력무시데미지",
       "방무뎀",
       "받는데미지증가",
       "받뎀증",
@@ -774,7 +791,7 @@
     "weaponType": "SR",
     "company": "Elysion",
     "ability": [
-      "방어력 무시 데미지",
+      "방어력무시데미지",
       "방무뎀",
       "받는데미지증가",
       "받뎀증"
@@ -852,7 +869,7 @@
     "weaponType": "SR",
     "company": "Tetra",
     "ability": [
-      "방어력 무시 데미지",
+      "방어력무시데미지",
       "방무뎀"
     ],
     "coolTime": 20,
@@ -1270,7 +1287,8 @@
     "company": "Abnormal",
     "ability": [
       "관통뎀",
-      "관통데미지"
+      "관통데미지",
+      "재장전속도증가"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -1376,7 +1394,10 @@
     "ability": [
       "메스트",
       "시공증",
-      "시전자 기준 공격력"
+      "시전자 기준 공격력",
+      "분배데미지",
+      "분배뎀",
+      "재장전속도증가"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1480,7 +1501,8 @@
     "ability": [
       "바밀크",
       "관통뎀",
-      "관통데미지"
+      "관통데미지",
+      "분배데미지"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1769,7 +1791,9 @@
     "element": "Water",
     "weaponType": "AR",
     "company": "Elysion",
-    "ability": [],
+    "ability": [
+      "분배데미지"
+    ],
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR"
@@ -1809,7 +1833,11 @@
     "weaponType": "AR",
     "company": "Elysion",
     "ability": [
-      "프바"
+      "애프바"
+      , "재장전속도증가"
+      , "막탄"
+      , "받는데미지증가"
+      , "받뎀증"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1890,7 +1918,9 @@
     "element": "Water",
     "weaponType": "SMG",
     "company": "Missilis",
-    "ability": [],
+    "ability": [
+      "분배데미지"  
+    ],
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR"
@@ -2157,7 +2187,9 @@
     "element": "Electric",
     "weaponType": "AR",
     "company": "Tetra",
-    "ability": [],
+    "ability": [
+      "재장전속도증가"
+    ],
     "coolTime": 20,
     "squadNum": 0,
     "rank": "SSR"
@@ -2230,7 +2262,8 @@
     "weaponType": "RL",
     "company": "Pilgrim",
     "ability": [
-      "흑련"
+      "흑련",
+      "분배데미지"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -2466,7 +2499,9 @@
     "element": "Electric",
     "weaponType": "MG",
     "company": "Missilis",
-    "ability": [],
+    "ability": [
+      "재장전속도증가"
+    ],
     "coolTime": 20,
     "squadNum": 0,
     "rank": "SSR"
@@ -2479,7 +2514,9 @@
     "element": "Fire",
     "weaponType": "SR",
     "company": "Missilis",
-    "ability": [],
+    "ability": [
+      "분배데미지"
+    ],
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR"
@@ -2506,7 +2543,7 @@
     "weaponType": "RL",
     "company": "Elysion",
     "ability": [
-      "방어력 무시 데미지",
+      "방어력무시데미지",
       "방무뎀"
     ],
     "coolTime": 40,
@@ -2694,7 +2731,7 @@
     "weaponType": "SMG",
     "company": "Abnormal",
     "ability": [
-      "방어력 무시 데미지",
+      "방어력무시데미지",
       "방무뎀"
     ],
     "coolTime": 40,
@@ -2710,7 +2747,7 @@
     "weaponType": "SR",
     "company": "Abnormal",
     "ability": [
-      "방어력 무시 데미지",
+      "방어력무시데미지",
       "방무뎀",
       "받는데미지증가",
       "받뎀증"
