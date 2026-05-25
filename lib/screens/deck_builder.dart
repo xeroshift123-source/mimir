@@ -36,6 +36,14 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   String? _selectedNikkeId;
   bool _isNikkeSheetOpen = false;
   String? _weaknessElement;
+
+  static const Map<String, String> _elementIconMap = {
+    '전격': 'assets/icons/elements/icon-elements-Electric.webp',
+    '철갑': 'assets/icons/elements/icon-elements-Iron.webp',
+    '작열': 'assets/icons/elements/icon-elements-Fire.webp',
+    '수냉': 'assets/icons/elements/icon-elements-Water.webp',
+    '풍압': 'assets/icons/elements/icon-elements-Wind.webp',
+  };
   List<List<String?>>? _pendingSquadsIds;
   bool _restoredOnce = false;
   final GlobalKey _deckCaptureKey = GlobalKey();
@@ -85,6 +93,13 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     super.didChangeDependencies();
 
     if (_restoredOnce) return;
+
+    // Retrieve weakness element from route arguments if available
+    final routeArgs = ModalRoute.of(context)?.settings.arguments as String?;
+    if (routeArgs != null) {
+      _weaknessElement = routeArgs;
+    }
+
     final nikkeList = context.watch<NikkeProvider>().nikkeList;
     if (nikkeList.isEmpty) return;
 
@@ -230,7 +245,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
   Future<Uint8List?> _capturePreview() async {
     try {
-      final boundary = _previewCaptureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final boundary = _previewCaptureKey.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
       if (boundary == null) return null;
       final image = await boundary.toImage(pixelRatio: 2.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -244,7 +260,9 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   Future<void> _downloadPreview() async {
     final bytes = await _capturePreview();
     if (bytes == null) {
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
       return;
     }
 
@@ -252,27 +270,37 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
       final blob = html.Blob([bytes], 'image/png');
       final url = html.Url.createObjectUrlFromBlob(blob);
       final anchor = html.AnchorElement(href: url)
-        ..setAttribute('download', 'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png')
+        ..setAttribute('download',
+            'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png')
         ..click();
       html.Url.revokeObjectUrl(url);
     } else {
-      final result = await ImageGallerySaver.saveImage(bytes, name: "mimir_deck_${DateTime.now().millisecondsSinceEpoch}");
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('갤러리에 저장되었습니다!')));
+      final result = await ImageGallerySaver.saveImage(bytes,
+          name: "mimir_deck_${DateTime.now().millisecondsSinceEpoch}");
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('갤러리에 저장되었습니다!')));
     }
   }
 
   Future<void> _copyToClipboard() async {
     final bytes = await _capturePreview();
     if (bytes == null) {
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
       return;
     }
 
     try {
       await Pasteboard.writeImage(bytes);
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('클립보드에 복사되었습니다!')));
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('클립보드에 복사되었습니다!')));
     } catch (e) {
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('클립보드 복사 실패: $e')));
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('클립보드 복사 실패: $e')));
     }
   }
 
@@ -288,7 +316,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ...List.generate(_squads.length, (index) {
-            final isLastWithoutCandidate = !_hasCandidate && index == _squads.length - 1;
+            final isLastWithoutCandidate =
+                !_hasCandidate && index == _squads.length - 1;
             return Padding(
               padding: EdgeInsets.only(bottom: isLastWithoutCandidate ? 0 : 8),
               child: _ShareSquadPanel(
@@ -312,7 +341,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
             ),
           const SizedBox(height: 10),
           const Text(
-            'Made with Mimir',
+            'Made with MIMIR',
             textAlign: TextAlign.right,
             style: TextStyle(
               fontSize: 11,
@@ -379,7 +408,6 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                       ),
                     ),
                     const Divider(height: 1),
-
                     Flexible(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -388,18 +416,20 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                             fit: BoxFit.contain,
                             child: RepaintBoundary(
                               key: _previewCaptureKey,
-                              child: _buildFiveSquadsShareCanvas(_weaknessElement ?? '전격'),
+                              child: _buildFiveSquadsShareCanvas(
+                                  _weaknessElement ?? '전격'),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade100,
-                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                        borderRadius: const BorderRadius.vertical(
+                            bottom: Radius.circular(12)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -539,7 +569,13 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     // 후보 덱 저장
     await prefs.setBool('deck_builder_has_candidate', _hasCandidate);
     final candidateAsIds = _candidateSquad.map((n) => n?.id).toList();
-    await prefs.setString('deck_builder_candidate_squad', jsonEncode(candidateAsIds));
+    await prefs.setString(
+        'deck_builder_candidate_squad', jsonEncode(candidateAsIds));
+
+    // 약점 속성 저장
+    if (_weaknessElement != null) {
+      await prefs.setString('deck_builder_weakness_element', _weaknessElement!);
+    }
   }
 
   Future<void> _loadDeckFromLocal() async {
@@ -567,8 +603,15 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
     final rawCandidate = prefs.getString('deck_builder_candidate_squad');
     if (rawCandidate != null) {
-      final decodedCandidate = (jsonDecode(rawCandidate) as List).cast<String?>();
+      final decodedCandidate =
+          (jsonDecode(rawCandidate) as List).cast<String?>();
       _pendingCandidateIds = decodedCandidate;
+    }
+
+    // 약점 속성 로드 (routeArgs 로 들어온 게 없을 때만)
+    final savedWeakness = prefs.getString('deck_builder_weakness_element');
+    if (savedWeakness != null && _weaknessElement == null) {
+      _weaknessElement = savedWeakness;
     }
 
     if (raw == null) return;
@@ -585,7 +628,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   @override
   Widget build(BuildContext context) {
     final nikkeList = context.watch<NikkeProvider>().nikkeList;
-    _weaknessElement ??= (ModalRoute.of(context)?.settings.arguments as String?) ?? '전격';
+    _weaknessElement ??= '전격';
 
     // 각 니케가 몇 번 스쿼드에 배치되어 있는지 계산
     final Map<String, int> assignedSquadMap = {};
@@ -608,13 +651,66 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
           "덱 구성",
           style: TextStyle(
             fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.orange,
         actions: [
+          // Sleek Element Selector Dropdown
+          Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: const Color(0xFF1E2330),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _weaknessElement ?? '전격',
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      _weaknessElement = newValue;
+                    });
+                    _saveDeckToLocal();
+                  }
+                },
+                items: <String>['전격', '철갑', '작열', '수냉', '풍압']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          _elementIconMap[value] ??
+                              'assets/icons/elements/icon-elements-Electric.webp',
+                          width: 18,
+                          height: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          value,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           IconButton(
             tooltip: '덱 캡쳐',
-            icon: const Icon(Icons.camera_alt),
+            icon: const Icon(Icons.camera_alt, color: Colors.white),
             onPressed: () async {
               await _showFiveSquadsPreviewDialog();
             },
@@ -1084,7 +1180,9 @@ class _NikkeListPanelState extends State<NikkeListPanel>
 
                 final String? squadName = (squadIndex == null)
                     ? null
-                    : (squadIndex == 5 ? '후보 덱' : widget.squadNames[squadIndex]);
+                    : (squadIndex == 5
+                        ? '후보 덱'
+                        : widget.squadNames[squadIndex]);
 
                 return NikkeCard(
                   nikke: nikke,
@@ -1336,16 +1434,18 @@ class SquadPanel extends StatelessWidget {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white.withOpacity(0.08)
-                                : Colors.black.withOpacity(0.05),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white.withOpacity(0.08)
+                                    : Colors.black.withOpacity(0.05),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.add,
-                            color: Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white70
-                                : Colors.black87,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white70
+                                    : Colors.black87,
                             size: 20,
                           ),
                         ),
@@ -1359,7 +1459,8 @@ class SquadPanel extends StatelessWidget {
 
           final slots = squads[index];
           return Padding(
-            padding: EdgeInsets.only(bottom: index == squads.length - 1 ? 0 : 12),
+            padding:
+                EdgeInsets.only(bottom: index == squads.length - 1 ? 0 : 12),
             child: SquadCard(
               name: squadNames[index],
               isActive: index == activeSquadIndex,
@@ -1565,7 +1666,8 @@ class _SquadCardState extends State<SquadCard> {
                           color: Colors.red, size: 24),
                     if (widget.onDelete != null)
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                        icon: const Icon(Icons.delete_outline,
+                            color: Colors.redAccent),
                         tooltip: '후보군 제거',
                         onPressed: widget.onDelete,
                       ),
@@ -1616,7 +1718,8 @@ class _SquadCardState extends State<SquadCard> {
                         final nikke = widget.slots[actualIndex];
                         return Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 4.0),
                             child: _SquadSlot(
                               squadIndex: widget.squadIndex ?? 0,
                               slotIndex: actualIndex,
@@ -1877,9 +1980,12 @@ class _ShareSquadPanel extends StatelessWidget {
       '작열': ElementType.Fire,
       '풍압': ElementType.Wind,
     };
-    final targetEnum = elementKoreanToEnum[weaknessElement] ?? ElementType.Electric;
-    final bool hasWeaknessMatch = activeNikkes.any((n) => n.element == targetEnum);
-    final bool hasCooldownReduction = activeNikkes.any((n) => n.ability.contains("버스트 쿨타임 감소"));
+    final targetEnum =
+        elementKoreanToEnum[weaknessElement] ?? ElementType.Electric;
+    final bool hasWeaknessMatch =
+        activeNikkes.any((n) => n.element == targetEnum);
+    final bool hasCooldownReduction =
+        activeNikkes.any((n) => n.ability.contains("버스트 쿨타임 감소"));
 
     // 2. 동적 키워드 로직
     final List<String> dynamicTags = [];
@@ -2011,7 +2117,8 @@ class _ShareSquadPanel extends StatelessWidget {
                             final nikke = activeNikkes[colIndex];
                             return Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 3),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 3),
                                 child: _ShareSlotThumb(
                                   nikke: nikke,
                                   displayIndex: colIndex + 1,
@@ -2032,7 +2139,8 @@ class _ShareSquadPanel extends StatelessWidget {
                               final nikke = activeNikkes[actualIndex];
                               return Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 3),
                                   child: _ShareSlotThumb(
                                     nikke: nikke,
                                     displayIndex: actualIndex + 1,
@@ -2171,4 +2279,3 @@ class _DottedLinePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
