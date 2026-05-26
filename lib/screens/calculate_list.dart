@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mimir/widgets/ein_ada_form.dart';
 import 'package:mimir/widgets/nayuta_helm_form.dart';
 import 'package:mimir/widgets/scarlet_lib_form.dart';
@@ -39,8 +38,10 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7),
       appBar: AppBar(
         title: const Text(
           "전용 계산기 목록",
@@ -65,16 +66,16 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                 curve: Curves.easeInOut,
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isExpanded ? Colors.orange : Colors.grey.shade300,
+                    color: isExpanded ? Colors.orange : (isDark ? Colors.grey.shade800 : Colors.grey.shade300),
                     width: 1.5,
                   ),
                   boxShadow: [
                     if (isExpanded)
                       BoxShadow(
-                        color: Colors.orange.withOpacity(0.1),
+                        color: Colors.orange.withOpacity(isDark ? 0.2 : 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       )
@@ -97,7 +98,7 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                               decoration: BoxDecoration(
                                 color: isExpanded
                                     ? Colors.orange
-                                    : Colors.grey.shade100,
+                                    : (isDark ? const Color(0xFF242424) : Colors.grey.shade100),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Image.asset(
@@ -113,16 +114,17 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                                 children: [
                                   Text(
                                     item['title'],
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 16,
-                                        fontWeight: FontWeight.bold),
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.white : Colors.black),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     item['subtitle'],
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.grey.shade600),
+                                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                                   ),
                                 ],
                               ),
@@ -131,8 +133,8 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                             AnimatedRotation(
                               turns: isExpanded ? 0.5 : 0,
                               duration: const Duration(milliseconds: 300),
-                              child: const Icon(Icons.expand_more,
-                                  color: Colors.grey),
+                              child: Icon(Icons.expand_more,
+                                  color: isDark ? Colors.grey.shade400 : Colors.grey),
                             ),
                           ],
                         ),

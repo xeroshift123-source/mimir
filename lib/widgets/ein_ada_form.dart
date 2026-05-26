@@ -230,12 +230,16 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
 
   // --- 추가된 타겟팅 판별 카드 ---
   Widget _buildTargetingCheckCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange.shade200, width: 1.5),
+        border: Border.all(
+          color: isDark ? Colors.orange.shade800 : Colors.orange.shade200,
+          width: 1.5,
+        ),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const Row(children: [
@@ -256,25 +260,27 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
         ]),
         const Divider(height: 20),
         Text("• 미란다 버프 수혜자: ${bufferedNikkes.join(', ')}",
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87)),
+                color: isDark ? Colors.white : Colors.black87)),
       ]),
     );
   }
 
   Widget _targetUnitColumn(String name, double val, bool isBuffered) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(children: [
       Text(name,
           style: TextStyle(
-              fontSize: 11, color: isBuffered ? Colors.black : Colors.grey)),
+              fontSize: 11, 
+              color: isBuffered ? (isDark ? Colors.white : Colors.black) : Colors.grey)),
       const SizedBox(height: 4),
       Text(_formatter.format(val.toInt()),
           style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: isBuffered ? Colors.orange : Colors.grey)),
+              color: isBuffered ? Colors.orange : (isDark ? Colors.grey.shade400 : Colors.grey))),
       if (isBuffered)
         Container(
             margin: const EdgeInsets.only(top: 2),
@@ -333,15 +339,17 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
   }
 
   Widget _buildCompactField(String label, TextEditingController controller) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return TextField(
         controller: controller,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        style: const TextStyle(fontSize: 12),
+        style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
             labelText: label,
+            labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
             isDense: true,
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: isDark ? const Color(0xFF242424) : Colors.white,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             border: OutlineInputBorder(
@@ -349,7 +357,7 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
                 borderSide: BorderSide.none),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.grey.shade200))));
+                borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300))));
   }
 
   Widget _buildSideButton(String label, VoidCallback onTap) {
@@ -373,80 +381,103 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
   }
 
   Widget _buildToggleButton() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
         height: 50,
         child: OutlinedButton(
             onPressed: () => setState(() => _useTakina = !_useTakina),
             style: OutlinedButton.styleFrom(
                 backgroundColor: _useTakina
-                    ? Colors.redAccent.withOpacity(0.1)
-                    : Colors.white,
+                    ? Colors.redAccent.withOpacity(isDark ? 0.2 : 0.1)
+                    : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
                 side: BorderSide(
-                    color:
-                        _useTakina ? Colors.redAccent : Colors.grey.shade300),
+                    color: _useTakina ? Colors.redAccent : (isDark ? Colors.grey.shade800 : Colors.grey.shade300)),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12))),
             child: Text("타키나",
                 style: TextStyle(
-                    color: _useTakina ? Colors.redAccent : Colors.grey,
+                    color: _useTakina ? Colors.redAccent : (isDark ? Colors.grey.shade400 : Colors.grey),
                     fontWeight: FontWeight.bold,
                     fontSize: 13))));
   }
 
   Widget _buildResultCard(
       String title, double adaVal, double einVal, List<String> notes) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    double maxVal = max(adaVal, einVal);
     return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200)),
+            border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, 
+                  fontSize: 13, 
+                  color: isDark ? Colors.white : Colors.black)),
           const SizedBox(height: 10),
-          _resRow("에이다", _formatter.format(adaVal.toInt()), adaVal > einVal,
+          _resRow("에이다", _formatter.format(adaVal.toInt()), adaVal == maxVal,
               Colors.orange),
           const SizedBox(height: 4),
-          _resRow("아인", _formatter.format(einVal.toInt()), einVal > adaVal,
+          _resRow("아인", _formatter.format(einVal.toInt()), einVal == maxVal,
               Colors.blue),
           const Divider(height: 20),
           ...notes.map((n) => Padding(
               padding: const EdgeInsets.only(bottom: 2),
               child: Text("• $n",
-                  style: const TextStyle(fontSize: 10, color: Colors.grey))))
+                  style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey))))
         ]));
   }
 
   Widget _resRow(String name, String val, bool win, Color winColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(name,
           style: TextStyle(
-              fontSize: 12, color: win ? Colors.black : Colors.grey.shade600)),
+              fontSize: 12, 
+              color: win ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.grey.shade400 : Colors.grey.shade600))),
       Text(val,
           style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: win ? winColor : Colors.black87))
+              color: win ? winColor : (isDark ? Colors.grey.shade300 : Colors.black87)))
     ]);
   }
 
   Widget _buildStatusBox() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    Color boxColor;
+    Color borderColor;
+    Color textColor;
+    Color detailColor;
+
+    if (isError) {
+      boxColor = isDark ? Colors.red.shade900.withOpacity(0.4) : Colors.red.shade50;
+      borderColor = isDark ? Colors.red.shade900 : Colors.red.shade200;
+      textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
+      detailColor = isDark ? Colors.red.shade200 : Colors.red.shade900;
+    } else {
+      boxColor = isDark ? Colors.green.shade900.withOpacity(0.4) : Colors.green.shade50;
+      borderColor = isDark ? Colors.green.shade900 : Colors.green.shade200;
+      textColor = isDark ? Colors.green.shade300 : Colors.green.shade800;
+      detailColor = isDark ? Colors.green.shade200 : Colors.green.shade900;
+    }
+
     return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-            color: isError ? Colors.red.shade50 : Colors.green.shade50,
+            color: boxColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-                color: isError ? Colors.red.shade200 : Colors.green.shade200)),
+            border: Border.all(color: borderColor)),
         child: Column(
           children: [
             Text(resultMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: isError ? Colors.red.shade800 : Colors.green.shade800,
+                    color: textColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 13)),
             if (needOverloadMessage.isNotEmpty) ...[
@@ -454,7 +485,7 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
               Text(needOverloadMessage,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: isError ? Colors.red.shade900 : Colors.green.shade900,
+                      color: detailColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 12)),
             ]
@@ -500,13 +531,19 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
   }
 
   Widget _buildPopupField(String label, TextEditingController controller) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: TextField(
             controller: controller,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
             decoration: InputDecoration(
                 labelText: label,
+                labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300)),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10)))));
   }

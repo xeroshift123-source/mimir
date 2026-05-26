@@ -289,15 +289,17 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
   }
 
   Widget _buildCompactField(String label, TextEditingController controller) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return TextField(
         controller: controller,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        style: const TextStyle(fontSize: 12),
+        style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
             labelText: label,
+            labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
             isDense: true,
             filled: true,
-            fillColor: Colors.white,
+            fillColor: isDark ? const Color(0xFF242424) : Colors.white,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             border: OutlineInputBorder(
@@ -305,34 +307,36 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
                 borderSide: BorderSide.none),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.grey.shade300))));
+                borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300))));
   }
 
   Widget _buildResultCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200)),
+            border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text("계산 결과",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          Text("계산 결과",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white : Colors.black)),
           const SizedBox(height: 10),
           _resRow("리버렐리오 최종 공격력", _formatter.format(resLibFinal.toInt()), !isError, Colors.blue),
           const SizedBox(height: 4),
           _resRow("흑련 최종 공격력", _formatter.format(resScarletFinal.toInt()), isError, Colors.purple),
           const Divider(height: 20),
-          Text("• 리버렐리오: 오버 + 스킬보너스(160%)${_useRita ? ' + 리타(${_ritaAtkController.text}%)' : ''}", style: const TextStyle(fontSize: 10, color: Colors.grey)),
-          Text("• 흑련: 오버 + 스킬보너스(115.12%)${_useRita ? ' + 리타(${_ritaAtkController.text}%)' : ''}${_useCrown ? ' + 크라운버프' : ''}", style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          Text("• 리버렐리오: 오버 + 스킬보너스(160%)${_useRita ? ' + 리타(${_ritaAtkController.text}%)' : ''}", style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey)),
+          Text("• 흑련: 오버 + 스킬보너스(115.12%)${_useRita ? ' + 리타(${_ritaAtkController.text}%)' : ''}${_useCrown ? ' + 크라운버프' : ''}", style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey)),
         ]));
   }
 
   Widget _resRow(String name, String val, bool isLoser, Color charColor) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(name,
           style: TextStyle(
-              fontSize: 12, color: Colors.grey.shade800)),
+              fontSize: 12, color: isDark ? Colors.grey.shade300 : Colors.grey.shade800)),
       Text(val,
           style: TextStyle(
               fontSize: 13,
@@ -342,20 +346,37 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
   }
 
   Widget _buildStatusBox() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    Color boxColor;
+    Color borderColor;
+    Color textColor;
+    Color detailColor;
+
+    if (isError) {
+      boxColor = isDark ? Colors.red.shade900.withOpacity(0.4) : Colors.red.shade50;
+      borderColor = isDark ? Colors.red.shade900 : Colors.red.shade200;
+      textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
+      detailColor = isDark ? Colors.red.shade200 : Colors.red.shade900;
+    } else {
+      boxColor = isDark ? Colors.green.shade900.withOpacity(0.4) : Colors.green.shade50;
+      borderColor = isDark ? Colors.green.shade900 : Colors.green.shade200;
+      textColor = isDark ? Colors.green.shade300 : Colors.green.shade800;
+      detailColor = isDark ? Colors.green.shade200 : Colors.green.shade900;
+    }
+
     return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-            color: isError ? Colors.red.shade50 : Colors.green.shade50,
+            color: boxColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-                color: isError ? Colors.red.shade200 : Colors.green.shade200)),
+            border: Border.all(color: borderColor)),
         child: Column(
           children: [
             Text(resultMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: isError ? Colors.red.shade800 : Colors.green.shade800,
+                    color: textColor,
                     fontWeight: FontWeight.bold,
                     fontSize: 14)),
             if (needOverloadMessage.isNotEmpty) ...[
@@ -363,7 +384,7 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
               Text(needOverloadMessage,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: isError ? Colors.red.shade900 : Colors.green.shade900,
+                      color: detailColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 12)),
             ]

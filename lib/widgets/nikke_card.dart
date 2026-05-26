@@ -64,6 +64,7 @@ class NikkeCard extends StatelessWidget {
                     : null,
               ),
               child: Card(
+                color: Colors.white,
                 clipBehavior: Clip.antiAlias,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4 * scale),

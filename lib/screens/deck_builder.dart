@@ -378,6 +378,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
               if (!didPop) Navigator.of(context).pop();
             },
             child: Dialog(
+              backgroundColor: Colors.white,
               insetPadding: const EdgeInsets.all(12),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -396,30 +397,31 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                       child: Row(
                         children: [
                           const Expanded(
-                            child: Text('미리보기',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w600)),
+                            child: Text(
+                              '미리보기',
+                              style: TextStyle(
+                                fontSize: 16, 
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.close, size: 18),
+                            icon: const Icon(Icons.close, size: 18, color: Colors.black),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
                         ],
                       ),
                     ),
-                    const Divider(height: 1),
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                        child: Center(
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            child: RepaintBoundary(
-                              key: _previewCaptureKey,
-                              child: _buildFiveSquadsShareCanvas(
-                                  _weaknessElement ?? '전격'),
-                            ),
-                          ),
+                    const Divider(height: 1, color: Colors.grey),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: RepaintBoundary(
+                          key: _previewCaptureKey,
+                          child: _buildFiveSquadsShareCanvas(
+                              _weaknessElement ?? '전격'),
                         ),
                       ),
                     ),
@@ -435,14 +437,22 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton.icon(
-                            icon: const Icon(Icons.content_copy),
-                            label: const Text('클립보드 복사'),
+                            icon: const Icon(Icons.content_copy, color: Colors.orange),
+                            label: const Text('클립보드 복사', style: TextStyle(color: Colors.orange)),
                             onPressed: _copyToClipboard,
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton.icon(
-                            icon: const Icon(Icons.download),
-                            label: const Text('이미지 다운로드'),
+                            icon: const Icon(Icons.download, color: Colors.white),
+                            label: const Text('이미지 다운로드', style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                             onPressed: _downloadPreview,
                           ),
                         ],
@@ -660,7 +670,9 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
           // Sleek Element Selector Dropdown
           Theme(
             data: Theme.of(context).copyWith(
-              canvasColor: const Color(0xFF1E2330),
+              canvasColor: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF2D2D2D) // M2 8dp surface
+                  : Colors.white,
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
@@ -846,7 +858,9 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
               },
               child: Container(
                 height: 48,
-                color: Colors.grey.shade900,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E1E1E)
+                    : const Color(0xFFE0E0E0),
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -855,15 +869,19 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withOpacity(0.7)
+                            : Colors.black.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       '니케 목록 열기',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white70
+                            : Colors.black87,
                         fontSize: 12,
                       ),
                     ),
@@ -1425,7 +1443,7 @@ class SquadPanel extends StatelessWidget {
                     margin: EdgeInsets.zero,
                     clipBehavior: Clip.antiAlias,
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF1B1D2A)
+                        ? const Color(0xFF1E1E1E) // M2 1dp surface
                         : const Color(0xFFF0F4FA),
                     child: InkWell(
                       onTap: onAddCandidate,
@@ -1598,7 +1616,7 @@ class _SquadCardState extends State<SquadCard> {
             InkWell(
               onTap: widget.onHeaderTap,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(color: Colors.transparent, width: 1),
@@ -1624,6 +1642,7 @@ class _SquadCardState extends State<SquadCard> {
                                 focusNode: _focusNode,
                                 decoration: const InputDecoration(
                                   isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(vertical: 4),
                                   border: InputBorder.none,
                                 ),
                                 style: const TextStyle(
@@ -1641,7 +1660,7 @@ class _SquadCardState extends State<SquadCard> {
                               onTap: _startEditing, // ✅ 이름 누르면 바로 인라인 편집
                               child: Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 6),
+                                    const EdgeInsets.symmetric(vertical: 4),
                                 child: Text(
                                   widget.name,
                                   style: const TextStyle(
@@ -1659,6 +1678,8 @@ class _SquadCardState extends State<SquadCard> {
                       IconButton(
                         icon: const Icon(Icons.check),
                         tooltip: '이름 저장',
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                         onPressed: _commitName,
                       ),
                     if (widget.hasWarning)
@@ -1669,18 +1690,22 @@ class _SquadCardState extends State<SquadCard> {
                         icon: const Icon(Icons.delete_outline,
                             color: Colors.redAccent),
                         tooltip: '후보군 제거',
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                         onPressed: widget.onDelete,
                       ),
                     IconButton(
                       icon: const Icon(Icons.refresh),
                       tooltip: '스쿼드 초기화',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                       onPressed: widget.onReset, // 아래에서 추가할 콜백
                     )
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
             // 슬롯 5개 (기존 그대로)
             Column(

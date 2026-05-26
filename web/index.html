@@ -41,6 +41,67 @@
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
+  <style>
+    body {
+      background-color: #121212;
+      margin: 0;
+      padding: 0;
+    }
+    
+    #loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 99999;
+      background-color: #121212;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .loading-container {
+      text-align: center;
+    }
+
+    .spinner {
+      width: 52px;
+      height: 52px;
+      border: 5px solid rgba(245, 124, 0, 0.15); /* Light orange track */
+      border-top-color: #f77c00; /* Deep orange spinner active color */
+      border-radius: 50%;
+      animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      margin: 0 auto 20px auto;
+    }
+
+    .loading-text {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 <script>
   async function captureElementById(elementId, fileName) {
@@ -89,6 +150,13 @@
 </script>
 
 <body>
+  <div id="loading">
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <div class="loading-text">Loading Mimir</div>
+    </div>
+  </div>
+
   <script>
     window.addEventListener('load', function (ev) {
       // Download main.dart.js
@@ -99,6 +167,15 @@
         onEntrypointLoaded: function (engineInitializer) {
           engineInitializer.initializeEngine().then(function (appRunner) {
             appRunner.runApp();
+            
+            // Fading out and removing the loading screen beautifully
+            var loading = document.getElementById('loading');
+            if (loading) {
+              loading.style.opacity = '0';
+              setTimeout(function () {
+                loading.remove();
+              }, 500);
+            }
           });
         }
       });
