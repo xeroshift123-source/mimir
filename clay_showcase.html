@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clay Design System Showcase</title>
+  
+  <!-- CSS Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icon Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* -------------------------------------------------------------------------- */
+    /* 1. Global Themes & Custom Properties                                        */
+    /* -------------------------------------------------------------------------- */
+    :root {
+      /* Palette */
+      --clay-black: #000000;
+      --pure-white: #ffffff;
+      --warm-cream: #faf9f7;
+
+      /* Swatches */
+      --matcha-300: #84e7a5;
+      --matcha-600: #078a52;
+      --matcha-800: #02492a;
+
+      --slushie-500: #3bd3fd;
+      --slushie-800: #0089ad;
+
+      --lemon-400: #f8cc65;
+      --lemon-500: #fbbd41;
+      --lemon-700: #d08a11;
+      --lemon-800: #9d6a09;
+
+      --ube-300: #c1b0ff;
+      --ube-800: #43089f;
+      --ube-900: #32037d;
+
+      --pomegranate-400: #fc7981;
+      --blueberry-800: #01418d;
+
+      /* Neutrals */
+      --warm-silver: #9f9b93;
+      --warm-charcoal: #55534e;
+      --dark-charcoal: #333333;
+
+      /* Borders */
+      --oat-border: #dad4c8;
+      --oat-light: #eee9df;
+      --cool-border: #e6e8ec;
+      --dark-border: #525a69;
+      --light-frost: #eff1f3;
+
+      /* Badges */
+      --badge-blue-bg: #f0f8ff;
+      --badge-blue-text: #3859f9;
+
+      /* Typo Fallbacks */
+      --font-primary: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'Space Mono', 'SFMono-Regular', Consolas, "Liberation Mono", Menlo, monospace;
+
+      /* Elevation Shadows */
+      --clay-shadow: 0px 1px 1px rgba(0,0,0,0.1), 0px -1px 1px inset rgba(0,0,0,0.04), 0px -0.5px 1px rgba(0,0,0,0.05);
+
+      /* Adaptive Variables */
+      --bg-color: var(--warm-cream);
+      --fg-color: var(--clay-black);
+      --border-color: var(--oat-border);
+      --border-light: var(--oat-light);
+      --card-bg: var(--pure-white);
+      --input-bg: var(--pure-white);
+      --glass-bg: rgba(250, 249, 247, 0.75);
+    }
+
+    .dark {
+      --bg-color: #15130f;
+      --fg-color: #fafafa;
+      --border-color: #322f29;
+      --border-light: #2a2822;
+      --card-bg: #201e18;
+      --input-bg: #1a1813;
+      --clay-black: #fafafa;
+      --glass-bg: rgba(21, 19, 15, 0.75);
+      --clay-shadow: 0px 1px 1px rgba(0,0,0,0.3), 0px -1px 1px inset rgba(255,255,255,0.02), 0px -0.5px 1px rgba(0,0,0,0.2);
+    }
+
+    /* Base resets */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--fg-color);
+      font-family: var(--font-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 2. Typo stylistic custom mapping                                           */
+    /* -------------------------------------------------------------------------- */
+    h1, h2, h3, h4, .roobert-heading {
+      font-feature-settings: "ss01" on, "ss03" on, "ss10" on, "ss11" on, "ss12" on;
+      font-weight: 600;
+    }
+
+    .roobert-body {
+      font-feature-settings: "ss03" on, "ss10" on, "ss11" on, "ss12" on;
+    }
+
+    .space-mono {
+      font-family: var(--font-mono);
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 3. Global CSS Layout & structural utility                                   */
+    /* -------------------------------------------------------------------------- */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 4. Glassmorphic Navigation Header                                          */
+    /* -------------------------------------------------------------------------- */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .nav-inner {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+      color: var(--fg-color);
+    }
+
+    .brand-logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--lemon-500);
+      border: 2px solid var(--clay-black);
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 800;
+      color: #000000;
+      box-shadow: var(--clay-shadow);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    nav a {
+      font-family: var(--font-primary);
+      font-feature-settings: "ss03" on, "ss10" on, "ss11" on, "ss12" on;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--warm-charcoal);
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--fg-color);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 5. Custom Button Styles & Playful Micro-Animations                        */
+    /* -------------------------------------------------------------------------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-primary);
+      font-feature-settings: "ss03" on, "ss10" on, "ss11" on, "ss12" on;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                  box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                  background-color 0.2s ease,
+                  color 0.2s ease,
+                  border-color 0.2s ease;
+      box-shadow: var(--clay-shadow);
+      border: 1px solid transparent;
+    }
+
+    /* Primary playful hover button */
+    .btn-primary {
+      background: var(--lemon-500);
+      color: #000000;
+      border-color: var(--clay-black);
+      border-width: 1px;
+    }
+
+    .btn-primary:hover {
+      background: var(--ube-300);
+      color: #000000;
+      border-color: var(--clay-black);
+      transform: translateY(-4px) rotateZ(-3deg);
+      box-shadow: -5px 5px 0px #000000;
+    }
+
+    /* Secondary */
+    .btn-secondary {
+      background: var(--card-bg);
+      color: var(--fg-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--fg-color);
+      transform: translateY(-2px);
+    }
+
+    /* Ghost button */
+    .btn-ghost {
+      background: transparent;
+      color: var(--fg-color);
+      box-shadow: none;
+    }
+
+    .btn-ghost:hover {
+      background: var(--light-frost);
+      transform: translateY(-2px);
+      box-shadow: var(--clay-shadow);
+    }
+
+    /* Compact sizing */
+    .btn-compact {
+      font-size: 12.8px;
+      padding: 6px 12px;
+    }
+
+    /* Theme toggle button styling */
+    .theme-toggle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      color: var(--fg-color);
+      box-shadow: var(--clay-shadow);
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      transform: scale(1.05) rotate(15deg);
+      border-color: var(--fg-color);
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 6. Section & Page Layouts                                                  */
+    /* -------------------------------------------------------------------------- */
+    .hero-section {
+      padding-top: 140px;
+      padding-bottom: 72px;
+      text-align: center;
+      background-image: radial-gradient(var(--border-light) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+
+    .hero-pretitle {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.08px;
+      color: var(--warm-charcoal);
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: 80px;
+      line-height: 1.0;
+      letter-spacing: -3.2px;
+      color: var(--fg-color);
+      margin-bottom: 24px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-subtitle {
+      font-size: 20px;
+      line-height: 1.4;
+      font-weight: 400;
+      color: var(--warm-charcoal);
+      max-width: 600px;
+      margin: 0 auto 36px auto;
+      font-feature-settings: "ss03" on, "ss10" on, "ss11" on, "ss12" on;
+    }
+
+    /* Responsive scaling for display typography */
+    @media (max-width: 991px) {
+      .hero-title {
+        font-size: 60px;
+        letter-spacing: -2.4px;
+      }
+    }
+    @media (max-width: 767px) {
+      .hero-title {
+        font-size: 44px;
+        letter-spacing: -1.32px;
+      }
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 7. Components Panels - Showcase & Tabs                                     */
+    /* -------------------------------------------------------------------------- */
+    .showcase-tabs-container {
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .showcase-tabs {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 40px;
+      padding: 6px;
+      display: flex;
+      gap: 4px;
+      box-shadow: var(--clay-shadow);
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 10px 24px;
+      border-radius: 1584px;
+      font-family: var(--font-primary);
+      font-feature-settings: "ss03" on, "ss10" on, "ss11" on, "ss12" on;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--warm-charcoal);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--fg-color);
+      color: var(--bg-color);
+    }
+
+    .showcase-section {
+      display: none;
+    }
+
+    .showcase-section.active {
+      display: block;
+      animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 8. Outbound GTM Spreadsheet (Table Component)                              */
+    /* -------------------------------------------------------------------------- */
+    .spreadsheet-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--clay-shadow);
+      overflow-x: auto;
+      margin-bottom: 40px;
+    }
+
+    .spreadsheet-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .spreadsheet-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fg-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .spreadsheet-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .spreadsheet-table th {
+      background: var(--bg-color);
+      font-weight: 600;
+      color: var(--warm-charcoal);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      font-feature-settings: "ss03" on, "ss10" on, "ss11" on, "ss12" on;
+      user-select: none;
+    }
+
+    .spreadsheet-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-light);
+      border-right: 1px solid var(--border-light);
+      color: var(--fg-color);
+      white-space: nowrap;
+      transition: background-color 0.15s ease;
+    }
+
+    .spreadsheet-table tbody tr:hover td {
+      background-color: var(--bg-color);
+    }
+
+    .editable-cell {
+      position: relative;
+      cursor: text;
+    }
+
+    .editable-cell input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 2px solid var(--lemon-500) !important;
+      padding: 10px 16px;
+      font-family: var(--font-primary);
+      font-size: 13px;
+      outline: none;
+      background: var(--input-bg);
+      color: var(--fg-color);
+      display: none;
+    }
+
+    .editable-cell.editing input {
+      display: block;
+    }
+
+    .enrich-status-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .enrich-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      color: var(--warm-charcoal);
+      transition: all 0.15s ease;
+    }
+
+    .enrich-btn:hover {
+      border-color: var(--fg-color);
+      color: var(--fg-color);
+      background: var(--lemon-400);
+    }
+
+    /* Cell-specific animation loading states */
+    .cell-loader {
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--lemon-700);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .success-pulse {
+      animation: greenPulse 1.2s ease-out;
+    }
+
+    @keyframes greenPulse {
+      0% { background-color: transparent; }
+      20% { background-color: rgba(132, 231, 165, 0.4); }
+      100% { background-color: transparent; }
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 9. Card, Input, & Badges Stylings                                          */
+    /* -------------------------------------------------------------------------- */
+    .showcase-grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    /* Custom high-fidelity Clay Card */
+    .clay-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--clay-shadow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .clay-card-dashed {
+      border-style: dashed;
+    }
+
+    .clay-card:hover {
+      transform: translateY(-6px) rotate(1deg);
+      box-shadow: -6px 6px 0px var(--fg-color);
+    }
+
+    .card-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.08px;
+      color: var(--warm-silver);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .card-title {
+      font-size: 24px;
+      letter-spacing: -0.64px;
+      color: var(--fg-color);
+      margin-bottom: 16px;
+    }
+
+    .card-body {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--warm-charcoal);
+      margin-bottom: 24px;
+      font-feature-settings: "ss03" on, "ss10" on, "ss11" on, "ss12" on;
+    }
+
+    /* Named Swatch Badges Capsules */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 11px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .badge-matcha { background: var(--matcha-300); color: var(--matcha-800); }
+    .badge-slushie { background: var(--slushie-500); color: var(--slushie-800); }
+    .badge-lemon { background: var(--lemon-400); color: var(--lemon-800); }
+    .badge-ube { background: var(--ube-300); color: var(--ube-800); }
+    .badge-pomegranate { background: var(--pomegranate-400); color: #801018; }
+    .badge-blueberry { background: #d0e6ff; color: var(--blueberry-800); }
+
+    /* Forms Inputs Elements */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.08px;
+      color: var(--warm-charcoal);
+      margin-bottom: 8px;
+    }
+
+    .input-field {
+      width: 100%;
+      font-family: var(--font-primary);
+      font-size: 14px;
+      color: #000000;
+      background: var(--input-bg);
+      border: 1px solid #717989;
+      border-radius: 8px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dark .input-field {
+      color: #ffffff;
+    }
+
+    .input-field:focus {
+      border-color: #000000;
+      box-shadow: 0 0 0 2px var(--lemon-500);
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 10. Colorful Swatch Sections Showcase                                      */
+    /* -------------------------------------------------------------------------- */
+    .swatch-showcase-bar {
+      margin-top: 72px;
+      margin-bottom: 72px;
+      border-radius: 40px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--clay-shadow);
+    }
+
+    .swatch-panel {
+      padding: 64px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .swatch-panel-matcha {
+      background-color: var(--matcha-800);
+      color: #ffffff;
+    }
+
+    .swatch-panel-slushie {
+      background-color: var(--slushie-800);
+      color: #ffffff;
+    }
+
+    .swatch-panel-ube {
+      background-color: var(--ube-900);
+      color: #ffffff;
+    }
+
+    .swatch-panel-lemon {
+      background-color: var(--lemon-400);
+      color: #000000;
+    }
+
+    .swatch-panel-title {
+      font-size: 32px;
+      letter-spacing: -0.64px;
+    }
+
+    .swatch-panel-body {
+      max-width: 600px;
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.85;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 11. Modal Dialog Component                                                */
+    /* -------------------------------------------------------------------------- */
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dialog-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .dialog-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 500px;
+      padding: 32px;
+      box-shadow: -8px 8px 0px #000000;
+      transform: scale(0.9) translateY(24px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bounce Entry */
+    }
+
+    .dialog-overlay.active .dialog-box {
+      transform: scale(1) translateY(0);
+    }
+
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .dialog-title {
+      font-size: 24px;
+      letter-spacing: -0.64px;
+      color: var(--fg-color);
+    }
+
+    .dialog-close {
+      background: transparent;
+      border: none;
+      color: var(--warm-charcoal);
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    .dialog-close:hover {
+      color: var(--fg-color);
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 12. Interactive Sandbox Playground Panel                                   */
+    /* -------------------------------------------------------------------------- */
+    .sandbox-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 80px;
+      box-shadow: var(--clay-shadow);
+    }
+
+    .sandbox-header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .sandbox-title {
+      font-size: 32px;
+      letter-spacing: -0.88px;
+      margin-bottom: 12px;
+    }
+
+    .sandbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      align-items: center;
+    }
+
+    .sandbox-preview {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 40px;
+      border: 1px dashed var(--border-color);
+      background: var(--bg-color);
+      border-radius: 16px;
+      min-height: 200px;
+      position: relative;
+    }
+
+    .playground-button-wrapper {
+      perspective: 800px;
+    }
+
+    /* Dynamically adjusted playground button */
+    #playground-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-primary);
+      font-size: 16px;
+      font-weight: 500;
+      padding: 14px 28px;
+      border-radius: 4px;
+      background: var(--lemon-500);
+      color: #000000;
+      border: 1px solid #000000;
+      cursor: pointer;
+      box-shadow: var(--clay-shadow);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sandbox-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .control-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control-row label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.08px;
+      color: var(--warm-charcoal);
+    }
+
+    .control-row select, .control-row input[type="range"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--fg-color);
+      border-radius: 6px;
+      outline: none;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* 13. Footer                                                                 */
+    /* -------------------------------------------------------------------------- */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 64px 0;
+      background: var(--card-bg);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 14px;
+      color: var(--warm-silver);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--fg-color);
+    }
+
+    .copyright {
+      font-size: 13px;
+      color: var(--warm-silver);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- -------------------------------------------------------------------------- -->
+  <!-- 1. Header Navigation Bar                                                   -->
+  <!-- -------------------------------------------------------------------------- -->
+  <header>
+    <div class="container nav-inner">
+      <a href="#" class="brand-logo">
+        <div class="brand-logo-mark">c</div>
+        <span>Clay</span>
+      </a>
+      
+      <nav>
+        <a href="#hero" class="active">Home</a>
+        <a href="#showcase">Components</a>
+        <a href="#spreadsheet">GTM Outbound</a>
+        <a href="#sandbox">Sandbox</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle dark mode">
+          <i data-lucide="moon"></i>
+        </button>
+        <button class="btn btn-primary" id="open-dialog-btn">
+          <span>Outbound Pitch</span>
+          <i data-lucide="sparkles"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- -------------------------------------------------------------------------- -->
+  <!-- 2. Hero Banner                                                             -->
+  <!-- -------------------------------------------------------------------------- -->
+  <section class="hero-section" id="hero">
+    <div class="container">
+      <span class="hero-pretitle">The design language of craft</span>
+      <h1 class="hero-title">Enrich data like an artisan.</h1>
+      <p class="hero-subtitle">
+        A warm, playful Swatch-driven custom design system made for outbound workflows, RevOps builders, and premium GTM engineering.
+      </p>
+      <div style="display: flex; gap: 16px; justify-content: center;">
+        <button class="btn btn-primary" id="hero-btn-cta">
+          <span>Start Outbounding</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+        <a href="#showcase" class="btn btn-secondary">
+          <span>View Components</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------------------------------- -->
+  <!-- 3. Component Showcase Tabs & Grid                                          -->
+  <!-- -------------------------------------------------------------------------- -->
+  <section class="container" id="showcase" style="padding-top: 24px; padding-bottom: 72px;">
+    
+    <div class="showcase-tabs-container">
+      <div class="showcase-tabs">
+        <button class="tab-btn active" data-target="panel-interactive">Live Playgrounds</button>
+        <button class="tab-btn" data-target="panel-standard">Basic Elements</button>
+      </div>
+    </div>
+
+    <!-- Active Tab Panel: Live Interactive Components -->
+    <div class="showcase-section active" id="panel-interactive">
+      
+      <!-- Component: Outline GTM Lead Enrichment Spreadsheet -->
+      <div id="spreadsheet">
+        <div class="spreadsheet-container">
+          <div class="spreadsheet-bar">
+            <div class="spreadsheet-title">
+              <i data-lucide="table" style="color: var(--lemon-700)"></i>
+              <span>Active Outbound Lead Personalizer Pipeline</span>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <span class="space-mono" style="font-size: 11px; color: var(--warm-silver)">150 Integrated Providers</span>
+              <button class="btn btn-secondary btn-compact" id="add-spreadsheet-row">
+                <i data-lucide="plus"></i>
+                <span>Add Row</span>
+              </button>
+            </div>
+          </div>
+          
+          <table class="spreadsheet-table" id="leads-table">
+            <thead>
+              <tr>
+                <th style="width: 48px; text-align: center;">Run</th>
+                <th>Lead Profile</th>
+                <th>Company Domain</th>
+                <th>Outbound Stage</th>
+                <th>LinkedIn Contact</th>
+                <th>Verification State</th>
+                <th>Enriched By</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="success-pulse">
+                <td style="text-align: center;">
+                  <button class="enrich-btn" onclick="triggerRowEnrich(this)">
+                    <i data-lucide="play" style="width: 12px; height: 12px;"></i>
+                    <div class="cell-loader"></div>
+                  </button>
+                </td>
+                <td class="editable-cell" onclick="makeCellEditable(this)">
+                  <span class="cell-text">Yusuf Khan</span>
+                  <input type="text" value="Yusuf Khan" onblur="saveCell(this)">
+                </td>
+                <td class="editable-cell" onclick="makeCellEditable(this)">
+                  <span class="cell-text">stripe.com</span>
+                  <input type="text" value="stripe.com" onblur="saveCell(this)">
+                </td>
+                <td>
+                  <span class="badge badge-matcha">Matcha Success</span>
+                </td>
+                <td class="space-mono">/in/yusufkhan-revops</td>
+                <td>
+                  <div class="enrich-status-container">
+                    <i data-lucide="check-circle-2" style="width: 14px; height: 14px; color: var(--matcha-600)"></i>
+                    <span>Verified</span>
+                  </div>
+                </td>
+                <td>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <i data-lucide="shield" style="width: 14px; height: 14px; color: var(--blueberry-800)"></i>
+                    <span class="space-mono" style="font-size: 11px;">Clearbit API</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center;">
+                  <button class="enrich-btn" onclick="triggerRowEnrich(this)">
+                    <i data-lucide="play" style="width: 12px; height: 12px;"></i>
+                    <div class="cell-loader"></div>
+                  </button>
+                </td>
+                <td class="editable-cell" onclick="makeCellEditable(this)">
+                  <span class="cell-text">Sarah Yoon</span>
+                  <input type="text" value="Sarah Yoon" onblur="saveCell(this)">
+                </td>
+                <td class="editable-cell" onclick="makeCellEditable(this)">
+                  <span class="cell-text">clay.com</span>
+                  <input type="text" value="clay.com" onblur="saveCell(this)">
+                </td>
+                <td>
+                  <span class="badge badge-slushie">Slushie Pending</span>
+                </td>
+                <td class="space-mono">/in/sarah-yoon-sfdc</td>
+                <td>
+                  <div class="enrich-status-container">
+                    <i data-lucide="refresh-cw" style="width: 14px; height: 14px; color: var(--slushie-800)" class="spinning-icon-static"></i>
+                    <span>Processing</span>
+                  </div>
+                </td>
+                <td>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <i data-lucide="zap" style="width: 14px; height: 14px; color: var(--lemon-700)"></i>
+                    <span class="space-mono" style="font-size: 11px;">Hunter API</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center;">
+                  <button class="enrich-btn" onclick="triggerRowEnrich(this)">
+                    <i data-lucide="play" style="width: 12px; height: 12px;"></i>
+                    <div class="cell-loader"></div>
+                  </button>
+                </td>
+                <td class="editable-cell" onclick="makeCellEditable(this)">
+                  <span class="cell-text">Olivia Bennett</span>
+                  <input type="text" value="Olivia Bennett" onblur="saveCell(this)">
+                </td>
+                <td class="editable-cell" onclick="makeCellEditable(this)">
+                  <span class="cell-text">retool.com</span>
+                  <input type="text" value="retool.com" onblur="saveCell(this)">
+                </td>
+                <td>
+                  <span class="badge badge-pomegranate">Pomegranate Error</span>
+                </td>
+                <td class="space-mono">/in/oliviabennett-foundry</td>
+                <td>
+                  <div class="enrich-status-container">
+                    <i data-lucide="alert-triangle" style="width: 14px; height: 14px; color: var(--pomegranate-400)"></i>
+                    <span>Rate Limited</span>
+                  </div>
+                </td>
+                <td>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <i data-lucide="globe" style="width: 14px; height: 14px; color: var(--warm-charcoal)"></i>
+                    <span class="space-mono" style="font-size: 11px;">Lusha API</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Component: Custom Clay Cards Grid -->
+      <div class="showcase-grid-cards">
+        
+        <!-- Interactive Card 1 -->
+        <div class="clay-card">
+          <span class="card-meta">Matcha Flavour</span>
+          <h3 class="card-title">Craft-driven Outbound</h3>
+          <p class="card-body">
+            Enrich leads through dozens of specific API recipe stages without the typical enterprise clunkiness. Designed to look and feel beautiful.
+          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="badge badge-matcha">Swatches</span>
+            <i data-lucide="sparkles" style="color: var(--matcha-600)"></i>
+          </div>
+        </div>
+
+        <!-- Interactive Card 2 (Dashed Border Option) -->
+        <div class="clay-card clay-card-dashed">
+          <span class="card-meta">Dashed Decisive Accent</span>
+          <h3 class="card-title">Recipe-Style Transparency</h3>
+          <p class="card-body">
+            Configure every provider, prompt, and criteria transparently. Dashed borders combine with solid ones to capture manual precision.
+          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="badge badge-slushie">Dashed Oat</span>
+            <i data-lucide="layers" style="color: var(--slushie-800)"></i>
+          </div>
+        </div>
+
+        <!-- Interactive Card 3 -->
+        <div class="clay-card">
+          <span class="card-meta">Tactile Shadows</span>
+          <h3 class="card-title">Embedded Highlights</h3>
+          <p class="card-body">
+            Our shadows use multi-layer inset styles so panels feel pressed directly into the Warm Cream paper canvas. Touch it to rotate slightly!
+          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="badge badge-lemon">Three-layer depth</span>
+            <i data-lucide="eye" style="color: var(--lemon-700)"></i>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Secondary Tab Panel: Basic CSS Component Styles -->
+    <div class="showcase-section" id="panel-standard">
+      <div class="showcase-grid-cards">
+        
+        <!-- Standard Card detailing buttons & icons -->
+        <div class="clay-card">
+          <h3 class="card-title">Responsive CTA Buttons</h3>
+          <p class="card-body">
+            Clay buttons tilt playfully `-3deg` and translation upward with a crisp offset shadow when hovered.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="btn btn-primary" style="width: 100%;">
+              <span>Primary Outbound</span>
+              <i data-lucide="arrow-right"></i>
+            </button>
+            <button class="btn btn-secondary" style="width: 100%;">
+              <span>Secondary Actions</span>
+            </button>
+            <button class="btn btn-ghost" style="width: 100%;">
+              <span>Ghost Options</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Standard Card detailing inputs and forms -->
+        <div class="clay-card">
+          <h3 class="card-title">Tactile Form Fields</h3>
+          <p class="card-body">
+            Fully bordered boxes with clean geometric parameters, custom shadows, and gold focus rings.
+          </p>
+          <div class="input-group">
+            <label class="input-label" for="example-name">Outbound Domain</label>
+            <input type="text" id="example-name" class="input-field" placeholder="e.g. google.com">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="example-plan">Recipe Provider</label>
+            <select id="example-plan" class="input-field" style="background-image: none;">
+              <option>Clearbit Custom Search</option>
+              <option>Hunter Email Match</option>
+              <option>Lusha Contact Sync</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Standard Card detailing badges -->
+        <div class="clay-card">
+          <h3 class="card-title">Swatch Capsule Badges</h3>
+          <p class="card-body">
+            Colorful named swatch capsules mapping data statuses and pipeline priorities across the workspace.
+          </p>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <span class="badge badge-matcha">Matcha Green</span>
+            <span class="badge badge-slushie">Slushie Cyan</span>
+            <span class="badge badge-lemon">Lemon Gold</span>
+            <span class="badge badge-ube">Ube Purple</span>
+            <span class="badge badge-pomegranate">Pomegranate Pink</span>
+            <span class="badge badge-blueberry">Blueberry Navy</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- -------------------------------------------------------------------------- -->
+  <!-- 4. Interactive Sandbox Playground Panel                                     -->
+  <!-- -------------------------------------------------------------------------- -->
+  <section class="container" id="sandbox">
+    <div class="sandbox-panel">
+      <div class="sandbox-header">
+        <h2 class="sandbox-title roobert-heading">Dynamic Hover sandbox</h2>
+        <p class="roobert-body" style="color: var(--warm-charcoal); font-size: 16px;">
+          Tweak active rotation and lift translations to test Clay's physical micro-interactions on the button below.
+        </p>
+      </div>
+
+      <div class="sandbox-grid">
+        <div class="sandbox-preview">
+          <div class="playground-button-wrapper">
+            <button id="playground-btn">
+              <span>Playground Outbound</span>
+              <i data-lucide="play-circle"></i>
+            </button>
+          </div>
+          <span class="space-mono" style="font-size: 11px; color: var(--warm-silver)" id="physics-status">
+            Physics: active
+          </span>
+        </div>
+
+        <div class="sandbox-controls">
+          <div class="control-row">
+            <label for="rot-control">Hover Rotation Angle</label>
+            <input type="range" id="rot-control" min="-15" max="15" value="-4">
+          </div>
+          <div class="control-row">
+            <label for="lift-control">Hover Lift Translate (px)</label>
+            <input type="range" id="lift-control" min="0" max="12" value="4">
+          </div>
+          <div class="control-row">
+            <label for="color-control">Hover Swatch Background</label>
+            <select id="color-control">
+              <option value="var(--ube-300)" selected>Ube Purple</option>
+              <option value="var(--matcha-300)">Matcha Green</option>
+              <option value="var(--slushie-500)">Slushie Cyan</option>
+              <option value="var(--pomegranate-400)">Pomegranate Pink</option>
+              <option value="var(--lemon-400)">Lemon Gold</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------------------------------- -->
+  <!-- 5. Swatch Sections Storytelling Bar                                        -->
+  <!-- -------------------------------------------------------------------------- -->
+  <section class="container">
+    <div class="swatch-showcase-bar">
+      
+      <!-- Story 1: Matcha -->
+      <div class="swatch-panel swatch-panel-matcha">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="swatch-panel-title roobert-heading">Matches outbound pipeline</h3>
+          <span class="badge badge-matcha">Matcha Green</span>
+        </div>
+        <p class="swatch-panel-body">
+          Clay connects seamlessly to your CRM tools and cold outreach tools. Track successful enrichments visually and dynamically with our Matcha green signals.
+        </p>
+      </div>
+
+      <!-- Story 2: Slushie -->
+      <div class="swatch-panel swatch-panel-slushie">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="swatch-panel-title roobert-heading">Slushie automation stages</h3>
+          <span class="badge badge-slushie">Slushie Cyan</span>
+        </div>
+        <p class="swatch-panel-body">
+          Run webhooks, automated scraper prompts, and batch API runs safely. Watch processing data stream live into cells using clean Slushie cyan status logs.
+        </p>
+      </div>
+
+      <!-- Story 3: Ube -->
+      <div class="swatch-panel swatch-panel-ube">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="swatch-panel-title roobert-heading">Ube premium configurations</h3>
+          <span class="badge badge-ube">Ube Purple</span>
+        </div>
+        <p class="swatch-panel-body">
+          GTM engineers can create extremely complex, custom-mapped multi-step integrations that scale infinitely, fully anchored by Ube purple accents.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------------------------------- -->
+  <!-- 6. Custom Modal Dialog Box                                                 -->
+  <!-- -------------------------------------------------------------------------- -->
+  <div class="dialog-overlay" id="dialog-overlay">
+    <div class="dialog-box">
+      <div class="dialog-header">
+        <h3 class="dialog-title roobert-heading">Create GTM Outbound Pitch</h3>
+        <button class="dialog-close" id="dialog-close-btn">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      
+      <div class="dialog-content">
+        <div class="input-group">
+          <label class="input-label" for="dialog-enrich-prompt">Personalization AI Prompt</label>
+          <textarea id="dialog-enrich-prompt" class="input-field" style="min-height: 100px; resize: vertical;" placeholder="Write a crisp outbound pitch mentioning their recent role changes..."></textarea>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="dialog-enrich-prov">Fallback Enrichment API</label>
+          <select id="dialog-enrich-prov" class="input-field">
+            <option>Hunter Email Verification</option>
+            <option>Clearbit Business Bio Lookup</option>
+            <option>Apollo Outreach Verification</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" id="dialog-cancel-btn">Cancel</button>
+        <button class="btn btn-primary" id="dialog-submit-btn">Run AI Pitcher</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- -------------------------------------------------------------------------- -->
+  <!-- 7. Footer                                                                  -->
+  <!-- -------------------------------------------------------------------------- -->
+  <footer>
+    <div class="container footer-inner">
+      <a href="#" class="brand-logo">
+        <div class="brand-logo-mark">c</div>
+        <span>Clay</span>
+      </a>
+      
+      <div class="footer-links">
+        <a href="#hero">Overview</a>
+        <a href="#showcase">Components</a>
+        <a href="#spreadsheet">Pipelines</a>
+        <a href="https://www.clay.com" target="_blank">Homepage</a>
+      </div>
+      
+      <span class="copyright space-mono">&copy; 2026 Clay Custom Design System Showcase</span>
+    </div>
+  </footer>
+
+  <!-- -------------------------------------------------------------------------- -->
+  <!-- 8. Interactive JS Control Logic                                            -->
+  <!-- -------------------------------------------------------------------------- -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // 1. Dark Mode Toggle
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const toggleIcon = themeToggleBtn.querySelector('i');
+    
+    // Check local storage or defaults
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      themeToggleBtn.setAttribute('aria-label', 'Switch to light mode');
+      // Redraw icon to sun
+      themeToggleBtn.innerHTML = '<i data-lucide="sun"></i>';
+      lucide.createIcons();
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      if (isDark) {
+        localStorage.setItem('theme', 'dark');
+        themeToggleBtn.setAttribute('aria-label', 'Switch to light mode');
+        themeToggleBtn.innerHTML = '<i data-lucide="sun"></i>';
+      } else {
+        localStorage.setItem('theme', 'light');
+        themeToggleBtn.setAttribute('aria-label', 'Switch to dark mode');
+        themeToggleBtn.innerHTML = '<i data-lucide="moon"></i>';
+      }
+      lucide.createIcons();
+    });
+
+    // 2. Showcase Component Tab Switcher
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const sections = document.querySelectorAll('.showcase-section');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.getAttribute('data-target');
+        
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        sections.forEach(sec => sec.classList.remove('active'));
+        
+        button.classList.add('active');
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+
+    // 3. Spreadsheet Dynamic Cells Editing Logic
+    function makeCellEditable(cell) {
+      if (cell.classList.contains('editing')) return;
+      cell.classList.add('editing');
+      const input = cell.querySelector('input');
+      input.focus();
+      // Select all text
+      input.select();
+    }
+
+    function saveCell(input) {
+      const cell = input.parentElement;
+      const span = cell.querySelector('.cell-text');
+      span.textContent = input.value;
+      cell.classList.remove('editing');
+      
+      // Visual feedback pulse
+      cell.classList.add('success-pulse');
+      setTimeout(() => {
+        cell.classList.remove('success-pulse');
+      }, 1200);
+    }
+
+    // Add Spreadsheet Row
+    const addRowBtn = document.getElementById('add-spreadsheet-row');
+    const tableBody = document.querySelector('#leads-table tbody');
+    
+    addRowBtn.addEventListener('click', () => {
+      const newRow = document.createElement('tr');
+      newRow.className = 'success-pulse';
+      newRow.innerHTML = `
+        <td style="text-align: center;">
+          <button class="enrich-btn" onclick="triggerRowEnrich(this)">
+            <i data-lucide="play" style="width: 12px; height: 12px;"></i>
+            <div class="cell-loader"></div>
+          </button>
+        </td>
+        <td class="editable-cell" onclick="makeCellEditable(this)">
+          <span class="cell-text">New GTM Lead</span>
+          <input type="text" value="New GTM Lead" onblur="saveCell(this)">
+        </td>
+        <td class="editable-cell" onclick="makeCellEditable(this)">
+          <span class="cell-text">example.io</span>
+          <input type="text" value="example.io" onblur="saveCell(this)">
+        </td>
+        <td>
+          <span class="badge badge-slushie">Slushie Pending</span>
+        </td>
+        <td class="space-mono">/in/new-gtm-rec</td>
+        <td>
+          <div class="enrich-status-container">
+            <i data-lucide="help-circle" style="width: 14px; height: 14px; color: var(--warm-silver)"></i>
+            <span>Unenriched</span>
+          </div>
+        </td>
+        <td>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <i data-lucide="network" style="width: 14px; height: 14px; color: var(--warm-charcoal)"></i>
+            <span class="space-mono" style="font-size: 11px;">Enrich Pipeline</span>
+          </div>
+        </td>
+      `;
+      tableBody.appendChild(newRow);
+      lucide.createIcons();
+      
+      // Auto-scroll
+      newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    // Cell Enrichment Simulated Trigger
+    function triggerRowEnrich(btn) {
+      const playIcon = btn.querySelector('[data-lucide="play"]');
+      const loader = btn.querySelector('.cell-loader');
+      const row = btn.closest('tr');
+      
+      // Get Status elements
+      const statusBadge = row.querySelector('.badge');
+      const verificationContainer = row.querySelector('.enrich-status-container');
+      
+      // Start loader
+      playIcon.style.display = 'none';
+      loader.style.display = 'block';
+      
+      // Simulate API lag
+      setTimeout(() => {
+        loader.style.display = 'none';
+        playIcon.style.display = 'block';
+        
+        // Randomly succeed or error
+        const isSuccessful = Math.random() > 0.2;
+        
+        if (isSuccessful) {
+          statusBadge.className = 'badge badge-matcha';
+          statusBadge.textContent = 'Matcha Success';
+          
+          verificationContainer.innerHTML = `
+            <i data-lucide="check-circle-2" style="width: 14px; height: 14px; color: var(--matcha-600)"></i>
+            <span>Verified</span>
+          `;
+          row.className = 'success-pulse';
+        } else {
+          statusBadge.className = 'badge badge-pomegranate';
+          statusBadge.textContent = 'Pomegranate Error';
+          
+          verificationContainer.innerHTML = `
+            <i data-lucide="alert-triangle" style="width: 14px; height: 14px; color: var(--pomegranate-400)"></i>
+            <span>API Timeout</span>
+          `;
+        }
+        
+        lucide.createIcons();
+        
+        // Remove animation pulse class after
+        setTimeout(() => {
+          row.classList.remove('success-pulse');
+        }, 1200);
+        
+      }, 1500);
+    }
+
+    // 4. Sandbox Interactive Playground physics controls
+    const rotControl = document.getElementById('rot-control');
+    const liftControl = document.getElementById('lift-control');
+    const colorControl = document.getElementById('color-control');
+    const playBtn = document.getElementById('playground-btn');
+    
+    function updatePlaygroundBtnStyle() {
+      const rot = rotControl.value;
+      const lift = liftControl.value;
+      const hoverBg = colorControl.value;
+      
+      // Construct dynamic inline hovering CSS styles
+      playBtn.onmouseenter = () => {
+        playBtn.style.transform = `translateY(-${lift}px) rotateZ(${rot}deg)`;
+        playBtn.style.boxShadow = `-7px 7px 0px #000000`;
+        playBtn.style.backgroundColor = hoverBg;
+      };
+      
+      playBtn.onmouseleave = () => {
+        playBtn.style.transform = 'translateY(0) rotateZ(0)';
+        playBtn.style.boxShadow = '';
+        playBtn.style.backgroundColor = '';
+      };
+    }
+
+    rotControl.addEventListener('input', updatePlaygroundBtnStyle);
+    liftControl.addEventListener('input', updatePlaygroundBtnStyle);
+    colorControl.addEventListener('change', updatePlaygroundBtnStyle);
+    
+    // Initial call
+    updatePlaygroundBtnStyle();
+
+    // 5. Modal Dialog Trigger Controls
+    const openDialogBtn = document.getElementById('open-dialog-btn');
+    const heroBtnCta = document.getElementById('hero-btn-cta');
+    const dialogOverlay = document.getElementById('dialog-overlay');
+    const dialogCloseBtn = document.getElementById('dialog-close-btn');
+    const dialogCancelBtn = document.getElementById('dialog-cancel-btn');
+    const dialogSubmitBtn = document.getElementById('dialog-submit-btn');
+
+    function openDialog() {
+      dialogOverlay.classList.add('active');
+    }
+
+    function closeDialog() {
+      dialogOverlay.classList.remove('active');
+    }
+
+    openDialogBtn.addEventListener('click', openDialog);
+    heroBtnCta.addEventListener('click', openDialog);
+    dialogCloseBtn.addEventListener('click', closeDialog);
+    dialogCancelBtn.addEventListener('click', closeDialog);
+    
+    dialogSubmitBtn.addEventListener('click', () => {
+      const prompt = document.getElementById('dialog-enrich-prompt').value;
+      if (prompt.trim() !== '') {
+        alert(`GTM Outbound AI Run Scheduled successfully! \nPrompt: "${prompt}"`);
+      } else {
+        alert('Enrichment run initiated with fallback defaults.');
+      }
+      closeDialog();
+    });
+
+    // Close Dialog on overlay click
+    dialogOverlay.addEventListener('click', (e) => {
+      if (e.target === dialogOverlay) closeDialog();
+    });
+
+  </script>
+</body>
+</html>

@@ -2876,7 +2876,9 @@
     "company": "Tetra",
     "ability": [
       "시공증",
-      "폭발데미지"
+      "시전자 기준 공격력",
+      "폭발데미지",
+      "힐"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -2886,12 +2888,17 @@
     "id": "prika",
     "name": "프리카",
     "imageUrl": "assets/nikke/prika.png",
-    "burst": "3",
+    "burst": "2",
     "element": "Water",
-    "weaponType": "RL",
+    "weaponType": "SR",
     "company": "Tetra",
     "ability": [
-      ""
+      "시공증",
+      "시전자 기준 공격력",
+      "폭발데미지",
+      "힐",
+      "관통데미지",
+      "관통뎀"
     ],
     "coolTime": 40,
     "squadNum": 0,

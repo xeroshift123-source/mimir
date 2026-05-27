@@ -83,10 +83,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.red.shade900.withOpacity(0.3) : Colors.red.shade50,
+                            color: isDark
+                                ? Colors.red.shade900.withOpacity(0.3)
+                                : Colors.red.shade50,
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(
-                              color: isDark ? Colors.red.shade700 : Colors.red.shade200,
+                              color: isDark
+                                  ? Colors.red.shade700
+                                  : Colors.red.shade200,
                             ),
                           ),
                           child: Text(
@@ -94,7 +98,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.red.shade300 : Colors.red.shade700,
+                              color: isDark
+                                  ? Colors.red.shade300
+                                  : Colors.red.shade700,
                             ),
                           ),
                         ),
@@ -102,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      "울트라",
+                      "울라리",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -114,8 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.schedule, 
-                          size: 18, 
+                          Icons.schedule,
+                          size: 18,
                           color: isDark ? Colors.grey.shade400 : Colors.black,
                         ),
                         const SizedBox(width: 6),
@@ -136,7 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         _chip(
                           context: context,
-                          iconPath: "assets/icons/elements/icon-elements-fire.webp",
+                          iconPath:
+                              "assets/icons/elements/icon-elements-fire.webp",
                           title: "보스 속성",
                           value: "작열",
                         ),
@@ -232,7 +239,9 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(
-              context.watch<ThemeProvider>().isDark ? Icons.light_mode : Icons.dark_mode,
+              context.watch<ThemeProvider>().isDark
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
               color: Colors.white,
             ),
             tooltip: '테마 전환',
@@ -252,18 +261,19 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildRaidSummaryCard(context),
-
                 const SizedBox(height: 24),
-
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     decoration: BoxDecoration(
                       color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDark ? Colors.orange.shade800 : Colors.orange.shade300,
+                        color: isDark
+                            ? Colors.orange.shade800
+                            : Colors.orange.shade300,
                         width: 1.5,
                       ),
                       boxShadow: [
@@ -277,14 +287,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: _selectedWeakness,
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.orange, size: 28),
+                        icon: const Icon(Icons.arrow_drop_down,
+                            color: Colors.orange, size: 28),
                         style: TextStyle(
                           fontSize: 15,
                           color: isDark ? Colors.white : Colors.black87,
                           fontWeight: FontWeight.bold,
                         ),
                         isExpanded: true,
-                        dropdownColor: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+                        dropdownColor:
+                            isDark ? const Color(0xFF2D2D2D) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         onChanged: (String? newValue) {
                           if (newValue != null) {
@@ -308,7 +320,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text(
                                   '공략 약점 속성: $value',
                                   style: TextStyle(
-                                    color: isDark ? Colors.white : Colors.black87,
+                                    color:
+                                        isDark ? Colors.white : Colors.black87,
                                   ),
                                 ),
                               ],
@@ -319,9 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
                   child: Row(
@@ -333,7 +344,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: OutlinedButton(
                             onPressed: () => _openCalculator(context),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colors.orange, width: 1.5),
+                              side: const BorderSide(
+                                  color: Colors.orange, width: 1.5),
                               foregroundColor: Colors.orange,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -341,7 +353,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: const Text(
                               "계산기",
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ),
@@ -363,7 +376,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: const Text(
                               "덱 구성 시작",
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w800),
                             ),
                           ),
                         ),
@@ -371,18 +385,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 48),
-
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E1E).withOpacity(0.5) : Colors.grey.shade100,
+                      color: isDark
+                          ? const Color(0xFF1E1E1E).withOpacity(0.5)
+                          : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                        color: isDark
+                            ? Colors.grey.shade800
+                            : Colors.grey.shade200,
                       ),
                     ),
                     child: Column(
@@ -392,8 +408,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Icon(
                               Icons.info_outline,
-                              size: 16, 
-                              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                              size: 16,
+                              color: isDark
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -401,7 +419,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                                color: isDark
+                                    ? Colors.grey.shade300
+                                    : Colors.grey.shade700,
                               ),
                             ),
                           ],
@@ -411,7 +431,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           "본 사이트는 개인이 운영하는 비영리 팬 사이트입니다. 사이트에 사용된 모든 게임 이미지, 캐릭터, 텍스트 등 일체의 자산에 대한 권리는 원저작권자인 (주)시프트업(SHIFT UP Corp.)에 있습니다. 본 사이트는 공식 서비스를 사칭하거나 영리적 이득을 취하지 않으며, 원저작권자의 요청이 있을 경우 콘텐츠가 수정 또는 삭제될 수 있습니다.",
                           style: TextStyle(
                             fontSize: 11,
-                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                            color: isDark
+                                ? Colors.grey.shade400
+                                : Colors.grey.shade600,
                             height: 1.5,
                           ),
                         ),
