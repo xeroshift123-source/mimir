@@ -414,14 +414,16 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                       ),
                     ),
                     const Divider(height: 1, color: Colors.grey),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                      child: FittedBox(
-                        fit: BoxFit.contain,
-                        child: RepaintBoundary(
-                          key: _previewCaptureKey,
-                          child: _buildFiveSquadsShareCanvas(
-                              _weaknessElement ?? '전격'),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: RepaintBoundary(
+                            key: _previewCaptureKey,
+                            child: _buildFiveSquadsShareCanvas(
+                                _weaknessElement ?? '전격'),
+                          ),
                         ),
                       ),
                     ),
