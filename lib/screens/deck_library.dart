@@ -524,7 +524,7 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
       children: [
         // 좌측 필터 패널 (고정폭)
         SizedBox(
-          width: 380,
+          width: 580,
           child: Container(
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
@@ -855,7 +855,7 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
         Expanded(
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
+              crossAxisCount: 5,
               crossAxisSpacing: 6,
               mainAxisSpacing: 6,
               childAspectRatio: 0.75,
@@ -1174,7 +1174,7 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
       fit: BoxFit.scaleDown,
       alignment: Alignment.center,
       child: Container(
-        width: 600,
+        width: 760,
         color: const Color(0xFF090A0F),
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -1416,7 +1416,7 @@ class _LibraryShareSquadPanel extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           const _LibraryVerticalDottedLine(
-            height: 100,
+            height: 140,
             color: Colors.white12,
             dashHeight: 3,
             gap: 3,
