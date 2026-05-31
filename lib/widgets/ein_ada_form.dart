@@ -108,17 +108,19 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
         double targetDiff = targetTakina - min(targetAda, targetEin);
         double neededDecrease = (targetDiff / tAtk) * 100;
         // 타키나를 낮추거나 다른 애들을 올려야 함
-        needOverloadMessage = "타키나의 오버공증을 최소 ${neededDecrease.toStringAsFixed(2)}% 낮추거나 딜러들의 오버공증을 높여야 합니다.";
+        needOverloadMessage =
+            "타키나의 오버공증을 최소 ${neededDecrease.toStringAsFixed(2)}% 낮추거나 딜러들의 오버공증을 높여야 합니다.";
       } else if (resEinOnAdaB > resAdaOnAdaB) {
         isError = true;
         resultMessage = "⚠️ 에이다 버스트 시 아인의 공격력이 더 높습니다.";
         double margin = resEinOnAdaB - resAdaOnAdaB;
         double neededIncrease = (margin / aAtk) * 100;
-        needOverloadMessage = "에이다의 오버공증이 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.";
+        needOverloadMessage =
+            "에이다의 오버공증이 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.";
       } else {
         isError = false;
         resultMessage = "✅ 모든 버프 타겟팅 및 위계가 정상입니다.";
-        
+
         double marginBurst = resAdaOnAdaB - resEinOnAdaB;
         double adaAllowedDecrease = (marginBurst / aAtk) * 100;
         double einAllowedIncrease = (marginBurst / eAtk) * 100;
@@ -130,7 +132,8 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
         if (_useTakina) {
           double marginTarget = min(targetAda, targetEin) - targetTakina;
           double takinaAllowedIncrease = (marginTarget / tAtk) * 100;
-          needOverloadMessage += "\n• 타키나 오버공증: ${takinaAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
+          needOverloadMessage +=
+              "\n• 타키나 오버공증: ${takinaAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
         }
       }
     });
@@ -273,14 +276,18 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
     return Column(children: [
       Text(name,
           style: TextStyle(
-              fontSize: 11, 
-              color: isBuffered ? (isDark ? Colors.white : Colors.black) : Colors.grey)),
+              fontSize: 11,
+              color: isBuffered
+                  ? (isDark ? Colors.white : Colors.black)
+                  : Colors.grey)),
       const SizedBox(height: 4),
       Text(_formatter.format(val.toInt()),
           style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: isBuffered ? Colors.orange : (isDark ? Colors.grey.shade400 : Colors.grey))),
+              color: isBuffered
+                  ? Colors.orange
+                  : (isDark ? Colors.grey.shade400 : Colors.grey))),
       if (isBuffered)
         Container(
             margin: const EdgeInsets.only(top: 2),
@@ -343,10 +350,12 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
     return TextField(
         controller: controller,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
+        style: TextStyle(
+            fontSize: 12, color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
             labelText: label,
-            labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+            labelStyle: TextStyle(
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
             isDense: true,
             filled: true,
             fillColor: isDark ? const Color(0xFF242424) : Colors.white,
@@ -357,7 +366,10 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
                 borderSide: BorderSide.none),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300))));
+                borderSide: BorderSide(
+                    color: isDark
+                        ? Colors.grey.shade800
+                        : Colors.grey.shade300))));
   }
 
   Widget _buildSideButton(String label, VoidCallback onTap) {
@@ -391,12 +403,18 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
                     ? Colors.redAccent.withOpacity(isDark ? 0.2 : 0.1)
                     : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
                 side: BorderSide(
-                    color: _useTakina ? Colors.redAccent : (isDark ? Colors.grey.shade800 : Colors.grey.shade300)),
+                    color: _useTakina
+                        ? Colors.redAccent
+                        : (isDark
+                            ? Colors.grey.shade800
+                            : Colors.grey.shade300)),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12))),
             child: Text("타키나",
                 style: TextStyle(
-                    color: _useTakina ? Colors.redAccent : (isDark ? Colors.grey.shade400 : Colors.grey),
+                    color: _useTakina
+                        ? Colors.redAccent
+                        : (isDark ? Colors.grey.shade400 : Colors.grey),
                     fontWeight: FontWeight.bold,
                     fontSize: 13))));
   }
@@ -410,12 +428,13 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
         decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
+            border: Border.all(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title,
               style: TextStyle(
-                  fontWeight: FontWeight.bold, 
-                  fontSize: 13, 
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
                   color: isDark ? Colors.white : Colors.black)),
           const SizedBox(height: 10),
           _resRow("에이다", _formatter.format(adaVal.toInt()), adaVal == maxVal,
@@ -427,7 +446,9 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
           ...notes.map((n) => Padding(
               padding: const EdgeInsets.only(bottom: 2),
               child: Text("• $n",
-                  style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey))))
+                  style: TextStyle(
+                      fontSize: 10,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey))))
         ]));
   }
 
@@ -436,13 +457,17 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(name,
           style: TextStyle(
-              fontSize: 12, 
-              color: win ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.grey.shade400 : Colors.grey.shade600))),
+              fontSize: 12,
+              color: win
+                  ? (isDark ? Colors.white : Colors.black)
+                  : (isDark ? Colors.grey.shade400 : Colors.grey.shade600))),
       Text(val,
           style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: win ? winColor : (isDark ? Colors.grey.shade300 : Colors.black87)))
+              color: win
+                  ? winColor
+                  : (isDark ? Colors.grey.shade300 : Colors.black87)))
     ]);
   }
 
@@ -454,12 +479,15 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
     Color detailColor;
 
     if (isError) {
-      boxColor = isDark ? Colors.red.shade900.withOpacity(0.4) : Colors.red.shade50;
+      boxColor =
+          isDark ? Colors.red.shade900.withOpacity(0.4) : Colors.red.shade50;
       borderColor = isDark ? Colors.red.shade900 : Colors.red.shade200;
       textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
       detailColor = isDark ? Colors.red.shade200 : Colors.red.shade900;
     } else {
-      boxColor = isDark ? Colors.green.shade900.withOpacity(0.4) : Colors.green.shade50;
+      boxColor = isDark
+          ? Colors.green.shade900.withOpacity(0.4)
+          : Colors.green.shade50;
       borderColor = isDark ? Colors.green.shade900 : Colors.green.shade200;
       textColor = isDark ? Colors.green.shade300 : Colors.green.shade800;
       detailColor = isDark ? Colors.green.shade200 : Colors.green.shade900;
@@ -540,10 +568,15 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
             style: TextStyle(color: isDark ? Colors.white : Colors.black),
             decoration: InputDecoration(
                 labelText: label,
-                labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+                labelStyle: TextStyle(
+                    color:
+                        isDark ? Colors.grey.shade400 : Colors.grey.shade700),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300)),
+                    borderSide: BorderSide(
+                        color: isDark
+                            ? Colors.grey.shade800
+                            : Colors.grey.shade300)),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10)))));
   }

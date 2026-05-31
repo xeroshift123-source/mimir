@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
 // lib/web/web_capture.dart
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:js_util' as js_util;

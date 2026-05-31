@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,15 +9,20 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:path_provider/path_provider.dart';
 import 'package:pasteboard/pasteboard.dart';
 
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/models/nikke.dart';
+import 'package:mimir/models/shared_deck.dart';
 import 'package:mimir/providers/nikke_provider.dart';
+import 'package:mimir/providers/auth_provider.dart';
+import 'package:mimir/repository/mock_deck_repository.dart';
+import 'package:mimir/repository/local_file_saver.dart';
+import 'package:mimir/screens/login.dart';
+import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/widgets/nikke_card.dart';
+import 'package:mimir/widgets/app_drawer.dart';
 
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -260,47 +264,268 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   Future<void> _downloadPreview() async {
     final bytes = await _capturePreview();
     if (bytes == null) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
+      }
       return;
     }
 
     if (kIsWeb) {
       final blob = html.Blob([bytes], 'image/png');
       final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
+      html.AnchorElement(href: url)
         ..setAttribute('download',
             'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png')
         ..click();
       html.Url.revokeObjectUrl(url);
     } else {
-      final result = await ImageGallerySaver.saveImage(bytes,
+      await ImageGallerySaver.saveImage(bytes,
           name: "mimir_deck_${DateTime.now().millisecondsSinceEpoch}");
-      if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('갤러리에 저장되었습니다!')));
+      if (mounted) {
+      }
     }
+  }
+
+  Future<void> _publishDeckToLibrary() async {
+    final authProvider = context.read<AuthProvider>();
+    if (!authProvider.isLoggedIn) {
+      // Show login suggestion dialog
+      showDialog(
+        context: context,
+        builder: (context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.orange),
+                SizedBox(width: 8),
+                Text("로그인 필요", style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: const Text(
+              "구성하신 5개 스쿼드 덱을 공유 라이브러리에 게시하려면 로그인이 필요합니다. 지금 소셜 로그인 화면으로 이동하시겠습니까?",
+              style: TextStyle(height: 1.5),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("취소", style: TextStyle(color: Colors.grey)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Pop AlertDialog
+                  Navigator.pushNamed(context, LoginScreen.routeName);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                ),
+                child: const Text("로그인하러 가기"),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    // User is logged in, show elegant Publish Form Dialog
+    final titleController = TextEditingController(text: "${authProvider.nickname}의 시즌 37 솔로레이드 공략 덱");
+    final descController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              title: Row(
+                children: [
+                  const Icon(Icons.cloud_upload, color: Colors.orange),
+                  const SizedBox(width: 8),
+                  const Text("공유 라이브러리에 덱 등록", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Spacer(),
+                  Text(
+                    "작성자: ${authProvider.nickname}",
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                primary: false,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 450),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        "현재 구성하신 5개 스쿼드(총 25인)를 공유 덱 라이브러리에 실시간으로 업로드합니다. 보스 공략을 위한 상세한 설명을 함께 작성해 보세요!",
+                        style: TextStyle(fontSize: 12, color: Colors.grey, height: 1.5),
+                      ),
+                      const SizedBox(height: 18),
+                      
+                      // Title textfield
+                      const Text("덱 제목", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange)),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: titleController,
+                        style: const TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          hintText: "사령관님만의 덱 제목을 입력해 주세요",
+                          isDense: true,
+                          filled: true,
+                          fillColor: isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Description textfield
+                      const Text("상세 설명 및 공략 팁", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange)),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: descController,
+                        maxLines: 4,
+                        style: const TextStyle(fontSize: 13),
+                        decoration: InputDecoration(
+                          hintText: "크라운/클루드 등 핵심 메인 딜러 연동과 5개 스쿼드 배치 팁을 꼼꼼히 채워주시면 다른 사령관님들께 큰 도움이 됩니다!",
+                          isDense: true,
+                          filled: true,
+                          fillColor: isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("취소", style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final title = titleController.text.trim();
+                    if (title.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("덱 제목을 입력해 주세요.")),
+                      );
+                      return;
+                    }
+
+                    // Extract squad ids
+                    final List<List<String?>> squadIds = _squads
+                        .map((squad) => squad.map((n) => n?.id).toList())
+                        .toList();
+
+                    final newDeck = SharedDeck(
+                      id: "shared_${DateTime.now().millisecondsSinceEpoch}",
+                      authorName: authProvider.nickname!,
+                      title: title,
+                      description: descController.text.trim(),
+                      squadsNikkeIds: squadIds,
+                      upvotes: 0,
+                      downvotes: 0,
+                      createdAt: DateTime.now(),
+                    );
+
+                    // Add to repository
+                    MockDeckRepository.addDeck(newDeck);
+
+                    // If running on Web, automatically copy generated code to clipboard
+                    if (kIsWeb) {
+                      final code = generateDeckCode(newDeck);
+                      Clipboard.setData(ClipboardData(text: code));
+                      debugPrint("\n====================================");
+                      debugPrint("Generated Deck Code for mock_deck_repository.dart:");
+                      debugPrint(code);
+                      debugPrint("====================================\n");
+                    }
+
+                    // Pop AlertDialog
+                    Navigator.pop(context);
+                    
+                    // Pop Preview Dialog as well!
+                    Navigator.pop(context);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Row(
+                          children: [
+                            Icon(Icons.check_circle, color: Colors.white),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(kIsWeb
+                                  ? "공유 완료! 웹 환경이므로 덱 소스 코드(Dart)가 클립보드에 복사되었습니다. mock_deck_repository.dart의 _decks 배열 안에 붙여넣어 주세요!"
+                                  : "공유 라이브러리에 덱을 성공적으로 등록했습니다!"),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: Colors.green.shade700,
+                        duration: const Duration(seconds: kIsWeb ? 8 : 4),
+                        behavior: SnackBarBehavior.floating,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                      ),
+                    );
+
+                    // Redirect to Deck Library
+                    Navigator.pushNamed(context, DeckLibraryScreen.routeName);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text("등록하기"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _copyToClipboard() async {
     final bytes = await _capturePreview();
     if (bytes == null) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
+      }
       return;
     }
 
     try {
       await Pasteboard.writeImage(bytes);
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('클립보드에 복사되었습니다!')));
+      }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('클립보드 복사 실패: $e')));
+      }
     }
   }
 
@@ -400,14 +625,15 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                             child: Text(
                               '미리보기',
                               style: TextStyle(
-                                fontSize: 16, 
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.close, size: 18, color: Colors.black),
+                            icon: const Icon(Icons.close,
+                                size: 18, color: Colors.black),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
                         ],
@@ -439,14 +665,18 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton.icon(
-                            icon: const Icon(Icons.content_copy, color: Colors.orange),
-                            label: const Text('클립보드 복사', style: TextStyle(color: Colors.orange)),
+                            icon: const Icon(Icons.content_copy,
+                                color: Colors.orange),
+                            label: const Text('클립보드 복사',
+                                style: TextStyle(color: Colors.orange)),
                             onPressed: _copyToClipboard,
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton.icon(
-                            icon: const Icon(Icons.download, color: Colors.white),
-                            label: const Text('이미지 다운로드', style: TextStyle(color: Colors.white)),
+                            icon:
+                                const Icon(Icons.download, color: Colors.white),
+                            label: const Text('이미지 다운로드',
+                                style: TextStyle(color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orange,
                               foregroundColor: Colors.white,
@@ -457,6 +687,23 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                             ),
                             onPressed: _downloadPreview,
                           ),
+                          if (AuthProvider.showLoginFeatures) ...[
+                            const SizedBox(width: 8),
+                            ElevatedButton.icon(
+                              icon: const Icon(Icons.cloud_upload_rounded, color: Colors.white),
+                              label: const Text('라이브러리에 공유',
+                                  style: TextStyle(color: Colors.white)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade700,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              onPressed: _publishDeckToLibrary,
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -658,6 +905,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     }
 
     return Scaffold(
+      drawer: const AppDrawer(activeRoute: DeckBuilderScreen.routeName),
       appBar: AppBar(
         title: const Text(
           "덱 구성",
@@ -729,6 +977,64 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
               await _showFiveSquadsPreviewDialog();
             },
           ),
+          if (AuthProvider.showLoginFeatures)
+            Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                if (auth.isLoggedIn) {
+                  return Tooltip(
+                    message: '${auth.nickname} (계정 설정)',
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, LoginScreen.routeName);
+                      },
+                      borderRadius: BorderRadius.circular(99),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [Colors.white, Colors.orangeAccent],
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 14,
+                              backgroundColor: Colors.orange,
+                              child: Text(
+                                (auth.nickname != null && auth.nickname!.isNotEmpty)
+                                    ? auth.nickname!.substring(0, 1).toUpperCase()
+                                    : 'C',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, LoginScreen.routeName);
+                      },
+                      icon: const Icon(Icons.login_rounded, size: 16, color: Colors.white),
+                      label: const Text(
+                        "로그인",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
         ],
       ),
       body: LayoutBuilder(
@@ -1644,7 +1950,8 @@ class _SquadCardState extends State<SquadCard> {
                                 focusNode: _focusNode,
                                 decoration: const InputDecoration(
                                   isDense: true,
-                                  contentPadding: EdgeInsets.symmetric(vertical: 4),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(vertical: 4),
                                   border: InputBorder.none,
                                 ),
                                 style: const TextStyle(

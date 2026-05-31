@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:mimir/providers/auth_provider.dart';
+import 'package:mimir/screens/login.dart';
 import 'package:mimir/widgets/ein_ada_form.dart';
 import 'package:mimir/widgets/nayuta_helm_form.dart';
 import 'package:mimir/widgets/scarlet_lib_form.dart';
+import 'package:mimir/widgets/app_drawer.dart';
 
 class CalculateListScreen extends StatefulWidget {
   static const routeName = '/calculate-list';
@@ -41,12 +45,74 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7),
+      drawer: const AppDrawer(activeRoute: '/calculate-list'),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7),
       appBar: AppBar(
         title: const Text(
           "전용 계산기 목록",
           style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
         ),
+        actions: [
+          if (AuthProvider.showLoginFeatures)
+            Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                if (auth.isLoggedIn) {
+                  return Tooltip(
+                    message: '${auth.nickname} (계정 설정)',
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, LoginScreen.routeName);
+                      },
+                      borderRadius: BorderRadius.circular(99),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [Colors.white, Colors.orangeAccent],
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 14,
+                              backgroundColor: Colors.orange,
+                              child: Text(
+                                (auth.nickname != null && auth.nickname!.isNotEmpty)
+                                    ? auth.nickname!.substring(0, 1).toUpperCase()
+                                    : 'C',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, LoginScreen.routeName);
+                      },
+                      icon: const Icon(Icons.login_rounded, size: 16, color: Colors.white),
+                      label: const Text(
+                        "로그인",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+        ],
         backgroundColor: Colors.orange,
         elevation: 0,
         centerTitle: true,
@@ -69,7 +135,11 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                   color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isExpanded ? Colors.orange : (isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+                    color: isExpanded
+                        ? Colors.orange
+                        : (isDark
+                            ? Colors.grey.shade800
+                            : Colors.grey.shade300),
                     width: 1.5,
                   ),
                   boxShadow: [
@@ -98,7 +168,9 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                               decoration: BoxDecoration(
                                 color: isExpanded
                                     ? Colors.orange
-                                    : (isDark ? const Color(0xFF242424) : Colors.grey.shade100),
+                                    : (isDark
+                                        ? const Color(0xFF242424)
+                                        : Colors.grey.shade100),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Image.asset(
@@ -117,14 +189,18 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: isDark ? Colors.white : Colors.black),
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     item['subtitle'],
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+                                        color: isDark
+                                            ? Colors.grey.shade400
+                                            : Colors.grey.shade600),
                                   ),
                                 ],
                               ),
@@ -134,7 +210,9 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                               turns: isExpanded ? 0.5 : 0,
                               duration: const Duration(milliseconds: 300),
                               child: Icon(Icons.expand_more,
-                                  color: isDark ? Colors.grey.shade400 : Colors.grey),
+                                  color: isDark
+                                      ? Colors.grey.shade400
+                                      : Colors.grey),
                             ),
                           ],
                         ),
@@ -163,4 +241,3 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
     );
   }
 }
-

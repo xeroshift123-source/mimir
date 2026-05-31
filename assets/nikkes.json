@@ -916,7 +916,8 @@
     "company": "Elysion",
     "ability": [
       "시전자 기준 공격력",
-      "시공증"
+      "시공증",
+      "클로틴"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1835,11 +1836,11 @@
     "weaponType": "AR",
     "company": "Elysion",
     "ability": [
-      "애프바"
-      , "재장전속도증가"
-      , "막탄"
-      , "받는데미지증가"
-      , "받뎀증"
+      "애프바",
+      "재장전속도증가",
+      "막탄",
+      "받는데미지증가",
+      "받뎀증"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1921,7 +1922,7 @@
     "weaponType": "SMG",
     "company": "Missilis",
     "ability": [
-      "분배데미지"  
+      "분배데미지"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -2887,7 +2888,7 @@
   {
     "id": "prika",
     "name": "프리카",
-    "imageUrl": "assets/nikke/prika.png",
+    "imageUrl": "assets/nikke/prika.webp",
     "burst": "2",
     "element": "Water",
     "weaponType": "SR",

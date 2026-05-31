@@ -15,7 +15,7 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
   final _libOverController = TextEditingController(text: "0");
   final _scarletAtkController = TextEditingController(text: "10000");
   final _scarletOverController = TextEditingController(text: "0");
-  
+
   final _crownAtkController = TextEditingController(text: "8000");
   final _ritaAtkController = TextEditingController(text: "80.42");
 
@@ -28,7 +28,7 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
 
   String resultMessage = "수치를 입력하고 계산하기를 눌러주세요.";
   String needOverloadMessage = "";
-  bool isError = false; 
+  bool isError = false;
   final NumberFormat _formatter = NumberFormat('#,###');
 
   @override
@@ -75,11 +75,13 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
       double ritaBonus = _useRita ? _parse(_ritaAtkController.text) : 0.0; // %
 
       // 리버렐리오 최종 공격력 계산
-      resLibFinal = reverberioBase * (1 + (reverberioEquipment + reverberioSkillBonus + ritaBonus) / 100);
+      resLibFinal = reverberioBase *
+          (1 + (reverberioEquipment + reverberioSkillBonus + ritaBonus) / 100);
 
       // 흑련 최종 공격력 계산
-      resScarletFinal = blacklotusBase * (1 + (blacklotusEquipment + blacklotusSkillBonus + ritaBonus) / 100);
-      
+      resScarletFinal = blacklotusBase *
+          (1 + (blacklotusEquipment + blacklotusSkillBonus + ritaBonus) / 100);
+
       if (_useCrown) {
         resScarletFinal += crownAttack * 0.6451; // 크라운 버프 64.51%
       }
@@ -89,10 +91,12 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
         // 리버렐리오가 먹음 (문제 상황)
         isError = true;
         double fixedBonus = reverberioSkillBonus + ritaBonus;
-        double needOverload = ((resScarletFinal / reverberioBase) - 1) * 100 - fixedBonus;
-        
+        double needOverload =
+            ((resScarletFinal / reverberioBase) - 1) * 100 - fixedBonus;
+
         resultMessage = "🚨 리버렐리오가 버프를 받습니다!";
-        needOverloadMessage = "리버렐리오 필요 추가 옵작: ${needOverload.toStringAsFixed(2)}%";
+        needOverloadMessage =
+            "리버렐리오 필요 추가 옵작: ${needOverload.toStringAsFixed(2)}%";
       } else if (resLibFinal > resScarletFinal) {
         // 흑련이 먹음 (정상 상황)
         isError = false;
@@ -132,7 +136,6 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
             atkCtrl: _scarletAtkController,
             overCtrl: _scarletOverController),
         const SizedBox(height: 24),
-        
         if (_bufferType == 'rita' || _bufferType == 'both')
           _buildBufferRow(
             label: "리타",
@@ -191,8 +194,10 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
                       onSelected: (val) {
                         setState(() {
                           _bufferType = val == 'remove' ? null : val;
-                          _useRita = _bufferType == 'rita' || _bufferType == 'both';
-                          _useCrown = _bufferType == 'crown' || _bufferType == 'both';
+                          _useRita =
+                              _bufferType == 'rita' || _bufferType == 'both';
+                          _useCrown =
+                              _bufferType == 'crown' || _bufferType == 'both';
                         });
                       },
                       itemBuilder: (context) => [
@@ -246,7 +251,8 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
               style: TextStyle(
                   color: color, fontWeight: FontWeight.bold, fontSize: 14)),
           const SizedBox(height: 4),
-          Text(description, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(description,
+              style: const TextStyle(fontSize: 12, color: Colors.grey)),
           if (atkCtrl != null) ...[
             const SizedBox(height: 6),
             _buildCompactField(atkLabel, atkCtrl)
@@ -293,10 +299,12 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
     return TextField(
         controller: controller,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
+        style: TextStyle(
+            fontSize: 12, color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
             labelText: label,
-            labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+            labelStyle: TextStyle(
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
             isDense: true,
             filled: true,
             fillColor: isDark ? const Color(0xFF242424) : Colors.white,
@@ -307,7 +315,10 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
                 borderSide: BorderSide.none),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300))));
+                borderSide: BorderSide(
+                    color: isDark
+                        ? Colors.grey.shade800
+                        : Colors.grey.shade300))));
   }
 
   Widget _buildResultCard() {
@@ -317,17 +328,31 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
         decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
+            border: Border.all(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text("계산 결과",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white : Colors.black)),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: isDark ? Colors.white : Colors.black)),
           const SizedBox(height: 10),
-          _resRow("리버렐리오 최종 공격력", _formatter.format(resLibFinal.toInt()), !isError, Colors.blue),
+          _resRow("리버렐리오 최종 공격력", _formatter.format(resLibFinal.toInt()),
+              !isError, Colors.blue),
           const SizedBox(height: 4),
-          _resRow("흑련 최종 공격력", _formatter.format(resScarletFinal.toInt()), isError, Colors.purple),
+          _resRow("흑련 최종 공격력", _formatter.format(resScarletFinal.toInt()),
+              isError, Colors.purple),
           const Divider(height: 20),
-          Text("• 리버렐리오: 오버 + 스킬보너스(160%)${_useRita ? ' + 리타(${_ritaAtkController.text}%)' : ''}", style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey)),
-          Text("• 흑련: 오버 + 스킬보너스(115.12%)${_useRita ? ' + 리타(${_ritaAtkController.text}%)' : ''}${_useCrown ? ' + 크라운버프' : ''}", style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey)),
+          Text(
+              "• 리버렐리오: 오버 + 스킬보너스(160%)${_useRita ? ' + 리타(${_ritaAtkController.text}%)' : ''}",
+              style: TextStyle(
+                  fontSize: 10,
+                  color: isDark ? Colors.grey.shade400 : Colors.grey)),
+          Text(
+              "• 흑련: 오버 + 스킬보너스(115.12%)${_useRita ? ' + 리타(${_ritaAtkController.text}%)' : ''}${_useCrown ? ' + 크라운버프' : ''}",
+              style: TextStyle(
+                  fontSize: 10,
+                  color: isDark ? Colors.grey.shade400 : Colors.grey)),
         ]));
   }
 
@@ -336,12 +361,11 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(name,
           style: TextStyle(
-              fontSize: 12, color: isDark ? Colors.grey.shade300 : Colors.grey.shade800)),
+              fontSize: 12,
+              color: isDark ? Colors.grey.shade300 : Colors.grey.shade800)),
       Text(val,
           style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: charColor))
+              fontSize: 13, fontWeight: FontWeight.bold, color: charColor))
     ]);
   }
 
@@ -353,12 +377,15 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
     Color detailColor;
 
     if (isError) {
-      boxColor = isDark ? Colors.red.shade900.withOpacity(0.4) : Colors.red.shade50;
+      boxColor =
+          isDark ? Colors.red.shade900.withOpacity(0.4) : Colors.red.shade50;
       borderColor = isDark ? Colors.red.shade900 : Colors.red.shade200;
       textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
       detailColor = isDark ? Colors.red.shade200 : Colors.red.shade900;
     } else {
-      boxColor = isDark ? Colors.green.shade900.withOpacity(0.4) : Colors.green.shade50;
+      boxColor = isDark
+          ? Colors.green.shade900.withOpacity(0.4)
+          : Colors.green.shade50;
       borderColor = isDark ? Colors.green.shade900 : Colors.green.shade200;
       textColor = isDark ? Colors.green.shade300 : Colors.green.shade800;
       detailColor = isDark ? Colors.green.shade200 : Colors.green.shade900;

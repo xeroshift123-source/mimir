@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/deck_builder.dart';
+import 'package:mimir/screens/deck_library.dart';
+import 'package:mimir/screens/login.dart';
 import 'package:mimir/providers/theme_provider.dart';
+import 'package:mimir/providers/auth_provider.dart';
+import 'package:mimir/widgets/app_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -156,6 +160,55 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(context, DeckLibraryScreen.routeName);
+                        },
+                        icon: const Icon(Icons.auto_awesome_motion, color: Colors.white, size: 18),
+                        label: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              "공유 덱 라이브러리 바로가기",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.white, width: 1.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                "BETA",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -231,6 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      drawer: const AppDrawer(activeRoute: '/'),
       appBar: AppBar(
         title: const Text(
           "니케 덱 빌딩 도우미 MIMIR!",
@@ -249,6 +303,64 @@ class _HomeScreenState extends State<HomeScreen> {
               context.read<ThemeProvider>().toggleTheme();
             },
           ),
+          if (AuthProvider.showLoginFeatures)
+            Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                if (auth.isLoggedIn) {
+                  return Tooltip(
+                    message: '${auth.nickname} (계정 설정)',
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, LoginScreen.routeName);
+                      },
+                      borderRadius: BorderRadius.circular(99),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [Colors.white, Colors.orangeAccent],
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 14,
+                              backgroundColor: Colors.orange,
+                              child: Text(
+                                (auth.nickname != null && auth.nickname!.isNotEmpty)
+                                    ? auth.nickname!.substring(0, 1).toUpperCase()
+                                    : 'C',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, LoginScreen.routeName);
+                      },
+                      icon: const Icon(Icons.login_rounded, size: 16, color: Colors.white),
+                      label: const Text(
+                        "로그인",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
         ],
         backgroundColor: Colors.orange,
         centerTitle: true,

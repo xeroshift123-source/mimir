@@ -109,7 +109,7 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         double secondMaxAtk = resHelmFinal;
         String secondRival = "헬름";
         double secondRivalBase = hBase;
-        
+
         if (_extraNikkeType != null && resExtraFinal > resHelmFinal) {
           secondMaxAtk = resExtraFinal;
           secondRival = (_extraNikkeType == 'clud') ? "클루드" : "일반 니케";
@@ -130,7 +130,8 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
             nOver + nayutaSkill2 + (nayutaHasMiranda ? mirandaVal : 0);
         double neededOver = ((maxAtk / nBase) - 1 - currentTotalBuff) * 100;
         resultMessage = "❌ 경고: $rival이 나유타보다 높습니다!";
-        needOverloadMessage = "나유타의 오버공증이 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
+        needOverloadMessage =
+            "나유타의 오버공증이 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
       }
     });
   }
@@ -343,10 +344,12 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
     return TextField(
         controller: controller,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        style: TextStyle(fontSize: 12, color: isDark ? Colors.white : Colors.black),
+        style: TextStyle(
+            fontSize: 12, color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
             labelText: label,
-            labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+            labelStyle: TextStyle(
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
             isDense: true,
             filled: true,
             fillColor: isDark ? const Color(0xFF242424) : Colors.white,
@@ -357,7 +360,10 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
                 borderSide: BorderSide.none),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300))));
+                borderSide: BorderSide(
+                    color: isDark
+                        ? Colors.grey.shade800
+                        : Colors.grey.shade300))));
   }
 
   Widget _buildResultCard(
@@ -372,18 +378,20 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
+            border: Border.all(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text(title,
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, 
+                    fontWeight: FontWeight.bold,
                     fontSize: 13,
                     color: isDark ? Colors.white : Colors.black)),
             GestureDetector(
                 onTap: onSettingsTap,
                 child: Icon(Icons.settings_outlined,
-                    size: 18, color: isDark ? Colors.grey.shade400 : Colors.grey))
+                    size: 18,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey))
           ]),
           const SizedBox(height: 10),
           _resRow("나유타", _formatter.format(nayutaVal.toInt()), nayutaVal == max,
@@ -400,7 +408,9 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
           ...notes.map((n) => Padding(
               padding: const EdgeInsets.only(bottom: 2),
               child: Text("• $n",
-                  style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey))))
+                  style: TextStyle(
+                      fontSize: 10,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey))))
         ]));
   }
 
@@ -409,13 +419,17 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text(name,
           style: TextStyle(
-              fontSize: 12, 
-              color: win ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.grey.shade400 : Colors.grey.shade600))),
+              fontSize: 12,
+              color: win
+                  ? (isDark ? Colors.white : Colors.black)
+                  : (isDark ? Colors.grey.shade400 : Colors.grey.shade600))),
       Text(val,
           style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: win ? winColor : (isDark ? Colors.grey.shade300 : Colors.black87)))
+              color: win
+                  ? winColor
+                  : (isDark ? Colors.grey.shade300 : Colors.black87)))
     ]);
   }
 
@@ -427,12 +441,15 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
     Color detailColor;
 
     if (isError) {
-      boxColor = isDark ? Colors.red.shade900.withOpacity(0.4) : Colors.red.shade50;
+      boxColor =
+          isDark ? Colors.red.shade900.withOpacity(0.4) : Colors.red.shade50;
       borderColor = isDark ? Colors.red.shade900 : Colors.red.shade200;
       textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
       detailColor = isDark ? Colors.red.shade200 : Colors.red.shade900;
     } else {
-      boxColor = isDark ? Colors.green.shade900.withOpacity(0.4) : Colors.green.shade50;
+      boxColor = isDark
+          ? Colors.green.shade900.withOpacity(0.4)
+          : Colors.green.shade50;
       borderColor = isDark ? Colors.green.shade900 : Colors.green.shade200;
       textColor = isDark ? Colors.green.shade300 : Colors.green.shade800;
       detailColor = isDark ? Colors.green.shade200 : Colors.green.shade900;
