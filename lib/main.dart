@@ -7,13 +7,24 @@ import 'screens/deck_builder.dart';
 import 'screens/deck_library.dart';
 import 'screens/calculate_list.dart';
 import 'screens/login.dart';
+import 'screens/sync_screen.dart';
+import 'screens/my_nikke_screen.dart';
 import 'providers/nikke_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/auth_provider.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint("Firebase initialization failed in main: $e");
+  }
   runApp(const MimirApp());
 }
 
@@ -94,6 +105,10 @@ class MimirApp extends StatelessWidget {
                   const CalculateListScreen(),
               LoginScreen.routeName: (context) =>
                   const LoginScreen(),
+              SyncScreen.routeName: (context) =>
+                  const SyncScreen(),
+              MyNikkeScreen.routeName: (context) =>
+                  const MyNikkeScreen(),
             },
           );
         },

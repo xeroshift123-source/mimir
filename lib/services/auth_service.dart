@@ -66,9 +66,11 @@ class AuthService {
       // 1. Try to initialize Firebase.
       // On Web, firebase_core dynamically loads the modular JS SDK. We use a generous timeout (10 seconds)
       // to allow downloading of SDK files over the network without blocking startup.
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ).timeout(const Duration(seconds: 10));
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        ).timeout(const Duration(seconds: 10));
+      }
 
       _auth = FirebaseAuth.instance;
       _googleSignIn = GoogleSignIn(

@@ -37,7 +37,18 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Node modules
+**/node_modules/
+
+# Scratch files
+/scratch/
+
+# Firebase debug logs and local emulator files
+.firebase/
+*-debug.log
+firebase-debug.log
+firestore-debug.log

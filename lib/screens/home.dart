@@ -4,6 +4,7 @@ import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/deck_builder.dart';
 import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/screens/login.dart';
+import 'package:mimir/screens/sync_screen.dart';
 import 'package:mimir/providers/theme_provider.dart';
 import 'package:mimir/providers/auth_provider.dart';
 import 'package:mimir/widgets/app_drawer.dart';
@@ -203,6 +204,31 @@ class _HomeScreenState extends State<HomeScreen> {
                           backgroundColor: Colors.orange,
                           foregroundColor: Colors.white,
                           elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(context, SyncScreen.routeName);
+                        },
+                        icon: const Icon(Icons.sync_rounded, color: Colors.orange, size: 18),
+                        label: const Text(
+                          "전투 정보 동기화 (블라블라링크)",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colors.orange, width: 1.5),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

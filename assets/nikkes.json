@@ -1074,7 +1074,7 @@
   },
   {
     "id": "jill",
-    "name": "질 발렌타인",
+    "name": "질",
     "imageUrl": "assets/nikke/jill.webp",
     "burst": "3",
     "element": "Electric",
@@ -1304,7 +1304,8 @@
     "weaponType": "AR",
     "company": "Missilis",
     "ability": [
-      "힐"
+      "힐",
+      "갓경누나"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1319,7 +1320,9 @@
     "weaponType": "SG",
     "company": "Elysion",
     "ability": [
-      "힐"
+      "힐",
+      "말차",
+      "화장실"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -1470,7 +1473,11 @@
     "element": "Fire",
     "weaponType": "MG",
     "company": "Missilis",
-    "ability": [],
+    "ability": [
+      "지속데미지",
+      "지속딜",
+      "애란다"
+    ],
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR"
@@ -1517,7 +1524,9 @@
     "element": "Fire",
     "weaponType": "SMG",
     "company": "Elysion",
-    "ability": [],
+    "ability": [
+      "애란다"
+    ],
     "coolTime": 20,
     "squadNum": 0,
     "rank": "SSR"
@@ -1625,7 +1634,8 @@
     "ability": [
       "힐",
       "시전자 기준 공격력",
-      "시공증"
+      "시공증",
+      "나북이"
     ],
     "coolTime": 20,
     "squadNum": 0,

@@ -7,6 +7,9 @@ import 'package:mimir/screens/deck_builder.dart';
 import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/login.dart';
+import 'package:mimir/screens/sync_screen.dart';
+import 'package:mimir/screens/my_nikke_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppDrawer extends StatelessWidget {
   final String activeRoute;
@@ -299,6 +302,49 @@ class AppDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     if (activeRoute != CalculateListScreen.routeName) {
                       Navigator.pushNamed(context, CalculateListScreen.routeName);
+                    }
+                  },
+                ),
+                _buildDrawerItem(
+                  context: context,
+                  icon: Icons.sync_rounded,
+                  activeIcon: Icons.sync_rounded,
+                  title: "프로필 동기화 (Sync Profile)",
+                  route: SyncScreen.routeName,
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (activeRoute != SyncScreen.routeName) {
+                      Navigator.pushNamed(context, SyncScreen.routeName);
+                    }
+                  },
+                ),
+                _buildDrawerItem(
+                  context: context,
+                  icon: Icons.person_search_outlined,
+                  activeIcon: Icons.person_search,
+                  title: "내 니케 정보 (My Nikkes)",
+                  route: MyNikkeScreen.routeName,
+                  onTap: () async {
+                    Navigator.pop(context);
+                    if (activeRoute != MyNikkeScreen.routeName) {
+                      final prefs = await SharedPreferences.getInstance();
+                      if (!context.mounted) return;
+                      final savedOpenId = prefs.getString('last_synced_openid');
+                      if (savedOpenId != null && savedOpenId.isNotEmpty) {
+                        Navigator.pushNamed(
+                          context,
+                          MyNikkeScreen.routeName,
+                          arguments: savedOpenId,
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("먼저 블라블라링크 프로필 동기화를 진행해 주세요."),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                        Navigator.pushNamed(context, SyncScreen.routeName);
+                      }
                     }
                   },
                 ),
