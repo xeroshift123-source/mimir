@@ -247,6 +247,8 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             normalCampaign: results.gameInfo ? results.gameInfo.normal_progress : 0,
             hardCampaign: results.gameInfo ? results.gameInfo.hard_progress : 0,
             towerFloor: results.gameInfo ? results.gameInfo.tower_floor : 0,
+            recycleRoom: results.gameInfo ? results.gameInfo.recycle_room_researches : [],
+            infraCoreLevel: results.gameInfo ? results.gameInfo.infra_core_level : 0,
             characters: results.characters, // 176명 상세 덱
             lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
         };

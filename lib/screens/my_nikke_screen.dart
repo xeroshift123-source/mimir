@@ -342,6 +342,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final synchro = _profileData?['synchroLevel'] ?? 0;
     final level = _profileData?['commanderLevel'] ?? 0;
     final count = _profileData?['ownedNikkesCount'] ?? 0;
+    final recycleRoom = _profileData?['recycleRoom'] as List<dynamic>? ?? [];
+    final infraCoreLevel = _profileData?['infraCoreLevel'] as int? ?? 0;
 
     final formattedCP = NumberFormat('#,###').format(cp);
 
@@ -392,8 +394,95 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               _buildSummaryItem("보유 니케", "$count명", isDark),
             ],
           ),
+          if (recycleRoom.isNotEmpty || infraCoreLevel > 0) ...[
+            const SizedBox(height: 12),
+            Divider(height: 1, color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+            const SizedBox(height: 12),
+            _buildRecycleRoomSection(recycleRoom, infraCoreLevel, isDark),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildRecycleRoomSection(List<dynamic> recycleRoom, int infraCore, bool isDark) {
+    int common = 0;
+    int attacker = 0;
+    int defender = 0;
+    int supporter = 0;
+    int elysion = 0;
+    int missilis = 0;
+    int tetra = 0;
+    int pilgrim = 0;
+    int abnormal = 0;
+
+    for (final item in recycleRoom) {
+      if (item is Map) {
+        final tid = item['tid'] as int? ?? 0;
+        final lv = item['lv'] as int? ?? 0;
+        switch (tid) {
+          case 1001: common = lv; break;
+          case 1101: attacker = lv; break;
+          case 1102: defender = lv; break;
+          case 1103: supporter = lv; break;
+          case 1201: elysion = lv; break;
+          case 1202: missilis = lv; break;
+          case 1203: tetra = lv; break;
+          case 1204: pilgrim = lv; break;
+          case 1205: abnormal = lv; break;
+        }
+      }
+    }
+
+    Widget badge(String label, int lv, Color color) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(label, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold)),
+            const SizedBox(width: 4),
+            Text("Lv.$lv", style: TextStyle(fontSize: 10, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.science, size: 14, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+            const SizedBox(width: 4),
+            Text("인프라 코어: Lv.$infraCore", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
+            const SizedBox(width: 12),
+            Icon(Icons.memory, size: 14, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+            const SizedBox(width: 4),
+            Text("리사이클 룸 (공용: Lv.$common)", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            badge("화력", attacker, Colors.lightGreen),
+            badge("방어", defender, Colors.lightGreen),
+            badge("지원", supporter, Colors.lightGreen),
+            badge("엘리시온", elysion, Colors.red.shade900),
+            badge("미실리스", missilis, Colors.red.shade900),
+            badge("테트라", tetra, Colors.red.shade900),
+            badge("필그림", pilgrim, Colors.red.shade900),
+            badge("앱노멀", abnormal, Colors.red.shade900),
+          ],
+        ),
+      ],
     );
   }
 
@@ -2093,7 +2182,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     final int optLevel = id % 100;
 
                     final bool isLevel15 = optLevel == 15;
-                    final bool isHighLevel = optLevel >= 11; // Lv. 11-15 are high level
+                    final bool isHighLevel = optLevel >= 12; // Lv. 12-15 are high level
 
                     // 1. Background color (matching in-game, independent of dark/light theme)
                     final Color boxBgColor = isLevel15
