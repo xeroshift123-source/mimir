@@ -300,6 +300,14 @@ class _SyncScreenState extends State<SyncScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "💡 쿠키를 입력하지 않을 경우 미미르의 자체 안전 봇 계정을 대리인으로 조회하여 동기화합니다. 개인정보 보호를 위해 비워두는 것을 권장합니다.",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                    ),
+                  ),
                   const SizedBox(height: 32),
 
                   SizedBox(

@@ -8,6 +8,7 @@ import 'package:mimir/models/enums.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/services/database_service.dart';
 import 'package:mimir/widgets/app_drawer.dart';
+import 'deck_builder.dart';
 
 class MyNikkeScreen extends StatefulWidget {
   const MyNikkeScreen({super.key});
@@ -53,7 +54,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = "올바른 지휘관 OpenID 정보가 제공되지 않았습니다.\n프로필 동기화 화면에서 먼저 동기화를 수행해 주세요.";
+          _errorMessage =
+              "올바른 지휘관 OpenID 정보가 제공되지 않았습니다.\n프로필 동기화 화면에서 먼저 동기화를 수행해 주세요.";
         });
       }
     }
@@ -75,7 +77,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = "데이터베이스에서 프로필 정보를 찾을 수 없습니다.\n블라블라링크 동기화를 다시 진행해 주세요.";
+          _errorMessage =
+              "데이터베이스에서 프로필 정보를 찾을 수 없습니다.\n블라블라링크 동기화를 다시 진행해 주세요.";
         });
       }
     } catch (e) {
@@ -86,65 +89,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     }
   }
 
-  // 💡 Overload option scaling formula
-  double _getOptionPercent(int id) {
-    final int tier = id % 100;
-    if (tier < 1 || tier > 15) return 0.0;
 
-    if (id >= 7000501 && id <= 7000515) {
-      // 우월코드 대미지 증가
-      const vals = [0.0, 9.54, 10.94, 12.34, 13.75, 15.15, 16.55, 17.95, 19.35, 20.75, 22.15, 23.56, 24.96, 26.36, 27.76, 29.16];
-      return vals[tier];
-    } else if (id >= 7000601 && id <= 7000615) {
-      // 명중률 증가
-      const vals = [0.0, 4.77, 5.47, 6.18, 6.88, 7.59, 8.29, 9.00, 9.70, 10.40, 11.11, 11.81, 12.52, 13.22, 13.93, 14.63];
-      return vals[tier];
-    } else if (id >= 7000701 && id <= 7000715) {
-      // 최대 장탄 수 증가
-      const vals = [0.0, 27.84, 31.95, 36.06, 40.17, 44.28, 48.39, 52.50, 56.60, 60.71, 64.82, 68.93, 73.04, 77.15, 81.26, 85.37];
-      return vals[tier];
-    } else if (id >= 7000801 && id <= 7000815) {
-      // 공격력 증가
-      const vals = [0.0, 4.77, 5.47, 6.18, 6.88, 7.59, 8.29, 9.00, 9.70, 10.40, 11.11, 11.81, 12.52, 13.22, 13.93, 14.63];
-      return vals[tier];
-    } else if (id >= 7000901 && id <= 7000915) {
-      // 차지 대미지 증가
-      const vals = [0.0, 4.77, 5.47, 6.18, 6.88, 7.59, 8.29, 9.00, 9.70, 10.40, 11.11, 11.81, 12.52, 13.22, 13.93, 14.63];
-      return vals[tier];
-    } else if (id >= 7001001 && id <= 7001015) {
-      // 차지 속도 증가
-      const vals = [0.0, 1.98, 2.28, 2.57, 2.86, 3.16, 3.45, 3.75, 4.04, 4.33, 4.63, 4.92, 5.21, 5.51, 5.80, 6.09];
-      return vals[tier];
-    } else if (id >= 7001101 && id <= 7001115) {
-      // 크리티컬 확률 증가
-      const vals = [0.0, 2.30, 2.64, 2.98, 3.32, 3.66, 4.00, 4.35, 4.69, 5.03, 5.37, 5.70, 6.05, 6.39, 6.73, 7.07];
-      return vals[tier];
-    } else if (id >= 7001201 && id <= 7001215) {
-      // 크리티컬 대미지 증가
-      const vals = [0.0, 6.64, 7.62, 8.60, 9.58, 10.56, 11.54, 12.52, 13.50, 14.48, 15.46, 16.44, 17.42, 18.40, 19.38, 20.36];
-      return vals[tier];
-    } else if (id >= 7001301 && id <= 7001315) {
-      // 방어력 증가
-      const vals = [0.0, 4.77, 5.47, 6.18, 6.88, 7.59, 8.29, 9.00, 9.70, 10.40, 11.11, 11.81, 12.52, 13.22, 13.93, 14.63];
-      return vals[tier];
-    }
-    return 0.0;
-  }
 
   String _getOptionName(int id) {
-    if (id >= 7000501 && id <= 7000515) return '우월코드 대미지';
-    if (id >= 7000601 && id <= 7000615) return '명중률';
-    if (id >= 7000701 && id <= 7000715) return '최대 장탄 수';
-    if (id >= 7000801 && id <= 7000815) return '공격력';
-    if (id >= 7000901 && id <= 7000915) return '차지 대미지';
-    if (id >= 7001001 && id <= 7001015) return '차지 속도';
-    if (id >= 7001101 && id <= 7001115) return '크리티컬 확률';
-    if (id >= 7001201 && id <= 7001215) return '크리티컬 대미지';
-    if (id >= 7001301 && id <= 7001315) return '방어력';
-    return '알 수 없는 옵션';
+    return BlablaMap.getOptionName(id);
   }
-
-
 
   String _getElementLabel(ElementType type) {
     return switch (type) {
@@ -184,16 +133,43 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0D0E12) : const Color(0xFFF5F5F7),
+      backgroundColor:
+          isDark ? const Color(0xFF0D0E12) : const Color(0xFFF5F5F7),
       drawer: const AppDrawer(activeRoute: '/my-nikkes'),
       appBar: AppBar(
         title: Text(
-          _profileData != null ? "내 니케 데이터보기 (${_profileData!['nickname']})" : "내 니케 데이터보기",
-          style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+          _profileData != null
+              ? "내 니케 데이터보기 (${_profileData!['nickname']})"
+              : "내 니케 데이터보기",
+          style:
+              const TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
         ),
         backgroundColor: Colors.orange,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          if (_profileData != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: TextButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, DeckBuilderScreen.routeName);
+                },
+                icon: const Icon(Icons.style, color: Colors.white, size: 18),
+                label: const Text(
+                  "덱 구성 시작",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.orange))
@@ -210,7 +186,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 72, color: Colors.redAccent),
+            const Icon(Icons.error_outline_rounded,
+                size: 72, color: Colors.redAccent),
             const SizedBox(height: 16),
             Text(
               "지휘관 연동 실패",
@@ -239,7 +216,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
             ),
           ],
@@ -261,7 +239,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final filteredChars = characters.where((char) {
       final nameCode = char['name_code'] as int? ?? 0;
       final String mappedName = BlablaMap.characterNames[nameCode] ?? '';
-      
+
       // 1. Search Query
       if (_searchQuery.isNotEmpty &&
           !mappedName.toLowerCase().contains(_searchQuery.toLowerCase())) {
@@ -269,13 +247,20 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       }
 
       final localNikke = nikkeNameMap[mappedName];
-      if (localNikke == null) return true; // Keep mapped if local not found, filters don't apply
+      if (localNikke == null) {
+        return true; // Keep mapped if local not found, filters don't apply
+      }
 
       // 2. Filters
-      if (_burstFilters.isNotEmpty && !_burstFilters.contains(localNikke.burst)) return false;
-      if (_elementFilters.isNotEmpty && !_elementFilters.contains(localNikke.element)) return false;
-      if (_weaponFilters.isNotEmpty && !_weaponFilters.contains(localNikke.weaponType)) return false;
-      if (_companyFilters.isNotEmpty && !_companyFilters.contains(localNikke.company)) return false;
+      if (_burstFilters.isNotEmpty && !_burstFilters.contains(localNikke.burst)) {
+        return false;
+      }
+      if (_elementFilters.isNotEmpty &&
+          !_elementFilters.contains(localNikke.element)) return false;
+      if (_weaponFilters.isNotEmpty &&
+          !_weaponFilters.contains(localNikke.weaponType)) return false;
+      if (_companyFilters.isNotEmpty &&
+          !_companyFilters.contains(localNikke.company)) return false;
 
       return true;
     }).toList();
@@ -298,7 +283,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                       decoration: BoxDecoration(
                         border: Border(
                           right: BorderSide(
-                            color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                            color: isDark
+                                ? Colors.grey.shade800
+                                : Colors.grey.shade300,
                             width: 1.0,
                           ),
                         ),
@@ -308,7 +295,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           _buildProfileSummaryBar(isDark),
                           _buildSearchAndFilters(isDark),
                           Expanded(
-                            child: _buildNikkeList(filteredChars, nikkeNameMap, isDark),
+                            child: _buildNikkeList(
+                                filteredChars, nikkeNameMap, isDark),
                           ),
                         ],
                       ),
@@ -319,7 +307,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     flex: 4,
                     child: filteredChars.isEmpty
                         ? const Center(child: Text("필터에 부합하는 니케가 없습니다."))
-                        : _buildDetailPanel(filteredChars[_selectedCharIndex.clamp(0, filteredChars.length - 1)], nikkeNameMap, isDark),
+                        : _buildDetailPanel(
+                            filteredChars[_selectedCharIndex.clamp(
+                                0, filteredChars.length - 1)],
+                            nikkeNameMap,
+                            isDark),
                   ),
                 ],
               ),
@@ -332,7 +324,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               _buildProfileSummaryBar(isDark),
               _buildSearchAndFilters(isDark),
               Expanded(
-                child: _buildNikkeGrid(filteredChars, nikkeNameMap, isDark, true),
+                child:
+                    _buildNikkeGrid(filteredChars, nikkeNameMap, isDark, true),
               ),
             ],
           );
@@ -381,7 +374,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                 ),
                 child: Text(
                   server,
-                  style: const TextStyle(fontSize: 12, color: Colors.orange, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.orange,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -443,24 +439,36 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                         _selectedCharIndex = 0;
                       });
                     },
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: 14),
+                    style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                        fontSize: 14),
                     decoration: InputDecoration(
                       hintText: "니케 이름 검색...",
-                      hintStyle: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400, fontSize: 13),
-                      prefixIcon: const Icon(Icons.search, color: Colors.orange, size: 18),
+                      hintStyle: TextStyle(
+                          color: isDark
+                              ? Colors.grey.shade500
+                              : Colors.grey.shade400,
+                          fontSize: 13),
+                      prefixIcon: const Icon(Icons.search,
+                          color: Colors.orange, size: 18),
                       filled: true,
-                      fillColor: isDark ? const Color(0xFF121212) : Colors.white,
+                      fillColor:
+                          isDark ? const Color(0xFF121212) : Colors.white,
                       contentPadding: EdgeInsets.zero,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(
-                          color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                          color: isDark
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade300,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(
-                          color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                          color: isDark
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade300,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -475,7 +483,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               IconButton(
                 icon: Icon(
                   _filterExpanded ? Icons.filter_list_off : Icons.filter_list,
-                  color: _filterExpanded || _hasActiveFilters() ? Colors.orange : Colors.grey,
+                  color: _filterExpanded || _hasActiveFilters()
+                      ? Colors.orange
+                      : Colors.grey,
                 ),
                 onPressed: () {
                   setState(() {
@@ -583,7 +593,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
             padding: const EdgeInsets.only(top: 4.0),
             child: Text(
               title,
-              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Colors.orange),
+              style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.orange),
             ),
           ),
         ),
@@ -596,7 +609,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               return GestureDetector(
                 onTap: () => onToggle(item),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isSel ? Colors.orange : Colors.grey.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -609,7 +623,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
-                      color: isSel ? Colors.white : (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade300 : Colors.black87),
+                      color: isSel
+                          ? Colors.white
+                          : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey.shade300
+                              : Colors.black87),
                     ),
                   ),
                 ),
@@ -637,13 +655,15 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         maxCrossAxisExtent: 105,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
-        childAspectRatio: 0.75, // Aspect ratio of 0.75 exactly maps to 90x120 style cards
+        childAspectRatio:
+            0.75, // Aspect ratio of 0.75 exactly maps to 90x120 style cards
       ),
       itemCount: filteredChars.length,
       itemBuilder: (context, index) {
         final char = filteredChars[index];
         final nameCode = char['name_code'] as int? ?? 0;
-        final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
+        final String mappedName =
+            BlablaMap.characterNames[nameCode] ?? '알 수 없음';
         final localNikke = nameMap[mappedName];
 
         final isSelected = !isMobile && _selectedCharIndex == index;
@@ -689,7 +709,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                         ? Image.asset(
                             localNikke.imageUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black26),
+                            errorBuilder: (_, __, ___) =>
+                                const ColoredBox(color: Colors.black26),
                           )
                         : const ColoredBox(color: Colors.black26),
                   ),
@@ -709,7 +730,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           'assets/icons/elements/icon-elements-${localNikke.element.name}.webp',
                           width: 14,
                           height: 14,
-                          errorBuilder: (_, __, ___) => const SizedBox(width: 14, height: 14),
+                          errorBuilder: (_, __, ___) =>
+                              const SizedBox(width: 14, height: 14),
                         ),
                       ),
                     ),
@@ -729,7 +751,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           'assets/icons/burst/icon-burst-${localNikke.burst == BurstType.burst0 ? 0 : localNikke.burst == BurstType.burst1 ? 1 : localNikke.burst == BurstType.burst2 ? 2 : 3}.webp',
                           width: 14,
                           height: 14,
-                          errorBuilder: (_, __, ___) => const SizedBox(width: 14, height: 14),
+                          errorBuilder: (_, __, ___) =>
+                              const SizedBox(width: 14, height: 14),
                         ),
                       ),
                     ),
@@ -740,7 +763,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                       left: 4,
                       top: 22,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 1.5),
                         decoration: BoxDecoration(
                           color: Colors.red.shade600,
                           borderRadius: BorderRadius.circular(4),
@@ -762,7 +786,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     right: 0,
                     bottom: 0,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 3, horizontal: 4),
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.bottomCenter,
@@ -779,8 +804,12 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List.generate(3, (starIdx) {
                               return Icon(
-                                starIdx < grade ? Icons.star_rounded : Icons.star_border_rounded,
-                                color: starIdx < grade ? Colors.amber : Colors.white30,
+                                starIdx < grade
+                                    ? Icons.star_rounded
+                                    : Icons.star_border_rounded,
+                                color: starIdx < grade
+                                    ? Colors.amber
+                                    : Colors.white30,
                                 size: 10,
                               );
                             }),
@@ -803,11 +832,15 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                             children: [
                               Text(
                                 "Lv.$level",
-                                style: const TextStyle(color: Colors.white70, fontSize: 10),
+                                style: const TextStyle(
+                                    color: Colors.white70, fontSize: 10),
                               ),
                               Text(
                                 NumberFormat('#,###').format(combat),
-                                style: const TextStyle(color: Colors.orangeAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Colors.orangeAccent,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -824,7 +857,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     );
   }
 
-  void _showMobileDetailsSheet(Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark) {
+  void _showMobileDetailsSheet(
+      Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -852,25 +886,62 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     );
   }
 
-  Map<String, double> _calculateStats(Map<String, dynamic> char, Nikke? localNikke) {
+  Map<String, double> _calculateStats(
+      Map<String, dynamic> char, Nikke? localNikke) {
     final int level = char['level'] as int? ?? 1;
     final int grade = char['grade'] as int? ?? 0;
     final int core = char['core'] as int? ?? 0;
 
     String role = 'Supporter';
     final String name = localNikke?.name ?? '';
-    
+
     const attackers = {
-      '홍련', '홍련 : 흑영', '모더니아', '레드 후드', '앨리스', '신데렐라', '스노우 화이트', 
-      '맥스웰', '아인', '파워', '2B', 'A2', '아니스 : 스파클링 서머', '루드밀라 : 윈터 오너', 
-      '길로틴', '메이든', '하란', '에피넬', '베스티', '브리드', '솔린', '율하', '드레이크', 
-      '라플라스', '사쿠라 : 블룸 인 서머', '로산나 : 시크 오션', '누아르', '프리바티', '그레이브'
+      '홍련',
+      '홍련 : 흑영',
+      '모더니아',
+      '레드 후드',
+      '앨리스',
+      '신데렐라',
+      '스노우 화이트',
+      '맥스웰',
+      '아인',
+      '파워',
+      '2B',
+      'A2',
+      '아니스 : 스파클링 서머',
+      '루드밀라 : 윈터 오너',
+      '길로틴',
+      '메이든',
+      '하란',
+      '에피넬',
+      '베스티',
+      '브리드',
+      '솔린',
+      '율하',
+      '드레이크',
+      '라플라스',
+      '사쿠라 : 블룸 인 서머',
+      '로산나 : 시크 오션',
+      '누아르',
+      '프리바티',
+      '그레이브'
     };
     const defenders = {
-      '크라운', '노아', '블랑', '디젤', '센티', '비스킷', '노이즈', '티아', '소다', 
-      '킬로', '신', '베이', '루마니'
+      '크라운',
+      '노아',
+      '블랑',
+      '디젤',
+      '센티',
+      '비스킷',
+      '노이즈',
+      '티아',
+      '소다',
+      '킬로',
+      '신',
+      '베이',
+      '루마니'
     };
-    
+
     if (attackers.contains(name)) {
       role = 'Attacker';
     } else if (defenders.contains(name)) {
@@ -898,7 +969,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       hpGrowth = 14500;
       atkGrowth = 401;
       defGrowth = 110;
-    } else { // Supporter
+    } else {
+      // Supporter
       baseHp = 555000;
       baseAtk = 20650;
       baseDef = 3950;
@@ -984,8 +1056,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       final options = eq['overloadOptions'] as List<dynamic>? ?? [];
       for (final optId in options) {
         final int id = optId as int? ?? 0;
-        final double pct = _getOptionPercent(id) / 100.0;
-        final String optName = _getOptionName(id);
+        final double pct = BlablaMap.getOptionPercent(id) / 100.0;
+        final String optName = BlablaMap.getOptionName(id);
         if (optName == '공격력') {
           overloadAtkPct += pct;
         } else if (optName == '방어력') {
@@ -1020,7 +1092,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       itemBuilder: (context, index) {
         final char = filteredChars[index];
         final nameCode = char['name_code'] as int? ?? 0;
-        final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
+        final String mappedName =
+            BlablaMap.characterNames[nameCode] ?? '알 수 없음';
         final localNikke = nameMap[mappedName];
 
         final isSelected = _selectedCharIndex == index;
@@ -1050,7 +1123,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               color: isDark ? const Color(0xFF14151B) : Colors.white,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isSelected ? Colors.orange : (isDark ? Colors.grey.shade900 : Colors.grey.shade300),
+                color: isSelected
+                    ? Colors.orange
+                    : (isDark ? Colors.grey.shade900 : Colors.grey.shade300),
                 width: isSelected ? 2.0 : 1.0,
               ),
               boxShadow: isSelected
@@ -1097,7 +1172,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                               "Lv.$level",
                               style: TextStyle(
                                 fontSize: 14.5,
-                                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                                color: isDark
+                                    ? Colors.grey.shade400
+                                    : Colors.grey.shade600,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -1115,10 +1192,12 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                 if (core > 0) ...[
                                   const SizedBox(width: 6),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 1),
                                     decoration: BoxDecoration(
                                       color: Colors.red.withOpacity(0.2),
-                                      border: Border.all(color: Colors.redAccent, width: 1),
+                                      border: Border.all(
+                                          color: Colors.redAccent, width: 1),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
@@ -1158,7 +1237,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                               "스킬 레벨",
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                                color: isDark
+                                    ? Colors.grey.shade500
+                                    : Colors.grey.shade600,
                               ),
                             ),
                           ],
@@ -1219,7 +1300,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   ? Image.asset(
                       localNikke.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black26),
+                      errorBuilder: (_, __, ___) =>
+                          const ColoredBox(color: Colors.black26),
                     )
                   : const ColoredBox(color: Colors.black26),
             ),
@@ -1237,7 +1319,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     'assets/icons/elements/icon-elements-${localNikke.element.name}.webp',
                     width: 14,
                     height: 14,
-                    errorBuilder: (_, __, ___) => const SizedBox(width: 14, height: 14),
+                    errorBuilder: (_, __, ___) =>
+                        const SizedBox(width: 14, height: 14),
                   ),
                 ),
               ),
@@ -1255,7 +1338,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     'assets/icons/burst/icon-burst-${localNikke.burst == BurstType.burst0 ? 0 : localNikke.burst == BurstType.burst1 ? 1 : localNikke.burst == BurstType.burst2 ? 2 : 3}.webp',
                     width: 14,
                     height: 14,
-                    errorBuilder: (_, __, ___) => const SizedBox(width: 14, height: 14),
+                    errorBuilder: (_, __, ___) =>
+                        const SizedBox(width: 14, height: 14),
                   ),
                 ),
               ),
@@ -1291,12 +1375,13 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   Widget _buildCollectionPill(Map<String, dynamic>? favItem) {
     if (favItem == null) {
-      return const Text("-", style: TextStyle(color: Colors.grey, fontSize: 13));
+      return const Text("-",
+          style: TextStyle(color: Colors.grey, fontSize: 13));
     }
     final int tid = favItem['tid'] as int? ?? 0;
     final int level = favItem['level'] as int? ?? 0;
     final bool isFavorite = tid >= 200000;
-    
+
     if (isFavorite) {
       final increasedLevel = level + 1;
       return Container(
@@ -1336,7 +1421,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   Widget _buildCubeBadge(Map<String, dynamic>? cube) {
     if (cube == null) {
-      return const Text("-", style: TextStyle(color: Colors.grey, fontSize: 12));
+      return const Text("-",
+          style: TextStyle(color: Colors.grey, fontSize: 12));
     }
     final txt = _getShortCubeName(cube);
     return Container(
@@ -1361,21 +1447,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     if (cube == null) return '-';
     final int tid = cube['tid'] as int? ?? 0;
     final int level = cube['level'] as int? ?? 0;
-    String type = '큐브';
-    final lastDigit = tid % 10;
-    switch (lastDigit) {
-      case 1: type = '명중'; break;      // Assault Cube
-      case 2: type = '차뎀'; break;      // Onslaught Cube
-      case 3: type = '재장전'; break;    // Resilience Cube
-      case 4: type = '차속'; break;      // Adjutant Cube
-      case 5: type = '탄환'; break;      // Bastion Cube
-      case 6: type = '탄환'; break;      // Wingman Cube
-      case 7: type = '충속'; break;      // Quantum Cube
-      case 8: type = '체력'; break;      // Vigor Cube
-      case 9: type = '힐량'; break;      // Healing Cube
-      case 0: type = '방어'; break;      // Endurance/Tempering Cube
-    }
-    return '$type $level';
+    final String mappedName = BlablaMap.cubeNames[tid] ?? '큐브 ($tid)';
+    return '$mappedName $level';
   }
 
   Widget _buildEquipmentStatusSummary(List<dynamic> equips, bool isDark) {
@@ -1417,7 +1490,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             buildSlotText('head', '머리'),
-            const Text(" / ", style: TextStyle(color: Colors.grey, fontSize: 12)),
+            const Text(" / ",
+                style: TextStyle(color: Colors.grey, fontSize: 12)),
             buildSlotText('torso', '몸통'),
           ],
         ),
@@ -1426,7 +1500,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             buildSlotText('arm', '장갑'),
-            const Text(" / ", style: TextStyle(color: Colors.grey, fontSize: 12)),
+            const Text(" / ",
+                style: TextStyle(color: Colors.grey, fontSize: 12)),
             buildSlotText('leg', '신발'),
           ],
         ),
@@ -1458,7 +1533,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       double sumPercent = 0.0;
       int maxLevel = 0;
       for (final id in ids) {
-        sumPercent += _getOptionPercent(id);
+        sumPercent += BlablaMap.getOptionPercent(id);
         final int lvl = id % 100;
         if (lvl > maxLevel) {
           maxLevel = lvl;
@@ -1486,17 +1561,24 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       children: top3.map((info) {
         final String name = info['name'];
         final double sumPercent = info['sumPercent'];
-        final int maxLevel = info['maxLevel'];
-
+        final int maxLevel = info['maxLevel'] as int? ?? 0;
         final bool isLevel15 = maxLevel == 15;
-        final bool isLevel12OrHigher = maxLevel >= 12;
+        final bool isHighLevel = maxLevel >= 12;
 
-        final Color boxBgColor = isLevel15 ? const Color(0xFF1E1E1E) : const Color(0xFFEEEEEE);
-        final Color labelColor = isLevel15 ? Colors.white70 : Colors.black87;
-        Color valueColor = isLevel15 ? const Color(0xFF64B5F6) : Colors.black87;
-        if (isLevel12OrHigher) {
-          valueColor = isLevel15 ? const Color(0xFF64B5F6) : const Color(0xFF0D47A1);
-        }
+        // 1. Background color (matching in-game, independent of dark/light theme)
+        final Color boxBgColor = isLevel15
+            ? const Color(0xFF232323) // 최대레벨옵션일 경우 배경 (#232323)
+            : const Color(0xFFEAEAEA); // 일반 오버로드 옵션 칸 배경 (#eaeaea)
+
+        // 2. Option name text color (matching in-game, independent of dark/light theme)
+        final Color labelColor = isLevel15
+            ? const Color(0xFFFFFFFF) // 최대 레벨일 때는 흰색 글씨
+            : const Color(0xFF333333); // 일반 레벨일 때는 어두운 회색 글씨
+
+        // 3. Value color (matching in-game)
+        final Color valueColor = isHighLevel
+            ? const Color(0xFF049EE7) // 파란색 글씨 (#049ee7)
+            : const Color(0xFF7F8C8D); // 일반 옵션 수치 색상 (회색)
 
         return Container(
           width: 150,
@@ -1532,7 +1614,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     );
   }
 
-  Widget _buildDetailPanel(Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark) {
+  Widget _buildDetailPanel(
+      Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark) {
     final nameCode = char['name_code'] as int? ?? 0;
     final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
     final localNikke = nameMap[mappedName];
@@ -1544,7 +1627,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         const SizedBox(height: 24),
         Row(
           children: [
-            Icon(Icons.analytics_outlined, color: Colors.orange.shade700, size: 20),
+            Icon(Icons.analytics_outlined,
+                color: Colors.orange.shade700, size: 20),
             const SizedBox(width: 8),
             Text(
               "계산된 상세 스펙 스탯",
@@ -1561,7 +1645,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         const SizedBox(height: 24),
         Row(
           children: [
-            Icon(Icons.shield_outlined, color: Colors.orange.shade700, size: 20),
+            Icon(Icons.shield_outlined,
+                color: Colors.orange.shade700, size: 20),
             const SizedBox(width: 8),
             Text(
               "각 부위별 장비 오버로드 상세 정보",
@@ -1574,12 +1659,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        _buildEquipmentOverloadList(char['equipment'] as List<dynamic>? ?? [], isDark),
+        _buildEquipmentOverloadList(
+            char['equipment'] as List<dynamic>? ?? [], isDark),
       ],
     );
   }
 
-  Widget _buildDetailHeader(Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
+  Widget _buildDetailHeader(
+      Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
     final nameCode = char['name_code'] as int? ?? 0;
     final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
     final grade = char['grade'] as int? ?? 0;
@@ -1593,7 +1680,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF14151B) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? Colors.grey.shade900 : Colors.grey.shade300),
+        border: Border.all(
+            color: isDark ? Colors.grey.shade900 : Colors.grey.shade300),
       ),
       child: Row(
         children: [
@@ -1632,10 +1720,12 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     ),
                     if (localNikke != null) ...[
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.orange.shade800.withOpacity(0.2),
-                          border: Border.all(color: Colors.orange.shade800, width: 1),
+                          border: Border.all(
+                              color: Colors.orange.shade800, width: 1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -1662,7 +1752,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.orange,
                         borderRadius: BorderRadius.circular(4),
@@ -1688,7 +1779,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     if (core > 0) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 1.5),
                         decoration: BoxDecoration(
                           color: Colors.red.shade900,
                           borderRadius: BorderRadius.circular(4),
@@ -1727,24 +1819,29 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     }
   }
 
-  Widget _buildCalculatedStatsGrid(Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
+  Widget _buildCalculatedStatsGrid(
+      Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
     final combat = char['combat'] as int? ?? 0;
     final stats = _calculateStats(char, localNikke);
-    
+
     final skills = char['skills'] as Map<String, dynamic>? ?? {};
     final skill1 = skills['skill1'] ?? 1;
     final skill2 = skills['skill2'] ?? 1;
     final burst = skills['burst'] ?? 1;
 
     final String formattedPow = NumberFormat('#,###').format(combat);
-    final String formattedHP = NumberFormat('#,###').format(stats['hp']!.round());
-    final String formattedATK = NumberFormat('#,###').format(stats['atk']!.round());
-    final String formattedDEF = NumberFormat('#,###').format(stats['def']!.round());
+    final String formattedHP =
+        NumberFormat('#,###').format(stats['hp']!.round());
+    final String formattedATK =
+        NumberFormat('#,###').format(stats['atk']!.round());
+    final String formattedDEF =
+        NumberFormat('#,###').format(stats['def']!.round());
     final String skillText = "$skill1 / $skill2 / $burst";
-    
+
     final favItem = char['favoriteItem'] as Map<String, dynamic>?;
     final String collText = _formatFavoriteItemShort(favItem);
-    final bool isFavorite = favItem != null && (favItem['tid'] as int? ?? 0) >= 200000;
+    final bool isFavorite =
+        favItem != null && (favItem['tid'] as int? ?? 0) >= 200000;
 
     final cube = char['harmonyCube'] as Map<String, dynamic>?;
     final String cubeText = _getShortCubeName(cube);
@@ -1804,7 +1901,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF14151B) : Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: isDark ? Colors.grey.shade900 : Colors.grey.shade300),
+            border: Border.all(
+                color: isDark ? Colors.grey.shade900 : Colors.grey.shade300),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1859,7 +1957,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF14151B) : Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: isDark ? Colors.grey.shade900 : Colors.grey.shade300),
+              border: Border.all(
+                  color: isDark ? Colors.grey.shade900 : Colors.grey.shade300),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1887,7 +1986,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         final int tid = eq['tid'] as int? ?? 0;
         final int level = eq['level'] as int? ?? 0;
         final int tier = eq['tier'] as int? ?? 0;
-        final String eqName = BlablaMap.equipmentNames[tid] ?? "$label 장비 ($tid)";
+        final String eqName =
+            BlablaMap.equipmentNames[tid] ?? "$label 장비 ($tid)";
         final rawOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
         final List<dynamic> options = List.from(rawOptions);
         if (options.isNotEmpty) {
@@ -1923,10 +2023,12 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.orange.shade800.withOpacity(0.15),
-                      border: Border.all(color: Colors.orange.shade800, width: 1),
+                      border:
+                          Border.all(color: Colors.orange.shade800, width: 1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -1946,9 +2048,13 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                 style: TextStyle(
                   fontSize: 17.5,
                   fontWeight: FontWeight.bold,
-                  color: tier >= 10 
-                      ? (isDark ? Colors.pinkAccent.shade100 : Colors.pink.shade600)
-                      : (isDark ? Colors.orange.shade300 : Colors.orange.shade800),
+                  color: tier >= 10
+                      ? (isDark
+                          ? Colors.pinkAccent.shade100
+                          : Colors.pink.shade600)
+                      : (isDark
+                          ? Colors.orange.shade300
+                          : Colors.orange.shade800),
                 ),
               ),
               const SizedBox(height: 8),
@@ -1961,9 +2067,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     if (id == 0) {
                       return Container(
                         margin: const EdgeInsets.symmetric(vertical: 4.0),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E1E26) : const Color(0xFFEEEEEE),
+                          color: const Color(0xFFEAEAEA),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
@@ -1971,32 +2078,44 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           children: [
                             Text(
                               "$slotPrefix효과 없음",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                                color: Color(0xFF7F8C8D),
                               ),
                             ),
                           ],
                         ),
                       );
                     }
-                    final double percent = _getOptionPercent(id);
-                    final String name = _getOptionName(id);
+                    final double percent = BlablaMap.getOptionPercent(id);
+                    final String name = BlablaMap.getOptionName(id);
                     final int optLevel = id % 100;
-                    
+
                     final bool isLevel15 = optLevel == 15;
-                    final bool isLevel12OrHigher = optLevel >= 12;
-                    
-                    final Color boxBgColor = isLevel15 ? const Color(0xFF121212) : const Color(0xFFEEEEEE);
-                    Color textColor = Colors.black87;
-                    if (isLevel12OrHigher) {
-                      textColor = isLevel15 ? const Color(0xFF64B5F6) : const Color(0xFF0D47A1);
-                    }
-                    
+                    final bool isHighLevel = optLevel >= 11; // Lv. 11-15 are high level
+
+                    // 1. Background color (matching in-game, independent of dark/light theme)
+                    final Color boxBgColor = isLevel15
+                        ? const Color(0xFF232323) // 최대레벨옵션일 경우 배경 (#232323)
+                        : const Color(0xFFEAEAEA); // 일반 오버로드 옵션 칸 배경 (#eaeaea)
+
+                    // 2. Option name text color (matching in-game, independent of dark/light theme)
+                    final Color nameTextColor = isLevel15
+                        ? const Color(0xFFFFFFFF) // 최대 레벨일 때는 흰색 글씨
+                        : const Color(0xFF333333); // 일반 레벨일 때는 어두운 회색 글씨
+
+                    // 3. Value and icon color (matching in-game)
+                    final Color valueColor = isHighLevel
+                        ? const Color(0xFF049EE7) // 파란색 글씨 (#049ee7)
+                        : const Color(0xFF7F8C8D); // 일반 옵션 수치 색상 (회색)
+
+                    final Color iconColor = isHighLevel ? valueColor : const Color(0xFF7F8C8D);
+
                     return Container(
                       margin: const EdgeInsets.symmetric(vertical: 4.0),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: boxBgColor,
                         borderRadius: BorderRadius.circular(6),
@@ -2007,8 +2126,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           Row(
                             children: [
                               Icon(
-                                Icons.flash_on, 
-                                color: isLevel15 ? const Color(0xFF64B5F6) : (isLevel12OrHigher ? const Color(0xFF0D47A1) : Colors.orange.shade700), 
+                                Icons.flash_on,
+                                color: iconColor,
                                 size: 14.5,
                               ),
                               const SizedBox(width: 6),
@@ -2017,7 +2136,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                 style: TextStyle(
                                   fontSize: 14.5,
                                   fontWeight: FontWeight.bold,
-                                  color: textColor,
+                                  color: nameTextColor,
                                 ),
                               ),
                             ],
@@ -2027,7 +2146,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                             style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.bold,
-                              color: textColor,
+                              color: valueColor,
                             ),
                           ),
                         ],
@@ -2043,7 +2162,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     child: Text(
                       "오버로드 옵션 없음",
                       style: TextStyle(
-                        color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+                        color: isDark
+                            ? Colors.grey.shade600
+                            : Colors.grey.shade400,
                         fontSize: 11,
                       ),
                     ),

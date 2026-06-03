@@ -23,6 +23,8 @@ import 'package:mimir/screens/login.dart';
 import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/widgets/nikke_card.dart';
 import 'package:mimir/widgets/app_drawer.dart';
+import 'package:mimir/services/database_service.dart';
+import 'package:mimir/utils/blabla_map.dart';
 
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,6 +42,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   String? _selectedNikkeId;
   bool _isNikkeSheetOpen = false;
   String? _weaknessElement;
+  Map<String, dynamic>? _profileData; // 👈 추가
 
   static const Map<String, String> _elementIconMap = {
     '전격': 'assets/icons/elements/icon-elements-Electric.webp',
@@ -86,10 +89,28 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     // 첫 프레임 이후에 저장된 덱 불러오기
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _loadDeckFromLocal();
+      await _loadSyncedProfile(); // 👈 추가
       if (mounted) {
         setState(() {});
       }
     });
+  }
+
+  Future<void> _loadSyncedProfile() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final openId = prefs.getString('last_synced_openid');
+      if (openId != null && openId.isNotEmpty) {
+        final profile = await DatabaseService().getCommanderProfile(openId);
+        if (profile != null) {
+          setState(() {
+            _profileData = profile;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Failed to load synced profile in deck builder: $e");
+    }
   }
 
   @override
@@ -904,6 +925,20 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
       }
     }
 
+    final Map<String, Map<String, dynamic>> syncedCharsByName = {};
+    if (_profileData != null && _profileData!['characters'] != null) {
+      final chars = _profileData!['characters'] as List<dynamic>;
+      for (final char in chars) {
+        if (char is Map<String, dynamic>) {
+          final nameCode = char['name_code'] as int? ?? 0;
+          final String mappedName = BlablaMap.characterNames[nameCode] ?? '';
+          if (mappedName.isNotEmpty) {
+            syncedCharsByName[mappedName] = char;
+          }
+        }
+      }
+    }
+
     return Scaffold(
       drawer: const AppDrawer(activeRoute: DeckBuilderScreen.routeName),
       appBar: AppBar(
@@ -1043,10 +1078,10 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
           if (isMobile) {
             // 📱 모바일 레이아웃
-            return _buildMobileLayout(context, nikkeList, assignedSquadMap);
+            return _buildMobileLayout(context, nikkeList, assignedSquadMap, syncedCharsByName);
           } else {
             // 💻 데스크탑 / 태블릿 레이아웃
-            return _buildDesktopLayout(context, nikkeList, assignedSquadMap);
+            return _buildDesktopLayout(context, nikkeList, assignedSquadMap, syncedCharsByName);
           }
         },
       ),
@@ -1057,6 +1092,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     BuildContext context,
     List<Nikke> nikkeList,
     Map<String, int> assignedSquadMap,
+    Map<String, Map<String, dynamic>> syncedCharacters,
   ) {
     return Center(
       child: ConstrainedBox(
@@ -1071,6 +1107,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                 nikkeList: nikkeList,
                 selectedNikkeId: _selectedNikkeId,
                 assignedSquadMap: assignedSquadMap,
+                syncedCharacters: syncedCharacters,
                 onNikkeTap: _onNikkeTap,
                 searchQuery: _searchQuery,
                 burstFilters: _burstFilters,
@@ -1116,6 +1153,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     BuildContext context,
     List<Nikke> nikkeList,
     Map<String, int> assignedSquadMap,
+    Map<String, Map<String, dynamic>> syncedCharacters,
   ) {
     final screenHeight = MediaQuery.of(context).size.height;
     final sheetHeight = screenHeight * 0.7; // 바텀시트 높이 (70%)
@@ -1261,6 +1299,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                           nikkeList: nikkeList,
                           selectedNikkeId: _selectedNikkeId,
                           assignedSquadMap: assignedSquadMap,
+                          syncedCharacters: syncedCharacters,
                           // 모바일에서는 선택하면 시트 닫고, 선택 유지
                           onNikkeTap: (nikke) {
                             _onNikkeTap(nikke); // 기존 선택 로직 그대로
@@ -1303,6 +1342,7 @@ class NikkeListPanel extends StatefulWidget {
   final List<Nikke> nikkeList;
   final String? selectedNikkeId;
   final Map<String, int> assignedSquadMap;
+  final Map<String, Map<String, dynamic>> syncedCharacters; // 👈 추가
   final ValueChanged<Nikke>? onNikkeTap;
   final List<String> squadNames;
 
@@ -1325,6 +1365,7 @@ class NikkeListPanel extends StatefulWidget {
     required this.squadNames,
     this.selectedNikkeId,
     this.assignedSquadMap = const {},
+    this.syncedCharacters = const {}, // 👈 추가
     this.onNikkeTap,
     this.searchQuery = '',
     this.burstFilters = const {},
@@ -1351,13 +1392,38 @@ class _NikkeListPanelState extends State<NikkeListPanel>
     // 1) 필터 적용
     List<Nikke> filtered = List<Nikke>.from(widget.nikkeList);
 
-    /// 정렬 (SSR → SR → R, 동일 등급 내에서는 이름순)
-    filtered.sort((a, b) {
-      final rankDiff = a.rank.sortValue.compareTo(b.rank.sortValue);
-      if (rankDiff != 0) return rankDiff;
-      // 등급이 같으면 이름순으로
-      return a.name.compareTo(b.name);
-    });
+    /// 정렬
+    if (widget.syncedCharacters.isNotEmpty) {
+      filtered.sort((a, b) {
+        final aOwned = widget.syncedCharacters.containsKey(a.name);
+        final bOwned = widget.syncedCharacters.containsKey(b.name);
+
+        if (aOwned && !bOwned) return -1;
+        if (!aOwned && bOwned) return 1;
+
+        if (aOwned && bOwned) {
+          final aChar = widget.syncedCharacters[a.name]!;
+          final bChar = widget.syncedCharacters[b.name]!;
+          final aPower = aChar['combat'] as int? ?? 0;
+          final bPower = bChar['combat'] as int? ?? 0;
+          final powerDiff = bPower.compareTo(aPower); // Descending
+          if (powerDiff != 0) return powerDiff;
+        }
+
+        // Fallback: SSR → SR → R, then name
+        final rankDiff = a.rank.sortValue.compareTo(b.rank.sortValue);
+        if (rankDiff != 0) return rankDiff;
+        return a.name.compareTo(b.name);
+      });
+    } else {
+      /// 정렬 (SSR → SR → R, 동일 등급 내에서는 이름순)
+      filtered.sort((a, b) {
+        final rankDiff = a.rank.sortValue.compareTo(b.rank.sortValue);
+        if (rankDiff != 0) return rankDiff;
+        // 등급이 같으면 이름순으로
+        return a.name.compareTo(b.name);
+      });
+    }
 
     // 이름 + ability 검색
     if (widget.searchQuery.isNotEmpty) {
@@ -1498,9 +1564,12 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                 final int? squadIndex = widget.assignedSquadMap[nikke.id];
                 final bool isAssigned = squadIndex != null;
 
+                final bool isSynced = widget.syncedCharacters.isNotEmpty;
+                final bool isNotOwned = isSynced && !widget.syncedCharacters.containsKey(nikke.name);
+
                 final bool isSelected =
-                    !isAssigned && widget.selectedNikkeId == nikke.id;
-                final bool isDimmed = isAssigned ||
+                    !isAssigned && !isNotOwned && widget.selectedNikkeId == nikke.id;
+                final bool isDimmed = isAssigned || isNotOwned ||
                     (widget.selectedNikkeId != null &&
                         widget.selectedNikkeId != nikke.id);
 
@@ -1510,17 +1579,30 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                         ? '후보 덱'
                         : widget.squadNames[squadIndex]);
 
-                return NikkeCard(
+                final Map<String, dynamic>? syncedChar = widget.syncedCharacters[nikke.name];
+
+                final card = NikkeCard(
                   nikke: nikke,
                   onTap: () {
-                    if (isAssigned) return;
+                    if (isAssigned || isNotOwned) return;
                     widget.onNikkeTap?.call(nikke);
                   },
                   isSelected: isSelected,
                   isDimmed: isDimmed,
                   assignedSquadIndex: squadIndex,
-                  assignedSquadName: squadName, // ✅ 추가
+                  assignedSquadName: squadName,
+                  isNotOwned: isNotOwned,
                 );
+
+                if (syncedChar != null) {
+                  return NikkeHoverTooltip(
+                    charData: syncedChar,
+                    nikke: nikke,
+                    child: card,
+                  );
+                } else {
+                  return card;
+                }
               },
             ),
           ),
@@ -2612,4 +2694,390 @@ class _DottedLinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ---------------------------
+// Hover Tooltip for Owned Nikkes
+// ---------------------------
+class NikkeHoverTooltip extends StatefulWidget {
+  final Widget child;
+  final Map<String, dynamic> charData;
+  final Nikke nikke;
+
+  const NikkeHoverTooltip({
+    super.key,
+    required this.child,
+    required this.charData,
+    required this.nikke,
+  });
+
+  @override
+  State<NikkeHoverTooltip> createState() => _NikkeHoverTooltipState();
+}
+
+class _NikkeHoverTooltipState extends State<NikkeHoverTooltip> {
+  OverlayEntry? _overlayEntry;
+  final LayerLink _layerLink = LayerLink();
+
+  void _showTooltip() {
+    _hideTooltip();
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _hideTooltip() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    return OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          width: 320,
+          child: CompositedTransformFollower(
+            link: _layerLink,
+            showWhenUnlinked: false,
+            targetAnchor: Alignment.topRight,
+            followerAnchor: Alignment.topLeft,
+            offset: const Offset(10, 0),
+            child: IgnorePointer(
+              child: Material(
+                elevation: 8,
+                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFF14151B), // Sleek dark mode background
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade800, width: 1),
+                  ),
+                  child: _buildTooltipContent(),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTooltipContent() {
+    final char = widget.charData;
+    final name = widget.nikke.name;
+    final grade = char['grade'] as int? ?? 0;
+    final core = char['core'] as int? ?? 0;
+    final skills = char['skills'] as Map<String, dynamic>? ?? {};
+    final skill1 = skills['skill1'] ?? 1;
+    final skill2 = skills['skill2'] ?? 1;
+    final burst = skills['burst'] ?? 1;
+    final favItem = char['favoriteItem'] as Map<String, dynamic>?;
+    final equips = char['equipment'] as List<dynamic>? ?? [];
+
+    final String stars = '★' * grade;
+
+    final Map<String, dynamic> equipsBySlot = {
+      for (final eq in equips) eq['slot'] as String: eq
+    };
+
+    String getEquipLevel(String slot) {
+      final eq = equipsBySlot[slot];
+      if (eq == null) return '+0';
+      final int level = eq['level'] as int? ?? 0;
+      return '+$level';
+    }
+
+    final Map<String, List<int>> groups = {};
+    for (final eq in equips) {
+      final options = eq['overloadOptions'] as List<dynamic>? ?? [];
+      for (final optId in options) {
+        final int id = optId as int? ?? 0;
+        if (id == 0) continue;
+        final String optName = BlablaMap.getOptionName(id);
+        groups.putIfAbsent(optName, () => []).add(id);
+      }
+    }
+
+    final List<Map<String, dynamic>> overloadSummaries = [];
+    groups.forEach((optName, ids) {
+      double sumPercent = 0.0;
+      int maxLevel = 0;
+      for (final id in ids) {
+        sumPercent += BlablaMap.getOptionPercent(id);
+        final int lvl = id % 100;
+        if (lvl > maxLevel) {
+          maxLevel = lvl;
+        }
+      }
+      overloadSummaries.add({
+        'name': optName,
+        'sumPercent': sumPercent,
+        'maxLevel': maxLevel,
+        'count': ids.length,
+      });
+    });
+
+    overloadSummaries.sort((a, b) {
+      final int countCompare = b['count'].compareTo(a['count']);
+      if (countCompare != 0) return countCompare;
+      return b['sumPercent'].compareTo(a['sumPercent']);
+    });
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (stars.isNotEmpty) ...[
+              const SizedBox(width: 8),
+              Text(
+                stars,
+                style: const TextStyle(
+                  color: Colors.amber,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+            if (core > 0) ...[
+              const SizedBox(width: 4),
+              Text(
+                '(+$core)',
+                style: const TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$skill1 / $skill2 / $burst',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    '스킬 레벨',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (favItem != null) _buildTooltipCollectionPill(favItem),
+          ],
+        ),
+        const Divider(color: Colors.grey, height: 24),
+
+        const Text(
+          '장비 강화',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Expanded(
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  children: [
+                    const TextSpan(text: '머리 '),
+                    TextSpan(
+                      text: getEquipLevel('head'),
+                      style: const TextStyle(
+                        color: Color(0xFFF06292),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const TextSpan(text: ' / 몸통 '),
+                    TextSpan(
+                      text: getEquipLevel('torso'),
+                      style: const TextStyle(
+                        color: Color(0xFFF06292),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Expanded(
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  children: [
+                    const TextSpan(text: '장갑 '),
+                    TextSpan(
+                      text: getEquipLevel('arm'),
+                      style: const TextStyle(
+                        color: Color(0xFFF06292),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const TextSpan(text: ' / 신발 '),
+                    TextSpan(
+                      text: getEquipLevel('leg'),
+                      style: const TextStyle(
+                        color: Color(0xFFF06292),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        if (overloadSummaries.isNotEmpty) ...[
+          const Divider(color: Colors.grey, height: 24),
+          ...overloadSummaries.map((info) {
+            final String optName = info['name'];
+            final double sumPercent = info['sumPercent'];
+            final int maxLevel = info['maxLevel'] as int? ?? 0;
+            final bool isLevel15 = maxLevel == 15;
+            final bool isHighLevel = maxLevel >= 12;
+
+            final Color boxBgColor = isLevel15
+                ? const Color(0xFF232323)
+                : const Color(0xFFEAEAEA);
+
+            final Color labelColor = isLevel15
+                ? const Color(0xFFFFFFFF)
+                : const Color(0xFF333333);
+
+            final Color valueColor = isHighLevel
+                ? const Color(0xFF049EE7)
+                : const Color(0xFF7F8C8D);
+
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 3.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: boxBgColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    optName,
+                    style: TextStyle(
+                      color: labelColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '+${sumPercent.toStringAsFixed(2)}%',
+                    style: TextStyle(
+                      color: valueColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildTooltipCollectionPill(Map<String, dynamic> favItem) {
+    final int tid = favItem['tid'] as int? ?? 0;
+    final int level = favItem['level'] as int? ?? 0;
+    final bool isFavorite = tid >= 200000;
+
+    if (isFavorite) {
+      final increasedLevel = level + 1;
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.orange.withOpacity(0.1),
+          border: Border.all(color: Colors.orange, width: 1.5),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          "♥$increasedLevel",
+          style: const TextStyle(
+            color: Colors.orange,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.purple.shade700,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          "SR$level",
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _hideTooltip();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: MouseRegion(
+        onEnter: (_) => _showTooltip(),
+        onExit: (_) => _hideTooltip(),
+        child: widget.child,
+      ),
+    );
+  }
 }

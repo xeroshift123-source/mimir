@@ -64,13 +64,14 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             rawOpenId = openId.split('-')[1];
         }
 
+        const botCookie = process.env.BOT_COOKIE || '';
         const customHeaders = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Content-Type': 'application/json',
             'X-language': 'ko',
             'Origin': 'https://www.blablalink.com',
             'Referer': 'https://www.blablalink.com/',
-            'Cookie': cookie || ''
+            'Cookie': cookie || botCookie || ''
         };
 
         const results = { profile: null, gameInfo: null, characters: [] };
@@ -109,7 +110,9 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
 
         if (gameInfoRes && gameInfoRes.data && gameInfoRes.data.code === 0 && gameInfoRes.data.data) {
             results.gameInfo = gameInfoRes.data.data;
-            const proxyPayload = { intl_open_id: rawOpenId, nikke_area_id: 83 }; // 한국 리전 기본값 83
+            const areaIdStr = results.gameInfo.area_id ? results.gameInfo.area_id.toString() : '83';
+            const areaId = parseInt(areaIdStr, 10) || 83;
+            const proxyPayload = { intl_open_id: rawOpenId, nikke_area_id: areaId };
 
             // [Step 2] 인게임 Basic & Outpost 지표 조회
             const basicRes = await axios.post(
@@ -229,7 +232,11 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
 
         const payloadToSave = {
             nickname: results.profile ? (results.profile.info ? results.profile.info.username : '지휘관') : '지휘관',
-            server: results.gameInfo ? (results.gameInfo.area_id === '83' ? '한국' : results.gameInfo.area_id) : '알 수 없음',
+            server: results.gameInfo ? (() => {
+                const sMap = { '81': '일본', '82': '일본', '83': '한국', '84': '북미', '85': '글로벌', '86': '동남아' };
+                const aId = results.gameInfo.area_id ? results.gameInfo.area_id.toString() : '';
+                return sMap[aId] || `기타 (${aId})`;
+            })() : '알 수 없음',
             union: results.gameInfo ? results.gameInfo.guild_name : '없음',
             unionLevel: results.gameInfo ? results.gameInfo.guild_level : 0,
             combatPower: results.gameInfo ? results.gameInfo.team_combat : 0,

@@ -18,6 +18,7 @@ class NikkeCard extends StatelessWidget {
   final bool showAssignedOverlay;
 
   final String? assignedSquadName;
+  final bool isNotOwned; // 👈 추가
 
   const NikkeCard({
     super.key,
@@ -28,6 +29,7 @@ class NikkeCard extends StatelessWidget {
     this.assignedSquadIndex,
     this.showAssignedOverlay = true, // 👈 기본값 true
     this.assignedSquadName,
+    this.isNotOwned = false, // 👈 추가
   });
 
   @override
@@ -168,8 +170,34 @@ class NikkeCard extends StatelessWidget {
                         child: Container(color: Colors.black.withOpacity(0.55)),
                       ),
 
-                    // 7. 스쿼드 오버레이
-                    if (isAssigned && showAssignedOverlay)
+                    // 7. 스쿼드 오버레이 또는 미보유 오버레이
+                    if (isNotOwned)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.75),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.block,
+                                    color: Colors.white, size: 22 * scale),
+                                SizedBox(height: 4 * scale),
+                                Text(
+                                  '미보유',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14 * scale,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else if (isAssigned && showAssignedOverlay)
                       Positioned.fill(
                         child: Container(
                           color: Colors.black.withOpacity(0.7),
