@@ -976,6 +976,29 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     _saveDeckToLocal();
                   }
                 },
+                selectedItemBuilder: (BuildContext context) {
+                  return <String>['전격', '철갑', '작열', '수냉', '풍압'].map<Widget>((String value) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          _elementIconMap[value] ??
+                              'assets/icons/elements/icon-elements-Electric.webp',
+                          width: 18,
+                          height: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          value,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList();
+                },
                 items: <String>['전격', '철갑', '작열', '수냉', '풍압']
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
@@ -992,8 +1015,10 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                         const SizedBox(width: 6),
                         Text(
                           value,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87,
                             fontSize: 13,
                           ),
                         ),

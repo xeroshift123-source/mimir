@@ -35,7 +35,7 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             return res.status(200).json({ success: false, error: 'Method Not Allowed' });
         }
 
-        const { cookie, url } = req.body || {};
+        const { url } = req.body || {};
         if (!url) {
             return res.status(200).json({ success: false, error: 'Target URL is required.' });
         }
@@ -71,7 +71,7 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             'X-language': 'ko',
             'Origin': 'https://www.blablalink.com',
             'Referer': 'https://www.blablalink.com/',
-            'Cookie': cookie || botCookie || ''
+            'Cookie': botCookie
         };
 
         const results = { profile: null, gameInfo: null, characters: [] };

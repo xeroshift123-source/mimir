@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'my_nikke_screen.dart';
+import 'package:mimir/widgets/app_footer.dart';
 
 class SyncScreen extends StatefulWidget {
   const SyncScreen({super.key});
@@ -15,7 +16,6 @@ class SyncScreen extends StatefulWidget {
 
 class _SyncScreenState extends State<SyncScreen> {
   final TextEditingController _urlController = TextEditingController();
-  final TextEditingController _cookieController = TextEditingController();
   bool _isLoading = false;
 
   // Cloud Functions Endpoint
@@ -24,13 +24,11 @@ class _SyncScreenState extends State<SyncScreen> {
   @override
   void dispose() {
     _urlController.dispose();
-    _cookieController.dispose();
     super.dispose();
   }
 
   Future<void> _handleSync() async {
     final enteredUrl = _urlController.text.trim();
-    final enteredCookie = _cookieController.text.trim();
     if (enteredUrl.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -61,7 +59,6 @@ class _SyncScreenState extends State<SyncScreen> {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "url": enteredUrl,
-          "cookie": enteredCookie
         }),
       );
 
@@ -263,51 +260,6 @@ class _SyncScreenState extends State<SyncScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-
-                  // ✍️ Cookie 입력 필드
-                  Text(
-                    "블라블라링크 세션 쿠키 (Cookie) - 선택사항",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.orange.shade300 : Colors.orange.shade800,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _cookieController,
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: 14),
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.cookie_outlined, color: Colors.orange),
-                      hintText: "복사한 game_token 쿠키 또는 전체 쿠키 문자열을 붙여넣으세요.",
-                      hintStyle: TextStyle(
-                        color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
-                        fontSize: 13,
-                      ),
-                      filled: true,
-                      fillColor: isDark ? const Color(0xFF1E1E1E) : Colors.grey.shade50,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.orange, width: 1.5),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "💡 쿠키를 입력하지 않을 경우 미미르의 자체 안전 봇 계정을 대리인으로 조회하여 동기화합니다. 개인정보 보호를 위해 비워두는 것을 권장합니다.",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                    ),
-                  ),
                   const SizedBox(height: 32),
 
                   SizedBox(
@@ -365,10 +317,12 @@ class _SyncScreenState extends State<SyncScreen> {
                         _buildStep("2", "우측 상단 프로필 이미지 클릭 후 [마이페이지] 혹은 [프로필]에 진입합니다.", isDark),
                         _buildStep("3", "프로필 설정에서 소개글(상태메시지)을 '미미르만만세'로 변경 및 저장합니다.", isDark),
                         _buildStep("4", "주소창의 URL(openid 파라미터가 포함된 전체 주소)을 복사하여 위 필드에 입력합니다.", isDark),
-                        _buildStep("5", "비공개 계정인 경우 세션 쿠키(game_token 또는 전체 쿠키 문자열)를 함께 기입해야 수집이 가능합니다.", isDark),
+                        _buildStep("5", "블라블라링크 설정에서 '내 정보 공개' 및 '캐릭터 정보 공개' 옵션이 활성화되어 있어야 동기화가 가능합니다.", isDark),
                       ],
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 16),
+                  const AppFooter(),
                 ],
               ),
             ),

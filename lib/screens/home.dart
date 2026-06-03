@@ -8,6 +8,7 @@ import 'package:mimir/screens/sync_screen.dart';
 import 'package:mimir/providers/theme_provider.dart';
 import 'package:mimir/providers/auth_provider.dart';
 import 'package:mimir/widgets/app_drawer.dart';
+import 'package:mimir/widgets/app_footer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -523,62 +524,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 48),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF1E1E1E).withOpacity(0.5)
-                          : Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.grey.shade800
-                            : Colors.grey.shade200,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              size: 16,
-                              color: isDark
-                                  ? Colors.grey.shade400
-                                  : Colors.grey.shade600,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              "안내",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: isDark
-                                    ? Colors.grey.shade300
-                                    : Colors.grey.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "본 사이트는 개인이 운영하는 비영리 팬 사이트입니다. 사이트에 사용된 모든 게임 이미지, 캐릭터, 텍스트 등 일체의 자산에 대한 권리는 원저작권자인 (주)시프트업(SHIFT UP Corp.)에 있습니다. 본 사이트는 공식 서비스를 사칭하거나 영리적 이득을 취하지 않으며, 원저작권자의 요청이 있을 경우 콘텐츠가 수정 또는 삭제될 수 있습니다.",
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isDark
-                                ? Colors.grey.shade400
-                                : Colors.grey.shade600,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 24),
+                const AppFooter(),
               ],
             ),
           ),
