@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemeProvider with ChangeNotifier {
   static const _kThemeModeKey = 'theme_mode_is_dark';
   
-  // 기본값을 다크 모드(true)로 설정하여 로딩 화면의 멋진 어두운 테마와 이어지도록 합니다.
-  bool _isDark = true; 
+  // 기본값을 라이트 모드(false)로 설정
+  bool _isDark = false; 
 
   bool get isDark => _isDark;
 
@@ -13,7 +13,7 @@ class ThemeProvider with ChangeNotifier {
 
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    _isDark = prefs.getBool(_kThemeModeKey) ?? true;
+    _isDark = prefs.getBool(_kThemeModeKey) ?? false;
     notifyListeners();
   }
 

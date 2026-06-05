@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'screens/home.dart';
 import 'screens/deck_builder.dart';
+import 'screens/union_deck_builder.dart';
 import 'screens/deck_library.dart';
 import 'screens/calculate_list.dart';
 import 'screens/login.dart';
@@ -99,6 +100,8 @@ class MimirApp extends StatelessWidget {
             routes: {
               DeckBuilderScreen.routeName: (context) =>
                   const DeckBuilderScreen(),
+              UnionDeckBuilderScreen.routeName: (context) =>
+                  const UnionDeckBuilderScreen(),
               DeckLibraryScreen.routeName: (context) =>
                   const DeckLibraryScreen(),
               CalculateListScreen.routeName: (context) =>

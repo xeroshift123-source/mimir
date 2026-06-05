@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/deck_builder.dart';
+import 'package:mimir/screens/union_deck_builder.dart';
 import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/screens/login.dart';
 import 'package:mimir/screens/sync_screen.dart';
+import 'package:mimir/screens/my_nikke_screen.dart';
 import 'package:mimir/providers/theme_provider.dart';
 import 'package:mimir/providers/auth_provider.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/app_footer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/raid_info.dart';
+import '../data/raid_data.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +24,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late int _currentRaidPage = raidHistory.length - 1;
+  late final PageController _raidPageController = PageController(initialPage: raidHistory.length - 1, viewportFraction: 1.0);
+
+  @override
+  void dispose() {
+    _raidPageController.dispose();
+    super.dispose();
+  }
+  
   String _selectedWeakness = '수냉';
 
   static const Map<String, String> _elementIconMap = {
@@ -28,17 +43,261 @@ class _HomeScreenState extends State<HomeScreen> {
     '풍압': 'assets/icons/elements/icon-elements-Wind.webp',
   };
 
-  void _openDeckBuilder(BuildContext context) {
-    Navigator.pushNamed(
-      context,
-      DeckBuilderScreen.routeName,
-      arguments: _selectedWeakness,
+  void _showWeaknessDialog(BuildContext context, {String? initialWeakness}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        String tempWeakness = initialWeakness ?? _selectedWeakness;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              title: const Text("공략 약점 속성 선택", style: TextStyle(fontWeight: FontWeight.bold)),
+              content: DropdownButtonHideUnderline(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.shade300, width: 1.5),
+                  ),
+                  child: DropdownButton<String>(
+                    value: tempWeakness,
+                    isExpanded: true,
+                    dropdownColor: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setStateDialog(() {
+                          tempWeakness = newValue;
+                        });
+                        setState(() {
+                          _selectedWeakness = newValue;
+                        });
+                      }
+                    },
+                    items: <String>['전격', '철갑', '작열', '수냉', '풍압']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Row(
+                          children: [
+                            Image.asset(_elementIconMap[value]!, width: 20, height: 20),
+                            const SizedBox(width: 10),
+                            Text(value, style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text("취소", style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    Navigator.pushNamed(
+                      context,
+                      DeckBuilderScreen.routeName,
+                      arguments: tempWeakness,
+                    );
+                  },
+                  child: const Text("확인"),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
+  void _openCalculator(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CalculateListScreen()),
+    );
+  }
+
+  Widget _buildMenuButton(BuildContext context, {required String title, required IconData icon, required Color color, required VoidCallback onTap, bool isOutlined = false}) {
+    if (isOutlined) {
+      return SizedBox(
+        height: 56,
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: onTap,
+          icon: Icon(icon, color: color, size: 20),
+          label: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: color, width: 1.5),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      );
+    } else {
+      return SizedBox(
+        height: 56,
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: onTap,
+          icon: Icon(icon, color: Colors.white, size: 20),
+          label: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      );
+    }
+  }
+
   // ✅ 레이드 요약 카드 위젯
-  Widget _buildRaidSummaryCard(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildRaidSummaryCard(BuildContext context, RaidInfo raid) {
+    final isDark = context.watch<ThemeProvider>().isDark;
+
+    if (raid.type == RaidType.union) {
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E1E1E) : Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ✅ 카드 상단 이미지
+                if (raid.imagePath.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      raid.imagePath,
+                      width: double.infinity,
+                      height: 100,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(height: 100, color: Colors.grey.shade800, child: const Center(child: Icon(Icons.broken_image, color: Colors.white, size: 50)));
+                      },
+                    ),
+                  ),
+                // ✅ 카드 본문
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "유니온 레이드",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.red.shade900.withOpacity(0.3)
+                                  : Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.red.shade700
+                                    : Colors.red.shade200,
+                              ),
+                            ),
+                            child: Text(
+                              raid.seasonName,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: isDark
+                                    ? Colors.red.shade300
+                                    : Colors.red.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.schedule,
+                            size: 18,
+                            color: isDark ? Colors.grey.shade400 : Colors.black,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            raid.period,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: isDark ? Colors.grey.shade400 : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+                      if (raid.unionBosses != null)
+                        ...raid.unionBosses!.entries.map((entry) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: SizedBox(
+                              width: 220,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Image.asset(
+                                    _elementIconMap[entry.key] ?? "assets/icons/elements/icon-elements-Electric.webp",
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      entry.value,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: isDark ? Colors.white : Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 400),
@@ -59,9 +318,13 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Image.asset(
-                  "assets/images/raids/ultra.webp",
+                  raid.imagePath,
                   width: double.infinity,
+                  height: 140,
                   fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(height: 140, color: Colors.grey.shade800, child: const Center(child: Icon(Icons.broken_image, color: Colors.white, size: 50)));
+                  },
                 ),
               ),
 
@@ -75,7 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "다음 솔로 레이드",
+                          raid.typeLabel,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -100,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           child: Text(
-                            "SEASON 37",
+                            raid.seasonName,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -114,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      "울라리",
+                      raid.bossName ?? '',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -132,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          "5/28(목) 12:00 ~ 6/4(목) 4:59",
+                          raid.period,
                           style: TextStyle(
                             fontSize: 13,
                             color: isDark ? Colors.grey.shade400 : Colors.black,
@@ -148,93 +411,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         _chip(
                           context: context,
-                          iconPath:
+                          iconPath: _elementIconMap[raid.bossElement ?? ''] ??
                               "assets/icons/elements/icon-elements-fire.webp",
                           title: "보스 속성",
-                          value: "작열",
+                          value: raid.bossElement ?? '',
                         ),
                         _chip(
                           context: context,
-                          iconPath: _elementIconMap[_selectedWeakness] ??
+                          iconPath: _elementIconMap[raid.weakness ?? ''] ??
                               "assets/icons/elements/icon-elements-Electric.webp",
                           title: "약점 속성",
-                          value: _selectedWeakness,
+                          value: raid.weakness ?? '',
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pushNamed(context, DeckLibraryScreen.routeName);
-                        },
-                        icon: const Icon(Icons.auto_awesome_motion, color: Colors.white, size: 18),
-                        label: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              "공유 덱 라이브러리 바로가기",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.white, width: 1.2),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                "BETA",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.pushNamed(context, SyncScreen.routeName);
-                        },
-                        icon: const Icon(Icons.sync_rounded, color: Colors.orange, size: 18),
-                        label: const Text(
-                          "전투 정보 동기화 (블라블라링크)",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.orange, width: 1.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -252,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String title,
     required String value,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.watch<ThemeProvider>().isDark;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -299,17 +488,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _openCalculator(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const CalculateListScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       drawer: const AppDrawer(activeRoute: '/'),
       appBar: AppBar(
@@ -399,127 +579,187 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildRaidSummaryCard(context),
-                const SizedBox(height: 24),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.orange.shade800
-                            : Colors.orange.shade300,
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedWeakness,
-                        icon: const Icon(Icons.arrow_drop_down,
-                            color: Colors.orange, size: 28),
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: isDark ? Colors.white : Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        isExpanded: true,
-                        dropdownColor:
-                            isDark ? const Color(0xFF2D2D2D) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 420),
+                      child: SizedBox(
+                        height: 380,
+                        child: PageView.builder(
+                          controller: _raidPageController,
+                          clipBehavior: Clip.none,
+                          onPageChanged: (index) {
                             setState(() {
-                              _selectedWeakness = newValue;
+                              _currentRaidPage = index;
                             });
-                          }
-                        },
-                        items: <String>['전격', '철갑', '작열', '수냉', '풍압']
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  _elementIconMap[value]!,
-                                  width: 20,
-                                  height: 20,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  '공략 약점 속성: $value',
-                                  style: TextStyle(
-                                    color:
-                                        isDark ? Colors.white : Colors.black87,
+                          },
+                          itemCount: raidHistory.length,
+                          itemBuilder: (context, index) {
+                            return AnimatedBuilder(
+                              animation: _raidPageController,
+                              builder: (context, child) {
+                                double page = index.toDouble();
+                                if (_raidPageController.position.haveDimensions) {
+                                  page = _raidPageController.page ?? page;
+                                } else {
+                                  page = _raidPageController.initialPage.toDouble();
+                                }
+                                double diff = (page - index).abs();
+                                double scale = (1 - (diff * 0.15)).clamp(0.85, 1.0);
+                                double opacity = (1 - (diff * 0.5)).clamp(0.4, 1.0);
+
+                                return Opacity(
+                                  opacity: opacity,
+                                  child: Transform.scale(
+                                    scale: scale,
+                                    child: child,
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                child: _buildRaidSummaryCard(context, raidHistory[index]),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
+                    // 좌측 화살표
+                    if (_currentRaidPage > 0)
+                      Positioned(
+                        left: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.4),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+                            onPressed: () {
+                              _raidPageController.previousPage(
+                                duration: const Duration(milliseconds: 400),
+                                curve: Curves.easeOutCubic,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    // 우측 화살표
+                    if (_currentRaidPage < raidHistory.length - 1)
+                      Positioned(
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.4),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.chevron_right, color: Colors.white, size: 32),
+                            onPressed: () {
+                              _raidPageController.nextPage(
+                                duration: const Duration(milliseconds: 400),
+                                curve: Curves.easeOutCubic,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(raidHistory.length, (index) {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: _currentRaidPage == index ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _currentRaidPage == index
+                            ? Colors.orange
+                            : Colors.grey.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    );
+                  }),
                 ),
                 const SizedBox(height: 24),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  child: Row(
+                  child: Column(
                     children: [
-                      Expanded(
-                        flex: 1,
-                        child: SizedBox(
-                          height: 56,
-                          child: OutlinedButton(
-                            onPressed: () => _openCalculator(context),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                  color: Colors.orange, width: 1.5),
-                              foregroundColor: Colors.orange,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              "계산기",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ),
+                      _buildMenuButton(
+                        context,
+                        title: "솔로 레이드 덱 구성",
+                        icon: Icons.dashboard_customize,
+                        color: Colors.orange,
+                        onTap: () => _showWeaknessDialog(context, initialWeakness: raidHistory[_currentRaidPage].weakness),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: SizedBox(
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: () => _openDeckBuilder(context),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              "덱 구성 시작",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800),
+                      const SizedBox(height: 12),
+                      _buildMenuButton(
+                        context,
+                        title: "유니온 레이드 덱 구성",
+                        icon: Icons.group_work,
+                        color: Colors.orange.shade700,
+                        onTap: () => Navigator.pushNamed(context, UnionDeckBuilderScreen.routeName),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildMenuButton(
+                        context,
+                        title: "공유 덱 라이브러리 바로가기",
+                        icon: Icons.auto_awesome_motion,
+                        color: Colors.deepOrange,
+                        onTap: () => Navigator.pushNamed(context, DeckLibraryScreen.routeName),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildMenuButton(
+                        context,
+                        title: "전투 정보 동기화",
+                        icon: Icons.sync_rounded,
+                        color: Colors.blueAccent,
+                        onTap: () => Navigator.pushNamed(context, SyncScreen.routeName),
+                        isOutlined: true,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildMenuButton(
+                              context,
+                              title: "계산기",
+                              icon: Icons.calculate,
+                              color: Colors.teal,
+                              onTap: () => _openCalculator(context),
+                              isOutlined: true,
                             ),
                           ),
-                        ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildMenuButton(
+                              context,
+                              title: "내 니케 정보",
+                              icon: Icons.person_search,
+                              color: Colors.purple,
+                              onTap: () async {
+                                final prefs = await SharedPreferences.getInstance();
+                                if (!context.mounted) return;
+                                final savedOpenId = prefs.getString('last_synced_openid');
+                                if (savedOpenId != null && savedOpenId.isNotEmpty) {
+                                  Navigator.pushNamed(context, MyNikkeScreen.routeName, arguments: savedOpenId);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("먼저 블라블라링크 프로필 동기화를 진행해 주세요."), backgroundColor: Colors.orange),
+                                  );
+                                  Navigator.pushNamed(context, SyncScreen.routeName);
+                                }
+                              },
+                              isOutlined: true,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

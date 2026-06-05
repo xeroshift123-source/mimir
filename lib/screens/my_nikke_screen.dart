@@ -240,23 +240,37 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       final nameCode = char['name_code'] as int? ?? 0;
       final String mappedName = BlablaMap.characterNames[nameCode] ?? '';
 
+      final localNikke = nikkeNameMap[mappedName];
+
       // 1. Search Query
-      if (_searchQuery.isNotEmpty &&
-          !mappedName.toLowerCase().contains(_searchQuery.toLowerCase())) {
-        return false;
+      if (_searchQuery.isNotEmpty) {
+        final q = _searchQuery.trim().toLowerCase();
+        final nameHit = mappedName.toLowerCase().contains(q);
+        final abilityHit = localNikke != null &&
+            localNikke.ability.any((a) => a.toLowerCase().contains(q));
+        if (!nameHit && !abilityHit) {
+          return false;
+        }
       }
 
-      final localNikke = nikkeNameMap[mappedName];
       if (localNikke == null) {
         return true; // Keep mapped if local not found, filters don't apply
       }
 
       // 2. Filters
-      if (_burstFilters.isNotEmpty && !_burstFilters.contains(localNikke.burst)) {
+      if (_burstFilters.isNotEmpty &&
+          localNikke.burst != BurstType.burst0 &&
+          !_burstFilters.contains(localNikke.burst)) {
         return false;
       }
-      if (_elementFilters.isNotEmpty &&
-          !_elementFilters.contains(localNikke.element)) return false;
+      if (_elementFilters.isNotEmpty) {
+        bool elementMatch = _elementFilters.contains(localNikke.element);
+        if (localNikke.id == 'rapi_red_hood' &&
+            _elementFilters.contains(ElementType.Iron)) {
+          elementMatch = true;
+        }
+        if (!elementMatch) return false;
+      }
       if (_weaponFilters.isNotEmpty &&
           !_weaponFilters.contains(localNikke.weaponType)) return false;
       if (_companyFilters.isNotEmpty &&

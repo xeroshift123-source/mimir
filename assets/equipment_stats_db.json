@@ -1,0 +1,1115 @@
+{
+  "3100901": {
+    "class": "All",
+    "tier": "T9",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 999999
+    }
+  },
+  "3110101": {
+    "class": "Attacker",
+    "tier": "T1",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 66,
+      "Hp": 540
+    }
+  },
+  "3110201": {
+    "class": "Attacker",
+    "tier": "T2",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 86,
+      "Hp": 707
+    }
+  },
+  "3110301": {
+    "class": "Attacker",
+    "tier": "T3",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 114,
+      "Hp": 927
+    }
+  },
+  "3110401": {
+    "class": "Attacker",
+    "tier": "T4",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 186,
+      "Hp": 1521
+    }
+  },
+  "3110501": {
+    "class": "Attacker",
+    "tier": "T5",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 305,
+      "Hp": 2495
+    }
+  },
+  "3110601": {
+    "class": "Attacker",
+    "tier": "T6",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 534,
+      "Hp": 4367
+    }
+  },
+  "3110701": {
+    "class": "Attacker",
+    "tier": "T7",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 935,
+      "Hp": 7643
+    }
+  },
+  "3110801": {
+    "class": "Attacker",
+    "tier": "T8",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 1739,
+      "Hp": 14216
+    }
+  },
+  "3110901": {
+    "class": "Attacker",
+    "tier": "T9",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 3233,
+      "Hp": 26442
+    }
+  },
+  "3111001": {
+    "class": "Attacker",
+    "tier": "T10",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 6014,
+      "Hp": 49181
+    }
+  },
+  "3120101": {
+    "class": "Defender",
+    "tier": "T1",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 44,
+      "Hp": 660
+    }
+  },
+  "3120201": {
+    "class": "Defender",
+    "tier": "T2",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 58,
+      "Hp": 865
+    }
+  },
+  "3120301": {
+    "class": "Defender",
+    "tier": "T3",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 76,
+      "Hp": 1133
+    }
+  },
+  "3120401": {
+    "class": "Defender",
+    "tier": "T4",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 124,
+      "Hp": 1859
+    }
+  },
+  "3120501": {
+    "class": "Defender",
+    "tier": "T5",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 203,
+      "Hp": 3049
+    }
+  },
+  "3120601": {
+    "class": "Defender",
+    "tier": "T6",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 356,
+      "Hp": 5337
+    }
+  },
+  "3120701": {
+    "class": "Defender",
+    "tier": "T7",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 623,
+      "Hp": 9341
+    }
+  },
+  "3120801": {
+    "class": "Defender",
+    "tier": "T8",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 1159,
+      "Hp": 17376
+    }
+  },
+  "3120901": {
+    "class": "Defender",
+    "tier": "T9",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 2155,
+      "Hp": 32318
+    }
+  },
+  "3121001": {
+    "class": "Defender",
+    "tier": "T10",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 4010,
+      "Hp": 60111
+    }
+  },
+  "3130101": {
+    "class": "Supporter",
+    "tier": "T1",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 55,
+      "Hp": 600
+    }
+  },
+  "3130201": {
+    "class": "Supporter",
+    "tier": "T2",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 72,
+      "Hp": 786
+    }
+  },
+  "3130301": {
+    "class": "Supporter",
+    "tier": "T3",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 95,
+      "Hp": 1030
+    }
+  },
+  "3130401": {
+    "class": "Supporter",
+    "tier": "T4",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 155,
+      "Hp": 1690
+    }
+  },
+  "3130501": {
+    "class": "Supporter",
+    "tier": "T5",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 254,
+      "Hp": 2772
+    }
+  },
+  "3130601": {
+    "class": "Supporter",
+    "tier": "T6",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 445,
+      "Hp": 4852
+    }
+  },
+  "3130701": {
+    "class": "Supporter",
+    "tier": "T7",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 779,
+      "Hp": 8492
+    }
+  },
+  "3130801": {
+    "class": "Supporter",
+    "tier": "T8",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 1449,
+      "Hp": 15796
+    }
+  },
+  "3130901": {
+    "class": "Supporter",
+    "tier": "T9",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 2694,
+      "Hp": 29380
+    }
+  },
+  "3131001": {
+    "class": "Supporter",
+    "tier": "T10",
+    "part": "Module_A",
+    "stats": {
+      "Atk": 5012,
+      "Hp": 54646
+    }
+  },
+  "3200901": {
+    "class": "All",
+    "tier": "T9",
+    "part": "Module_B",
+    "stats": {
+      "Hp": 99999999
+    }
+  },
+  "3210101": {
+    "class": "Attacker",
+    "tier": "T1",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 12,
+      "Hp": 1755
+    }
+  },
+  "3210201": {
+    "class": "Attacker",
+    "tier": "T2",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 16,
+      "Hp": 2300
+    }
+  },
+  "3210301": {
+    "class": "Attacker",
+    "tier": "T3",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 20,
+      "Hp": 3013
+    }
+  },
+  "3210401": {
+    "class": "Attacker",
+    "tier": "T4",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 34,
+      "Hp": 4944
+    }
+  },
+  "3210501": {
+    "class": "Attacker",
+    "tier": "T5",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 55,
+      "Hp": 8108
+    }
+  },
+  "3210601": {
+    "class": "Attacker",
+    "tier": "T6",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 97,
+      "Hp": 14192
+    }
+  },
+  "3210701": {
+    "class": "Attacker",
+    "tier": "T7",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 170,
+      "Hp": 24839
+    }
+  },
+  "3210801": {
+    "class": "Attacker",
+    "tier": "T8",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 316,
+      "Hp": 46203
+    }
+  },
+  "3210901": {
+    "class": "Attacker",
+    "tier": "T9",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 588,
+      "Hp": 85937
+    }
+  },
+  "3211001": {
+    "class": "Attacker",
+    "tier": "T10",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 1093,
+      "Hp": 159840
+    }
+  },
+  "3220101": {
+    "class": "Defender",
+    "tier": "T1",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 8,
+      "Hp": 2145
+    }
+  },
+  "3220201": {
+    "class": "Defender",
+    "tier": "T2",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 10,
+      "Hp": 2811
+    }
+  },
+  "3220301": {
+    "class": "Defender",
+    "tier": "T3",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 14,
+      "Hp": 3683
+    }
+  },
+  "3220401": {
+    "class": "Defender",
+    "tier": "T4",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 22,
+      "Hp": 6042
+    }
+  },
+  "3220501": {
+    "class": "Defender",
+    "tier": "T5",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 37,
+      "Hp": 9910
+    }
+  },
+  "3220601": {
+    "class": "Defender",
+    "tier": "T6",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 65,
+      "Hp": 17346
+    }
+  },
+  "3220701": {
+    "class": "Defender",
+    "tier": "T7",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 114,
+      "Hp": 30359
+    }
+  },
+  "3220801": {
+    "class": "Defender",
+    "tier": "T8",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 210,
+      "Hp": 56471
+    }
+  },
+  "3220901": {
+    "class": "Defender",
+    "tier": "T9",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 392,
+      "Hp": 105034
+    }
+  },
+  "3221001": {
+    "class": "Defender",
+    "tier": "T10",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 729,
+      "Hp": 195360
+    }
+  },
+  "3230101": {
+    "class": "Supporter",
+    "tier": "T1",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 10,
+      "Hp": 1950
+    }
+  },
+  "3230201": {
+    "class": "Supporter",
+    "tier": "T2",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 13,
+      "Hp": 2555
+    }
+  },
+  "3230301": {
+    "class": "Supporter",
+    "tier": "T3",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 17,
+      "Hp": 3348
+    }
+  },
+  "3230401": {
+    "class": "Supporter",
+    "tier": "T4",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 28,
+      "Hp": 5493
+    }
+  },
+  "3230501": {
+    "class": "Supporter",
+    "tier": "T5",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 46,
+      "Hp": 9009
+    }
+  },
+  "3230601": {
+    "class": "Supporter",
+    "tier": "T6",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 81,
+      "Hp": 15769
+    }
+  },
+  "3230701": {
+    "class": "Supporter",
+    "tier": "T7",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 142,
+      "Hp": 27599
+    }
+  },
+  "3230801": {
+    "class": "Supporter",
+    "tier": "T8",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 263,
+      "Hp": 51337
+    }
+  },
+  "3230901": {
+    "class": "Supporter",
+    "tier": "T9",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 490,
+      "Hp": 95485
+    }
+  },
+  "3231001": {
+    "class": "Supporter",
+    "tier": "T10",
+    "part": "Module_B",
+    "stats": {
+      "Atk": 911,
+      "Hp": 177600
+    }
+  },
+  "3300901": {
+    "class": "All",
+    "tier": "T9",
+    "part": "Module_C",
+    "stats": {
+      "Defence": 999999
+    }
+  },
+  "3310101": {
+    "class": "Attacker",
+    "tier": "T1",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 42,
+      "Defence": 7
+    }
+  },
+  "3310201": {
+    "class": "Attacker",
+    "tier": "T2",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 55,
+      "Defence": 9
+    }
+  },
+  "3310301": {
+    "class": "Attacker",
+    "tier": "T3",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 72,
+      "Defence": 13
+    }
+  },
+  "3310401": {
+    "class": "Attacker",
+    "tier": "T4",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 119,
+      "Defence": 20
+    }
+  },
+  "3310501": {
+    "class": "Attacker",
+    "tier": "T5",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 194,
+      "Defence": 33
+    }
+  },
+  "3310601": {
+    "class": "Attacker",
+    "tier": "T6",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 340,
+      "Defence": 58
+    }
+  },
+  "3310701": {
+    "class": "Attacker",
+    "tier": "T7",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 595,
+      "Defence": 102
+    }
+  },
+  "3310801": {
+    "class": "Attacker",
+    "tier": "T8",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 1106,
+      "Defence": 189
+    }
+  },
+  "3310901": {
+    "class": "Attacker",
+    "tier": "T9",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 2058,
+      "Defence": 352
+    }
+  },
+  "3311001": {
+    "class": "Attacker",
+    "tier": "T10",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 3827,
+      "Defence": 654
+    }
+  },
+  "3320101": {
+    "class": "Defender",
+    "tier": "T1",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 28,
+      "Defence": 9
+    }
+  },
+  "3320201": {
+    "class": "Defender",
+    "tier": "T2",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 37,
+      "Defence": 11
+    }
+  },
+  "3320301": {
+    "class": "Defender",
+    "tier": "T3",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 48,
+      "Defence": 15
+    }
+  },
+  "3320401": {
+    "class": "Defender",
+    "tier": "T4",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 79,
+      "Defence": 24
+    }
+  },
+  "3320501": {
+    "class": "Defender",
+    "tier": "T5",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 130,
+      "Defence": 41
+    }
+  },
+  "3320601": {
+    "class": "Defender",
+    "tier": "T6",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 226,
+      "Defence": 70
+    }
+  },
+  "3320701": {
+    "class": "Defender",
+    "tier": "T7",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 397,
+      "Defence": 124
+    }
+  },
+  "3320801": {
+    "class": "Defender",
+    "tier": "T8",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 738,
+      "Defence": 231
+    }
+  },
+  "3320901": {
+    "class": "Defender",
+    "tier": "T9",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 1372,
+      "Defence": 430
+    }
+  },
+  "3321001": {
+    "class": "Defender",
+    "tier": "T10",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 2551,
+      "Defence": 800
+    }
+  },
+  "3330101": {
+    "class": "Supporter",
+    "tier": "T1",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 35,
+      "Defence": 8
+    }
+  },
+  "3330201": {
+    "class": "Supporter",
+    "tier": "T2",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 46,
+      "Defence": 10
+    }
+  },
+  "3330301": {
+    "class": "Supporter",
+    "tier": "T3",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 60,
+      "Defence": 14
+    }
+  },
+  "3330401": {
+    "class": "Supporter",
+    "tier": "T4",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 99,
+      "Defence": 22
+    }
+  },
+  "3330501": {
+    "class": "Supporter",
+    "tier": "T5",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 162,
+      "Defence": 37
+    }
+  },
+  "3330601": {
+    "class": "Supporter",
+    "tier": "T6",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 283,
+      "Defence": 64
+    }
+  },
+  "3330701": {
+    "class": "Supporter",
+    "tier": "T7",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 496,
+      "Defence": 113
+    }
+  },
+  "3330801": {
+    "class": "Supporter",
+    "tier": "T8",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 922,
+      "Defence": 210
+    }
+  },
+  "3330901": {
+    "class": "Supporter",
+    "tier": "T9",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 1715,
+      "Defence": 391
+    }
+  },
+  "3331001": {
+    "class": "Supporter",
+    "tier": "T10",
+    "part": "Module_C",
+    "stats": {
+      "Atk": 3189,
+      "Defence": 727
+    }
+  },
+  "3400901": {
+    "class": "All",
+    "tier": "T9",
+    "part": "Module_D",
+    "stats": {
+      "Hp": 99999999,
+      "Defence": 999999
+    }
+  },
+  "3410101": {
+    "class": "Attacker",
+    "tier": "T1",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 11,
+      "Hp": 405
+    }
+  },
+  "3410201": {
+    "class": "Attacker",
+    "tier": "T2",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 14,
+      "Hp": 531
+    }
+  },
+  "3410301": {
+    "class": "Attacker",
+    "tier": "T3",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 18,
+      "Hp": 696
+    }
+  },
+  "3410401": {
+    "class": "Attacker",
+    "tier": "T4",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 31,
+      "Hp": 1141
+    }
+  },
+  "3410501": {
+    "class": "Attacker",
+    "tier": "T5",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 50,
+      "Hp": 1871
+    }
+  },
+  "3410601": {
+    "class": "Attacker",
+    "tier": "T6",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 87,
+      "Hp": 3275
+    }
+  },
+  "3410701": {
+    "class": "Attacker",
+    "tier": "T7",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 152,
+      "Hp": 5732
+    }
+  },
+  "3410801": {
+    "class": "Attacker",
+    "tier": "T8",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 284,
+      "Hp": 10662
+    }
+  },
+  "3410901": {
+    "class": "Attacker",
+    "tier": "T9",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 527,
+      "Hp": 19832
+    }
+  },
+  "3411001": {
+    "class": "Attacker",
+    "tier": "T10",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 981,
+      "Hp": 36887
+    }
+  },
+  "3420101": {
+    "class": "Defender",
+    "tier": "T1",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 13,
+      "Hp": 495
+    }
+  },
+  "3420201": {
+    "class": "Defender",
+    "tier": "T2",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 18,
+      "Hp": 649
+    }
+  },
+  "3420301": {
+    "class": "Defender",
+    "tier": "T3",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 22,
+      "Hp": 850
+    }
+  },
+  "3420401": {
+    "class": "Defender",
+    "tier": "T4",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 37,
+      "Hp": 1395
+    }
+  },
+  "3420501": {
+    "class": "Defender",
+    "tier": "T5",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 61,
+      "Hp": 2287
+    }
+  },
+  "3420601": {
+    "class": "Defender",
+    "tier": "T6",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 107,
+      "Hp": 4003
+    }
+  },
+  "3420701": {
+    "class": "Defender",
+    "tier": "T7",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 186,
+      "Hp": 7006
+    }
+  },
+  "3420801": {
+    "class": "Defender",
+    "tier": "T8",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 347,
+      "Hp": 13032
+    }
+  },
+  "3420901": {
+    "class": "Defender",
+    "tier": "T9",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 645,
+      "Hp": 24239
+    }
+  },
+  "3421001": {
+    "class": "Defender",
+    "tier": "T10",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 1199,
+      "Hp": 45084
+    }
+  },
+  "3430101": {
+    "class": "Supporter",
+    "tier": "T1",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 12,
+      "Hp": 450
+    }
+  },
+  "3430201": {
+    "class": "Supporter",
+    "tier": "T2",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 16,
+      "Hp": 590
+    }
+  },
+  "3430301": {
+    "class": "Supporter",
+    "tier": "T3",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 20,
+      "Hp": 773
+    }
+  },
+  "3430401": {
+    "class": "Supporter",
+    "tier": "T4",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 34,
+      "Hp": 1268
+    }
+  },
+  "3430501": {
+    "class": "Supporter",
+    "tier": "T5",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 55,
+      "Hp": 2079
+    }
+  },
+  "3430601": {
+    "class": "Supporter",
+    "tier": "T6",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 97,
+      "Hp": 3639
+    }
+  },
+  "3430701": {
+    "class": "Supporter",
+    "tier": "T7",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 169,
+      "Hp": 6369
+    }
+  },
+  "3430801": {
+    "class": "Supporter",
+    "tier": "T8",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 315,
+      "Hp": 11847
+    }
+  },
+  "3430901": {
+    "class": "Supporter",
+    "tier": "T9",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 586,
+      "Hp": 22035
+    }
+  },
+  "3431001": {
+    "class": "Supporter",
+    "tier": "T10",
+    "part": "Module_D",
+    "stats": {
+      "Defence": 1090,
+      "Hp": 40985
+    }
+  }
+}

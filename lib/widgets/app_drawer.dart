@@ -4,6 +4,7 @@ import 'package:mimir/providers/theme_provider.dart';
 import 'package:mimir/providers/auth_provider.dart';
 import 'package:mimir/screens/home.dart';
 import 'package:mimir/screens/deck_builder.dart';
+import 'package:mimir/screens/union_deck_builder.dart';
 import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/login.dart';
@@ -270,12 +271,25 @@ class AppDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.dashboard_customize_outlined,
                   activeIcon: Icons.dashboard_customize,
-                  title: "덱 빌더 (Deck Builder)",
+                  title: "솔로 레이드 덱 구성",
                   route: DeckBuilderScreen.routeName,
                   onTap: () {
                     Navigator.pop(context);
                     if (activeRoute != DeckBuilderScreen.routeName) {
-                      Navigator.pushNamed(context, DeckBuilderScreen.routeName);
+                      _showWeaknessDialog(context);
+                    }
+                  },
+                ),
+                _buildDrawerItem(
+                  context: context,
+                  icon: Icons.group_work_outlined,
+                  activeIcon: Icons.group_work,
+                  title: "유니온 레이드 덱 구성",
+                  route: UnionDeckBuilderScreen.routeName,
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (activeRoute != UnionDeckBuilderScreen.routeName) {
+                      Navigator.pushNamed(context, UnionDeckBuilderScreen.routeName);
                     }
                   },
                 ),
@@ -283,12 +297,25 @@ class AppDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.auto_awesome_motion_outlined,
                   activeIcon: Icons.auto_awesome_motion,
-                  title: "덱 라이브러리 (Library)",
+                  title: "공유 덱 라이브러리 (Library)",
                   route: DeckLibraryScreen.routeName,
                   onTap: () {
                     Navigator.pop(context);
                     if (activeRoute != DeckLibraryScreen.routeName) {
                       Navigator.pushNamed(context, DeckLibraryScreen.routeName);
+                    }
+                  },
+                ),
+                _buildDrawerItem(
+                  context: context,
+                  icon: Icons.sync_rounded,
+                  activeIcon: Icons.sync_rounded,
+                  title: "전투 정보 동기화 (Sync Profile)",
+                  route: SyncScreen.routeName,
+                  onTap: () {
+                    Navigator.pop(context);
+                    if (activeRoute != SyncScreen.routeName) {
+                      Navigator.pushNamed(context, SyncScreen.routeName);
                     }
                   },
                 ),
@@ -302,19 +329,6 @@ class AppDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     if (activeRoute != CalculateListScreen.routeName) {
                       Navigator.pushNamed(context, CalculateListScreen.routeName);
-                    }
-                  },
-                ),
-                _buildDrawerItem(
-                  context: context,
-                  icon: Icons.sync_rounded,
-                  activeIcon: Icons.sync_rounded,
-                  title: "프로필 동기화 (Sync Profile)",
-                  route: SyncScreen.routeName,
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (activeRoute != SyncScreen.routeName) {
-                      Navigator.pushNamed(context, SyncScreen.routeName);
                     }
                   },
                 ),
@@ -354,7 +368,7 @@ class AppDrawer extends StatelessWidget {
           
           // Theme switch at footer
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
@@ -366,22 +380,131 @@ class AppDrawer extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  isDark ? "다크 모드 활성" : "라이트 모드 활성",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-                Switch(
-                  activeColor: Colors.orange,
-                  value: isDark,
-                  onChanged: (val) {
-                    context.read<ThemeProvider>().toggleTheme();
+                TextButton.icon(
+                  onPressed: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.remove('last_synced_openid');
+                    await prefs.remove('saved_sync_url');
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("동기화 연동이 해제되었습니다."),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    }
                   },
+                  icon: const Icon(Icons.link_off, size: 16, color: Colors.redAccent),
+                  label: const Text(
+                    "연동 해제",
+                    style: TextStyle(color: Colors.redAccent, fontSize: 12),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      isDark ? "다크 모드 활성" : "라이트 모드 활성",
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    const SizedBox(width: 4),
+                    Switch(
+                      activeColor: Colors.orange,
+                      value: isDark,
+                      onChanged: (val) {
+                        context.read<ThemeProvider>().toggleTheme();
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void _showWeaknessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        String tempWeakness = '수냉';
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        
+        final Map<String, String> elementIconMap = {
+          '전격': 'assets/icons/elements/icon-elements-Electric.webp',
+          '철갑': 'assets/icons/elements/icon-elements-Iron.webp',
+          '작열': 'assets/icons/elements/icon-elements-Fire.webp',
+          '수냉': 'assets/icons/elements/icon-elements-Water.webp',
+          '풍압': 'assets/icons/elements/icon-elements-Wind.webp',
+        };
+
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              title: const Text("공략 약점 속성 선택", style: TextStyle(fontWeight: FontWeight.bold)),
+              content: DropdownButtonHideUnderline(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange.shade300, width: 1.5),
+                  ),
+                  child: DropdownButton<String>(
+                    value: tempWeakness,
+                    isExpanded: true,
+                    dropdownColor: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setStateDialog(() {
+                          tempWeakness = newValue;
+                        });
+                      }
+                    },
+                    items: <String>['전격', '철갑', '작열', '수냉', '풍압']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Row(
+                          children: [
+                            Image.asset(elementIconMap[value]!, width: 20, height: 20),
+                            const SizedBox(width: 10),
+                            Text(value, style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text("취소", style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    Navigator.pushNamed(
+                      context,
+                      DeckBuilderScreen.routeName,
+                      arguments: tempWeakness,
+                    );
+                  },
+                  child: const Text("확인"),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

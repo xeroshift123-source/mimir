@@ -22,6 +22,22 @@ class _SyncScreenState extends State<SyncScreen> {
   final String _functionUrl = 'https://us-central1-nikke-mimir.cloudfunctions.net/scrapeNikkeProfile';
 
   @override
+  void initState() {
+    super.initState();
+    _loadSavedUrl();
+  }
+
+  Future<void> _loadSavedUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedUrl = prefs.getString('saved_sync_url');
+    if (savedUrl != null && savedUrl.isNotEmpty) {
+      setState(() {
+        _urlController.text = savedUrl;
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _urlController.dispose();
     super.dispose();
@@ -91,6 +107,7 @@ class _SyncScreenState extends State<SyncScreen> {
           try {
             final prefs = await SharedPreferences.getInstance();
             await prefs.setString('last_synced_openid', resolvedOpenId);
+            await prefs.setString('saved_sync_url', enteredUrl);
           } catch (prefErr) {
             debugPrint("Failed to save openId to SharedPreferences: $prefErr");
           }
