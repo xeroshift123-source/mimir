@@ -32,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _raidPageController.dispose();
     super.dispose();
   }
+
+  bool _isHoveringRaid = false;
   
   String _selectedWeakness = '수냉';
 
@@ -579,8 +581,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Stack(
-                  alignment: Alignment.center,
+                MouseRegion(
+                  onEnter: (_) => setState(() => _isHoveringRaid = true),
+                  onExit: (_) => setState(() => _isHoveringRaid = false),
+                  child: Stack(
+                    alignment: Alignment.center,
                   children: [
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 420),
@@ -630,19 +635,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_currentRaidPage > 0)
                       Positioned(
                         left: 0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.4),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
-                            onPressed: () {
-                              _raidPageController.previousPage(
-                                duration: const Duration(milliseconds: 400),
-                                curve: Curves.easeOutCubic,
-                              );
-                            },
+                        child: IgnorePointer(
+                          ignoring: !_isHoveringRaid,
+                          child: AnimatedOpacity(
+                            opacity: _isHoveringRaid ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
+                                onPressed: () {
+                                  _raidPageController.previousPage(
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.easeOutCubic,
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -650,23 +662,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_currentRaidPage < raidHistory.length - 1)
                       Positioned(
                         right: 0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.4),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.chevron_right, color: Colors.white, size: 32),
-                            onPressed: () {
-                              _raidPageController.nextPage(
-                                duration: const Duration(milliseconds: 400),
-                                curve: Curves.easeOutCubic,
-                              );
-                            },
+                        child: IgnorePointer(
+                          ignoring: !_isHoveringRaid,
+                          child: AnimatedOpacity(
+                            opacity: _isHoveringRaid ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.chevron_right, color: Colors.white, size: 32),
+                                onPressed: () {
+                                  _raidPageController.nextPage(
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.easeOutCubic,
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ),
                       ),
                   ],
+                ),
                 ),
                 const SizedBox(height: 12),
                 Row(
