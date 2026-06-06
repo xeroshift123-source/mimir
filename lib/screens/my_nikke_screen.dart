@@ -7,6 +7,7 @@ import 'package:mimir/models/nikke.dart';
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/services/database_service.dart';
+import 'package:mimir/utils/cp_calculator.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'deck_builder.dart';
 
@@ -33,6 +34,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final Set<WeaponType> _weaponFilters = {};
   final Set<Company> _companyFilters = {};
   bool _filterExpanded = false;
+  bool _assumeCube15 = false;
 
   @override
   void didChangeDependencies() {
@@ -989,197 +991,6 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     );
   }
 
-  Map<String, double> _calculateStats(
-      Map<String, dynamic> char, Nikke? localNikke) {
-    final int level = char['level'] as int? ?? 1;
-    final int grade = char['grade'] as int? ?? 0;
-    final int core = char['core'] as int? ?? 0;
-
-    String role = 'Supporter';
-    final String name = localNikke?.name ?? '';
-
-    const attackers = {
-      '홍련',
-      '홍련 : 흑영',
-      '모더니아',
-      '레드 후드',
-      '앨리스',
-      '신데렐라',
-      '스노우 화이트',
-      '맥스웰',
-      '아인',
-      '파워',
-      '2B',
-      'A2',
-      '아니스 : 스파클링 서머',
-      '루드밀라 : 윈터 오너',
-      '길로틴',
-      '메이든',
-      '하란',
-      '에피넬',
-      '베스티',
-      '브리드',
-      '솔린',
-      '율하',
-      '드레이크',
-      '라플라스',
-      '사쿠라 : 블룸 인 서머',
-      '로산나 : 시크 오션',
-      '누아르',
-      '프리바티',
-      '그레이브'
-    };
-    const defenders = {
-      '크라운',
-      '노아',
-      '블랑',
-      '디젤',
-      '센티',
-      '비스킷',
-      '노이즈',
-      '티아',
-      '소다',
-      '킬로',
-      '신',
-      '베이',
-      '루마니'
-    };
-
-    if (attackers.contains(name)) {
-      role = 'Attacker';
-    } else if (defenders.contains(name)) {
-      role = 'Defender';
-    }
-
-    double baseHp = 0;
-    double baseAtk = 0;
-    double baseDef = 0;
-    double hpGrowth = 0;
-    double atkGrowth = 0;
-    double defGrowth = 0;
-
-    if (role == 'Attacker') {
-      baseHp = 502000;
-      baseAtk = 24200;
-      baseDef = 3300;
-      hpGrowth = 11900;
-      atkGrowth = 562;
-      defGrowth = 76;
-    } else if (role == 'Defender') {
-      baseHp = 608000;
-      baseAtk = 17100;
-      baseDef = 4600;
-      hpGrowth = 14500;
-      atkGrowth = 401;
-      defGrowth = 110;
-    } else {
-      // Supporter
-      baseHp = 555000;
-      baseAtk = 20650;
-      baseDef = 3950;
-      hpGrowth = 13200;
-      atkGrowth = 482;
-      defGrowth = 94;
-    }
-
-    double hp = 0;
-    double atk = 0;
-    double def = 0;
-
-    if (level <= 200) {
-      final ratio = level / 200.0;
-      hp = baseHp * ratio;
-      atk = baseAtk * ratio;
-      def = baseDef * ratio;
-    } else {
-      final diff = level - 200;
-      hp = baseHp + diff * hpGrowth;
-      atk = baseAtk + diff * atkGrowth;
-      def = baseDef + diff * defGrowth;
-    }
-
-    final statMultiplier = 1.0 + (grade * 0.02) + (core * 0.02);
-    hp *= statMultiplier;
-    atk *= statMultiplier;
-    def *= statMultiplier;
-
-    final equips = char['equipment'] as List<dynamic>? ?? [];
-    for (final eq in equips) {
-      final int level = eq['level'] as int? ?? 0;
-      final int tier = eq['tier'] as int? ?? 1;
-      final String slot = eq['slot'] as String? ?? '';
-
-      double eqHp = 0;
-      double eqAtk = 0;
-      double eqDef = 0;
-
-      if (tier >= 10) {
-        if (slot == 'head') {
-          eqAtk = 9576 + level * 478.8;
-        } else if (slot == 'torso') {
-          eqHp = 143640 + level * 7182;
-          eqDef = 521 + level * 26.05;
-        } else if (slot == 'arm') {
-          eqAtk = 5745 + level * 287.25;
-          eqHp = 86184 + level * 4309.2;
-        } else if (slot == 'leg') {
-          eqHp = 86184 + level * 4309.2;
-          eqDef = 782 + level * 39.1;
-        }
-      } else if (tier == 9) {
-        if (slot == 'head') {
-          eqAtk = 6200 + level * 310;
-        } else if (slot == 'torso') {
-          eqHp = 93000 + level * 4650;
-          eqDef = 380 + level * 19;
-        } else if (slot == 'arm') {
-          eqAtk = 3700 + level * 185;
-          eqHp = 55800 + level * 2790;
-        } else if (slot == 'leg') {
-          eqHp = 55800 + level * 2790;
-          eqDef = 550 + level * 27.5;
-        }
-      } else {
-        if (slot == 'head') eqAtk = 2000 * (tier / 8.0);
-        if (slot == 'torso') eqHp = 30000 * (tier / 8.0);
-        if (slot == 'arm') eqAtk = 1200 * (tier / 8.0);
-        if (slot == 'leg') eqHp = 18000 * (tier / 8.0);
-      }
-
-      hp += eqHp;
-      atk += eqAtk;
-      def += eqDef;
-    }
-
-    double overloadAtkPct = 0;
-    double overloadDefPct = 0;
-    double overloadHpPct = 0;
-
-    for (final eq in equips) {
-      final options = eq['overloadOptions'] as List<dynamic>? ?? [];
-      for (final optId in options) {
-        final int id = optId as int? ?? 0;
-        final double pct = BlablaMap.getOptionPercent(id) / 100.0;
-        final String optName = BlablaMap.getOptionName(id);
-        if (optName == '공격력') {
-          overloadAtkPct += pct;
-        } else if (optName == '방어력') {
-          overloadDefPct += pct;
-        }
-      }
-    }
-
-    final double finalHp = hp * (1.0 + overloadHpPct);
-    final double finalAtk = atk * (1.0 + overloadAtkPct);
-    final double finalDef = def * (1.0 + overloadDefPct);
-
-    return {
-      'hp': finalHp,
-      'atk': finalAtk,
-      'def': finalDef,
-    };
-  }
-
   Widget _buildNikkeList(
     List<dynamic> filteredChars,
     Map<String, Nikke> nameMap,
@@ -1744,7 +1555,47 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        _buildCalculatedStatsGrid(char, localNikke, isDark),
+        Builder(builder: (context) {
+          final recycleRoom = _profileData?['recycleRoom'] as List<dynamic>? ?? [];
+          int common = 0;
+          int classConsole = 0;
+          int companyConsole = 0;
+          
+          for (final item in recycleRoom) {
+            if (item is Map) {
+              final tid = item['tid'] as int? ?? 0;
+              final lv = item['lv'] as int? ?? 0;
+              
+              if (tid == 1001) common = lv;
+              
+              if (localNikke != null) {
+                if (localNikke.type == 'ATK' && tid == 1101) classConsole = lv;
+                if (localNikke.type == 'DEF' && tid == 1102) classConsole = lv;
+                if (localNikke.type == 'SUP' && tid == 1103) classConsole = lv;
+                
+                final compStr = localNikke.company.toString().split('.').last;
+                if (compStr == 'Elysion' && tid == 1201) companyConsole = lv;
+                if (compStr == 'Missilis' && tid == 1202) companyConsole = lv;
+                if (compStr == 'Tetra' && tid == 1203) companyConsole = lv;
+                if (compStr == 'Pilgrim' && tid == 1204) companyConsole = lv;
+                if (compStr == 'Abnormal' && tid == 1205) companyConsole = lv;
+              }
+            }
+          }
+          
+          final modifiableChar = Map<String, dynamic>.from(char);
+          modifiableChar['commonConsoleLevel'] = common;
+          modifiableChar['classConsoleLevel'] = classConsole;
+          modifiableChar['companyConsoleLevel'] = companyConsole;
+          
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCalculatedStatsGrid(modifiableChar, localNikke, isDark),
+              // _buildDebugCpWidget(modifiableChar, localNikke, isDark), // 디버깅용 창 숨김 처리
+            ],
+          );
+        }),
         const SizedBox(height: 24),
         Row(
           children: [
@@ -1925,7 +1776,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   Widget _buildCalculatedStatsGrid(
       Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
     final combat = char['combat'] as int? ?? 0;
-    final stats = _calculateStats(char, localNikke);
+    
+    double cp40 = 0;
+    if (CpCalculator.isInitialized) {
+      cp40 = CpCalculator.calculateCp(char, localNikke, targetLevel: 40, assumeCube15: _assumeCube15);
+    }
 
     final skills = char['skills'] as Map<String, dynamic>? ?? {};
     final skill1 = skills['skill1'] ?? 1;
@@ -1933,12 +1788,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final burst = skills['burst'] ?? 1;
 
     final String formattedPow = NumberFormat('#,###').format(combat);
-    final String formattedHP =
-        NumberFormat('#,###').format(stats['hp']!.round());
-    final String formattedATK =
-        NumberFormat('#,###').format(stats['atk']!.round());
-    final String formattedDEF =
-        NumberFormat('#,###').format(stats['def']!.round());
+    final String formattedPow40 = cp40 == -1.0 ? '측정 불가' : (cp40 > 0 ? NumberFormat('#,###').format(cp40.round()) : '계산중...');
+    
     final String skillText = "$skill1 / $skill2 / $burst";
 
     final favItem = char['favoriteItem'] as Map<String, dynamic>?;
@@ -1947,28 +1798,21 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         favItem != null && (favItem['tid'] as int? ?? 0) >= 200000;
 
     final cube = char['harmonyCube'] as Map<String, dynamic>?;
+    final int cubeLv = cube != null ? (cube['level'] as int? ?? 0) : 0;
     final String cubeText = _getShortCubeName(cube);
+    final bool showCubeToggle = cubeLv < 15;
 
     final List<Map<String, dynamic>> statItems = [
       {
-        "label": "전투력 (Pow)",
+        "label": "현재 투력 (Pow)",
         "value": formattedPow,
         "color": Colors.orangeAccent.shade200,
       },
       {
-        "label": "체력 (HP)",
-        "value": formattedHP,
-        "color": Colors.red.shade400,
-      },
-      {
-        "label": "공격력 (ATK)",
-        "value": formattedATK,
-        "color": Colors.amber.shade400,
-      },
-      {
-        "label": "방어력 (DEF)",
-        "value": formattedDEF,
-        "color": Colors.tealAccent.shade400,
+        "label": "40Lv 투력 (Pow)",
+        "value": formattedPow40,
+        "color": Colors.redAccent.shade200,
+        "showToggle": showCubeToggle,
       },
       {
         "label": "스킬 레벨 (Skill)",
@@ -2011,12 +1855,38 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                item['label'],
-                style: TextStyle(
-                  color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
-                  fontSize: 14.5,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    item['label'],
+                    style: TextStyle(
+                      color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                      fontSize: 14.5,
+                    ),
+                  ),
+                  if (item['showToggle'] == true)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("15Lv큐브", style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+                        SizedBox(
+                          height: 20,
+                          child: Transform.scale(
+                            scale: 0.6,
+                            child: Switch(
+                              value: _assumeCube15,
+                              onChanged: (val) {
+                                setState(() {
+                                  _assumeCube15 = val;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
               ),
               const SizedBox(height: 4),
               Text(
@@ -2278,6 +2148,52 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           ),
         );
       }),
+    );
+  }
+  Widget _buildDebugCpWidget(Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
+    if (!CpCalculator.isInitialized) return const SizedBox();
+    
+    final debug = CpCalculator.debugCalculateCp(char, localNikke, targetLevel: 40, assumeCube15: _assumeCube15);
+    
+    final Color titleColor = isDark ? Colors.yellowAccent : Colors.deepOrange;
+    final Color textColor = isDark ? Colors.white70 : Colors.black87;
+    
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.redAccent.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("🛠️ 40레벨 전투력 디버깅", style: TextStyle(color: titleColor, fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          Text("최종 투력: ${debug['cp'].toStringAsFixed(2)}", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          Text("[보정계수 (Bojung)] : ${debug['bojung'].toStringAsFixed(4)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text("= 1.3 + (0.01 * ${debug['skill1']}) + (0.01 * ${debug['skill2']}) + (0.02 * ${debug['skillBurst']})", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("  + (0.00828 * ${debug['ukoLevel']} 우코) + (0.0069 * ${debug['nonUkoLevel']} 비우코)", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("  + (0.0092 * ${debug['cubeCoef']} 큐브) + (0.0069 * ${debug['colCoef']} 소장품)", style: TextStyle(color: textColor, fontSize: 12)),
+          const Divider(),
+          Text("[협전스탯_HP] : ${debug['finalHp'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text("= ((${debug['baseHp']} * ${debug['lbMult']}) + (${debug['bondHp']} + ${debug['consoleHp']} + ${debug['bojungHp']})) * ${debug['coreMult']}", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("  + (${debug['equipHp']} + ${debug['colHp']} + ${debug['cubeHp']})", style: TextStyle(color: textColor, fontSize: 12)),
+          const SizedBox(height: 4),
+          Text("[협전스탯_ATK] : ${debug['finalAtk'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text("= ((${debug['baseAtk']} * ${debug['lbMult']}) + (${debug['bondAtk']} + ${debug['consoleAtk']} + ${debug['bojungAtk']})) * ${debug['coreMult']}", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("  + (${debug['equipAtk']} + ${debug['colAtk']} + ${debug['cubeAtk']})", style: TextStyle(color: textColor, fontSize: 12)),
+          const SizedBox(height: 4),
+          Text("[협전스탯_DEF] : ${debug['finalDef'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text("= ((${debug['baseDef']} * ${debug['lbMult']}) + (${debug['bondDef']} + ${debug['consoleDef']} + ${debug['bojungDef']})) * ${debug['coreMult']}", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("  + (${debug['equipDef']} + ${debug['colDef']} + ${debug['cubeDef']})", style: TextStyle(color: textColor, fontSize: 12)),
+          const Divider(),
+          Text("[협전스탯 점수 (Score)] : ${debug['score'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text("= 0.7 * ${debug['finalHp'].toStringAsFixed(2)} + 19.35 * ${debug['finalAtk'].toStringAsFixed(2)} + 70 * ${debug['finalDef'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontSize: 12)),
+        ],
+      ),
     );
   }
 }
