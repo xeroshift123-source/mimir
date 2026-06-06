@@ -1,5 +1,15 @@
 import 'dart:convert';
+import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:pasteboard/pasteboard.dart';
+
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:mimir/providers/nikke_provider.dart';
@@ -90,8 +100,6 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       });
     }
   }
-
-
 
   String _getOptionName(int id) {
     return BlablaMap.getOptionName(id);
@@ -412,7 +420,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           ),
           if (recycleRoom.isNotEmpty || infraCoreLevel > 0) ...[
             const SizedBox(height: 12),
-            Divider(height: 1, color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+            Divider(
+                height: 1,
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
             const SizedBox(height: 12),
             _buildRecycleRoomSection(recycleRoom, infraCoreLevel, isDark),
           ],
@@ -421,7 +431,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     );
   }
 
-  Widget _buildRecycleRoomSection(List<dynamic> recycleRoom, int infraCore, bool isDark) {
+  Widget _buildRecycleRoomSection(
+      List<dynamic> recycleRoom, int infraCore, bool isDark) {
     int common = 0;
     int attacker = 0;
     int defender = 0;
@@ -437,15 +448,33 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         final tid = item['tid'] as int? ?? 0;
         final lv = item['lv'] as int? ?? 0;
         switch (tid) {
-          case 1001: common = lv; break;
-          case 1101: attacker = lv; break;
-          case 1102: defender = lv; break;
-          case 1103: supporter = lv; break;
-          case 1201: elysion = lv; break;
-          case 1202: missilis = lv; break;
-          case 1203: tetra = lv; break;
-          case 1204: pilgrim = lv; break;
-          case 1205: abnormal = lv; break;
+          case 1001:
+            common = lv;
+            break;
+          case 1101:
+            attacker = lv;
+            break;
+          case 1102:
+            defender = lv;
+            break;
+          case 1103:
+            supporter = lv;
+            break;
+          case 1201:
+            elysion = lv;
+            break;
+          case 1202:
+            missilis = lv;
+            break;
+          case 1203:
+            tetra = lv;
+            break;
+          case 1204:
+            pilgrim = lv;
+            break;
+          case 1205:
+            abnormal = lv;
+            break;
         }
       }
     }
@@ -461,9 +490,15 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(label, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 10, color: color, fontWeight: FontWeight.bold)),
             const SizedBox(width: 4),
-            Text("Lv.$lv", style: TextStyle(fontSize: 10, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)),
+            Text("Lv.$lv",
+                style: TextStyle(
+                    fontSize: 10,
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
       );
@@ -474,13 +509,27 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       children: [
         Row(
           children: [
-            Icon(Icons.science, size: 14, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+            Icon(Icons.science,
+                size: 14,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
             const SizedBox(width: 4),
-            Text("인프라 코어: Lv.$infraCore", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
+            Text("인프라 코어: Lv.$infraCore",
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
             const SizedBox(width: 12),
-            Icon(Icons.memory, size: 14, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+            Icon(Icons.memory,
+                size: 14,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
             const SizedBox(width: 4),
-            Text("리사이클 룸 (공용: Lv.$common)", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
+            Text("리사이클 룸 (공용: Lv.$common)",
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isDark ? Colors.grey.shade300 : Colors.grey.shade700)),
           ],
         ),
         const SizedBox(height: 8),
@@ -1528,17 +1577,55 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     );
   }
 
+  Map<String, dynamic> _getCharWithConsoleLevels(
+      Map<String, dynamic> char, Nikke? localNikke) {
+    final recycleRoom = _profileData?['recycleRoom'] as List<dynamic>? ?? [];
+    int common = 0;
+    int classConsole = 0;
+    int companyConsole = 0;
+
+    for (final item in recycleRoom) {
+      if (item is Map) {
+        final tid = item['tid'] as int? ?? 0;
+        final lv = item['lv'] as int? ?? 0;
+
+        if (tid == 1001) common = lv;
+
+        if (localNikke != null) {
+          if (localNikke.type == 'ATK' && tid == 1101) classConsole = lv;
+          if (localNikke.type == 'DEF' && tid == 1102) classConsole = lv;
+          if (localNikke.type == 'SUP' && tid == 1103) classConsole = lv;
+
+          final compStr = localNikke.company.toString().split('.').last;
+          if (compStr == 'Elysion' && tid == 1201) companyConsole = lv;
+          if (compStr == 'Missilis' && tid == 1202) companyConsole = lv;
+          if (compStr == 'Tetra' && tid == 1203) companyConsole = lv;
+          if (compStr == 'Pilgrim' && tid == 1204) companyConsole = lv;
+          if (compStr == 'Abnormal' && tid == 1205) companyConsole = lv;
+        }
+      }
+    }
+
+    final modifiableChar = Map<String, dynamic>.from(char);
+    modifiableChar['commonConsoleLevel'] = common;
+    modifiableChar['classConsoleLevel'] = classConsole;
+    modifiableChar['companyConsoleLevel'] = companyConsole;
+    return modifiableChar;
+  }
+
   Widget _buildDetailPanel(
       Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark) {
     final nameCode = char['name_code'] as int? ?? 0;
     final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
     final localNikke = nameMap[mappedName];
 
+    final modifiableChar = _getCharWithConsoleLevels(char, localNikke);
+
     return ListView(
       padding: const EdgeInsets.all(20.0),
       children: [
         _buildDetailHeader(char, localNikke, isDark),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         Row(
           children: [
             Icon(Icons.analytics_outlined,
@@ -1556,38 +1643,6 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         ),
         const SizedBox(height: 12),
         Builder(builder: (context) {
-          final recycleRoom = _profileData?['recycleRoom'] as List<dynamic>? ?? [];
-          int common = 0;
-          int classConsole = 0;
-          int companyConsole = 0;
-          
-          for (final item in recycleRoom) {
-            if (item is Map) {
-              final tid = item['tid'] as int? ?? 0;
-              final lv = item['lv'] as int? ?? 0;
-              
-              if (tid == 1001) common = lv;
-              
-              if (localNikke != null) {
-                if (localNikke.type == 'ATK' && tid == 1101) classConsole = lv;
-                if (localNikke.type == 'DEF' && tid == 1102) classConsole = lv;
-                if (localNikke.type == 'SUP' && tid == 1103) classConsole = lv;
-                
-                final compStr = localNikke.company.toString().split('.').last;
-                if (compStr == 'Elysion' && tid == 1201) companyConsole = lv;
-                if (compStr == 'Missilis' && tid == 1202) companyConsole = lv;
-                if (compStr == 'Tetra' && tid == 1203) companyConsole = lv;
-                if (compStr == 'Pilgrim' && tid == 1204) companyConsole = lv;
-                if (compStr == 'Abnormal' && tid == 1205) companyConsole = lv;
-              }
-            }
-          }
-          
-          final modifiableChar = Map<String, dynamic>.from(char);
-          modifiableChar['commonConsoleLevel'] = common;
-          modifiableChar['classConsoleLevel'] = classConsole;
-          modifiableChar['companyConsoleLevel'] = companyConsole;
-          
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1776,10 +1831,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   Widget _buildCalculatedStatsGrid(
       Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
     final combat = char['combat'] as int? ?? 0;
-    
+
     double cp40 = 0;
     if (CpCalculator.isInitialized) {
-      cp40 = CpCalculator.calculateCp(char, localNikke, targetLevel: 40, assumeCube15: _assumeCube15);
+      cp40 = CpCalculator.calculateCp(char, localNikke,
+          targetLevel: 40, assumeCube15: _assumeCube15);
     }
 
     final skills = char['skills'] as Map<String, dynamic>? ?? {};
@@ -1788,8 +1844,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final burst = skills['burst'] ?? 1;
 
     final String formattedPow = NumberFormat('#,###').format(combat);
-    final String formattedPow40 = cp40 == -1.0 ? '측정 불가' : (cp40 > 0 ? NumberFormat('#,###').format(cp40.round()) : '계산중...');
-    
+    final String formattedPow40 = cp40 == -1.0
+        ? '측정 불가'
+        : (cp40 > 0 ? NumberFormat('#,###').format(cp40.round()) : '계산중...');
+
     final String skillText = "$skill1 / $skill2 / $burst";
 
     final favItem = char['favoriteItem'] as Map<String, dynamic>?;
@@ -1813,6 +1871,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         "value": formattedPow40,
         "color": Colors.redAccent.shade200,
         "showToggle": showCubeToggle,
+        "showLicenseButton": true,
       },
       {
         "label": "스킬 레벨 (Skill)",
@@ -1843,6 +1902,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       itemCount: statItems.length,
       itemBuilder: (context, index) {
         final item = statItems[index];
+
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
@@ -1861,7 +1921,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   Text(
                     item['label'],
                     style: TextStyle(
-                      color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                      color:
+                          isDark ? Colors.grey.shade500 : Colors.grey.shade600,
                       fontSize: 14.5,
                     ),
                   ),
@@ -1869,7 +1930,12 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("15Lv큐브", style: TextStyle(fontSize: 10, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+                        Text("15Lv큐브",
+                            style: TextStyle(
+                                fontSize: 10,
+                                color: isDark
+                                    ? Colors.grey.shade400
+                                    : Colors.grey.shade600)),
                         SizedBox(
                           height: 20,
                           child: Transform.scale(
@@ -1889,13 +1955,36 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                 ],
               ),
               const SizedBox(height: 4),
-              Text(
-                item['value'],
-                style: TextStyle(
-                  color: item['color'],
-                  fontSize: 21.5,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    item['value'],
+                    style: TextStyle(
+                      color: item['color'],
+                      fontSize: 21.5,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (item['showLicenseButton'] == true)
+                    SizedBox(
+                      height: 26,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showLicenseDialog(char, localNikke),
+                        icon: const Icon(Icons.badge, color: Colors.white, size: 14),
+                        label: const Text("면허 발급",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          backgroundColor: Colors.purple.shade400,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6)),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -2066,7 +2155,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     final int optLevel = id % 100;
 
                     final bool isLevel15 = optLevel == 15;
-                    final bool isHighLevel = optLevel >= 12; // Lv. 12-15 are high level
+                    final bool isHighLevel =
+                        optLevel >= 12; // Lv. 12-15 are high level
 
                     // 1. Background color (matching in-game, independent of dark/light theme)
                     final Color boxBgColor = isLevel15
@@ -2083,7 +2173,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                         ? const Color(0xFF049EE7) // 파란색 글씨 (#049ee7)
                         : const Color(0xFF7F8C8D); // 일반 옵션 수치 색상 (회색)
 
-                    final Color iconColor = isHighLevel ? valueColor : const Color(0xFF7F8C8D);
+                    final Color iconColor =
+                        isHighLevel ? valueColor : const Color(0xFF7F8C8D);
 
                     return Container(
                       margin: const EdgeInsets.symmetric(vertical: 4.0),
@@ -2150,14 +2241,17 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       }),
     );
   }
-  Widget _buildDebugCpWidget(Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
+
+  Widget _buildDebugCpWidget(
+      Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
     if (!CpCalculator.isInitialized) return const SizedBox();
-    
-    final debug = CpCalculator.debugCalculateCp(char, localNikke, targetLevel: 40, assumeCube15: _assumeCube15);
-    
+
+    final debug = CpCalculator.debugCalculateCp(char, localNikke,
+        targetLevel: 40, assumeCube15: _assumeCube15);
+
     final Color titleColor = isDark ? Colors.yellowAccent : Colors.deepOrange;
     final Color textColor = isDark ? Colors.white70 : Colors.black87;
-    
+
     return Container(
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(12),
@@ -2169,29 +2263,461 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("🛠️ 40레벨 전투력 디버깅", style: TextStyle(color: titleColor, fontWeight: FontWeight.bold, fontSize: 16)),
+          Text("🛠️ 40레벨 전투력 디버깅",
+              style: TextStyle(
+                  color: titleColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16)),
           const SizedBox(height: 8),
-          Text("최종 투력: ${debug['cp'].toStringAsFixed(2)}", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16)),
+          Text("최종 투력: ${debug['cp'].toStringAsFixed(2)}",
+              style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16)),
           const SizedBox(height: 8),
-          Text("[보정계수 (Bojung)] : ${debug['bojung'].toStringAsFixed(4)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-          Text("= 1.3 + (0.01 * ${debug['skill1']}) + (0.01 * ${debug['skill2']}) + (0.02 * ${debug['skillBurst']})", style: TextStyle(color: textColor, fontSize: 12)),
-          Text("  + (0.00828 * ${debug['ukoLevel']} 우코) + (0.0069 * ${debug['nonUkoLevel']} 비우코)", style: TextStyle(color: textColor, fontSize: 12)),
-          Text("  + (0.0092 * ${debug['cubeCoef']} 큐브) + (0.0069 * ${debug['colCoef']} 소장품)", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("[보정계수 (Bojung)] : ${debug['bojung'].toStringAsFixed(4)}",
+              style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text(
+              "= 1.3 + (0.01 * ${debug['skill1']}) + (0.01 * ${debug['skill2']}) + (0.02 * ${debug['skillBurst']})",
+              style: TextStyle(color: textColor, fontSize: 12)),
+          Text(
+              "  + (0.00828 * ${debug['ukoLevel']} 우코) + (0.0069 * ${debug['nonUkoLevel']} 비우코)",
+              style: TextStyle(color: textColor, fontSize: 12)),
+          Text(
+              "  + (0.0092 * ${debug['cubeCoef']} 큐브) + (0.0069 * ${debug['colCoef']} 소장품)",
+              style: TextStyle(color: textColor, fontSize: 12)),
           const Divider(),
-          Text("[협전스탯_HP] : ${debug['finalHp'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-          Text("= ((${debug['baseHp']} * ${debug['lbMult']}) + (${debug['bondHp']} + ${debug['consoleHp']} + ${debug['bojungHp']})) * ${debug['coreMult']}", style: TextStyle(color: textColor, fontSize: 12)),
-          Text("  + (${debug['equipHp']} + ${debug['colHp']} + ${debug['cubeHp']})", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("[협전스탯_HP] : ${debug['finalHp'].toStringAsFixed(2)}",
+              style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text(
+              "= ((${debug['baseHp']} * ${debug['lbMult']}) + (${debug['bondHp']} + ${debug['consoleHp']} + ${debug['bojungHp']})) * ${debug['coreMult']}",
+              style: TextStyle(color: textColor, fontSize: 12)),
+          Text(
+              "  + (${debug['equipHp']} + ${debug['colHp']} + ${debug['cubeHp']})",
+              style: TextStyle(color: textColor, fontSize: 12)),
           const SizedBox(height: 4),
-          Text("[협전스탯_ATK] : ${debug['finalAtk'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-          Text("= ((${debug['baseAtk']} * ${debug['lbMult']}) + (${debug['bondAtk']} + ${debug['consoleAtk']} + ${debug['bojungAtk']})) * ${debug['coreMult']}", style: TextStyle(color: textColor, fontSize: 12)),
-          Text("  + (${debug['equipAtk']} + ${debug['colAtk']} + ${debug['cubeAtk']})", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("[협전스탯_ATK] : ${debug['finalAtk'].toStringAsFixed(2)}",
+              style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text(
+              "= ((${debug['baseAtk']} * ${debug['lbMult']}) + (${debug['bondAtk']} + ${debug['consoleAtk']} + ${debug['bojungAtk']})) * ${debug['coreMult']}",
+              style: TextStyle(color: textColor, fontSize: 12)),
+          Text(
+              "  + (${debug['equipAtk']} + ${debug['colAtk']} + ${debug['cubeAtk']})",
+              style: TextStyle(color: textColor, fontSize: 12)),
           const SizedBox(height: 4),
-          Text("[협전스탯_DEF] : ${debug['finalDef'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-          Text("= ((${debug['baseDef']} * ${debug['lbMult']}) + (${debug['bondDef']} + ${debug['consoleDef']} + ${debug['bojungDef']})) * ${debug['coreMult']}", style: TextStyle(color: textColor, fontSize: 12)),
-          Text("  + (${debug['equipDef']} + ${debug['colDef']} + ${debug['cubeDef']})", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("[협전스탯_DEF] : ${debug['finalDef'].toStringAsFixed(2)}",
+              style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text(
+              "= ((${debug['baseDef']} * ${debug['lbMult']}) + (${debug['bondDef']} + ${debug['consoleDef']} + ${debug['bojungDef']})) * ${debug['coreMult']}",
+              style: TextStyle(color: textColor, fontSize: 12)),
+          Text(
+              "  + (${debug['equipDef']} + ${debug['colDef']} + ${debug['cubeDef']})",
+              style: TextStyle(color: textColor, fontSize: 12)),
           const Divider(),
-          Text("[협전스탯 점수 (Score)] : ${debug['score'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-          Text("= 0.7 * ${debug['finalHp'].toStringAsFixed(2)} + 19.35 * ${debug['finalAtk'].toStringAsFixed(2)} + 70 * ${debug['finalDef'].toStringAsFixed(2)}", style: TextStyle(color: textColor, fontSize: 12)),
+          Text("[협전스탯 점수 (Score)] : ${debug['score'].toStringAsFixed(2)}",
+              style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+          Text(
+              "= 0.7 * ${debug['finalHp'].toStringAsFixed(2)} + 19.35 * ${debug['finalAtk'].toStringAsFixed(2)} + 70 * ${debug['finalDef'].toStringAsFixed(2)}",
+              style: TextStyle(color: textColor, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Future<Uint8List?> _captureKeyToBytes(GlobalKey key) async {
+    try {
+      // Allow some delay for rendering
+      await Future.delayed(const Duration(milliseconds: 100));
+      final boundary =
+          key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return null;
+      final image = await boundary.toImage(pixelRatio: 2.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      debugPrint('Capture error: $e');
+      return null;
+    }
+  }
+
+  void _showLicenseDialog(Map<String, dynamic> char, Nikke? localNikke) {
+    double cp40 = 0;
+    if (CpCalculator.isInitialized) {
+      cp40 = CpCalculator.calculateCp(char, localNikke,
+          targetLevel: 40, assumeCube15: _assumeCube15);
+    }
+
+    final GlobalKey captureKey = GlobalKey();
+
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("미리보기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87)),
+                          IconButton(
+                              icon: const Icon(Icons.close,
+                                  color: Colors.black54),
+                              onPressed: () => Navigator.pop(context)),
+                        ],
+                      ),
+                      const Divider(),
+                      const SizedBox(height: 8),
+                      FittedBox(
+                        fit: BoxFit.contain,
+                        child: RepaintBoundary(
+                          key: captureKey,
+                          child:
+                              _buildDriverLicenseCanvas(char, localNikke, cp40),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            icon: const Icon(Icons.content_copy,
+                                color: Colors.purple),
+                            label: const Text("클립보드 복사",
+                                style: TextStyle(color: Colors.purple)),
+                            onPressed: () async {
+                              final bytes =
+                                  await _captureKeyToBytes(captureKey);
+                              if (bytes != null) {
+                                try {
+                                  await Pasteboard.writeImage(bytes);
+                                  if (mounted)
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('클립보드에 복사되었습니다!')));
+                                } catch (e) {
+                                  if (mounted)
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('복사 실패: $e')));
+                                }
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton.icon(
+                            icon:
+                                const Icon(Icons.download, color: Colors.white),
+                            label: const Text("이미지 다운로드",
+                                style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.purple,
+                                foregroundColor: Colors.white,
+                                elevation: 0),
+                            onPressed: () async {
+                              final bytes =
+                                  await _captureKeyToBytes(captureKey);
+                              if (bytes != null) {
+                                if (kIsWeb) {
+                                  final blob = html.Blob([bytes], 'image/png');
+                                  final url =
+                                      html.Url.createObjectUrlFromBlob(blob);
+                                  html.AnchorElement(href: url)
+                                    ..setAttribute('download',
+                                        'license_${DateTime.now().millisecondsSinceEpoch}.png')
+                                    ..click();
+                                  html.Url.revokeObjectUrl(url);
+                                } else {
+                                  await ImageGallerySaver.saveImage(bytes,
+                                      name:
+                                          "license_${DateTime.now().millisecondsSinceEpoch}");
+                                  if (mounted)
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('저장되었습니다!')));
+                                }
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget _buildDriverLicenseCanvas(
+      Map<String, dynamic> char, Nikke? localNikke, double cp40) {
+    final nameCode = char['name_code'] as int? ?? 0;
+    final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
+    final nickname = _profileData?['nickname'] ?? '지휘관';
+    final String formattedPow40 = cp40 == -1.0
+        ? '측정 불가'
+        : (cp40 > 0 ? NumberFormat('#,###').format(cp40.round()) : '계산중...');
+    final today = DateFormat('yyyy.MM.dd').format(DateTime.now());
+
+    final grade = char['grade'] as int? ?? 0;
+    final core = char['core'] as int? ?? 0;
+    final skills = char['skills'] as Map<String, dynamic>? ?? {};
+    final skill1 = skills['skill1'] ?? 1;
+    final skill2 = skills['skill2'] ?? 1;
+    final burst = skills['burst'] ?? 1;
+
+    String starStr = '★' * grade + '☆' * (3 - grade);
+    if (core > 0) {
+      starStr += '  +$core';
+    }
+
+    String licenseType = "1종 보통";
+    if (cp40 >= 60000) {
+      licenseType = "1종 대형";
+    } else if (cp40 > 0 && cp40 < 50000) {
+      licenseType = "1종 소형";
+    }
+
+    return Container(
+      width: 640,
+      height: 380,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        gradient: const RadialGradient(
+          center: Alignment.centerRight,
+          radius: 1.5,
+          colors: [
+            Color(0xFFE8F4F8),
+            Color(0xFFFDE8F3),
+            Color(0xFFFFF6E5),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black12, width: 1),
+      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(licenseType,
+                            style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black87)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      color: Colors.yellow.shade200,
+                      child: const Text("이 면허증은 현실에서",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87)),
+                    ),
+                    const SizedBox(height: 2),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      color: Colors.yellow.shade200,
+                      child: const Text("쓰면 안 돼요! (진짜임)",
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87)),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 170,
+                      height: 230,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.black12, width: 1),
+                          color: Colors.grey.shade200,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(2, 2))
+                          ]),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(11),
+                        child: localNikke != null
+                            ? Image.asset(
+                                localNikke.imageUrl,
+                                fit: BoxFit.cover,
+                                alignment: Alignment.topCenter,
+                              )
+                            : const SizedBox(),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            "협전 운전 면허증",
+                            style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black87,
+                                letterSpacing: -0.5),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "(Driver's License)",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black54),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Container(height: 2, color: Colors.pink.shade200),
+                      const SizedBox(height: 40),
+                      Row(
+                        children: [
+                          const Text("이름 : ",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87)),
+                          Expanded(
+                              child: Text("$mappedName",
+                                  style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.black87,
+                                      letterSpacing: 1.0),
+                                  overflow: TextOverflow.ellipsis)),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Text("전투력 : ",
+                              style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87)),
+                          Text(formattedPow40,
+                              style: const TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.black87)),
+                          const SizedBox(width: 8),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Text("한계 돌파 : ",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87)),
+                          Text(starStr,
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber)),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          const Text("스킬 레벨 : ",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87)),
+                          Text("$skill1 / $skill2 / $burst",
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.black87)),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Spacer(),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Spacer(),
+                          Text(today,
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                  letterSpacing: 1.0)),
+                          const Spacer(),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.center,
+                            children: [
+                              const Text("발급기관 : 미미르만만세",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.black87)),
+                              Positioned(
+                                right: -10,
+                                top: -60,
+                                child: Opacity(
+                                  opacity: 0.9,
+                                  child: Transform.rotate(
+                                    angle: -0.15,
+                                    child: Image.asset(
+                                      'assets/images/dorodojang.png',
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 20),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
