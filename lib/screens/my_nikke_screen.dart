@@ -2550,8 +2550,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: isSpecial ? Colors.amber.shade500 : Colors.black12,
-            width: isSpecial ? 4 : 1),
+            color: isSpecial ? Colors.transparent : Colors.black12,
+            width: isSpecial ? 0 : 1),
       ),
       child: Stack(
         children: [
@@ -2571,7 +2571,21 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                 fontSize: 22,
                                 fontWeight: FontWeight.w900,
                                 color:
-                                    isSpecial ? Colors.amber : Colors.black87)),
+                                    isSpecial ? Colors.amber : Colors.black87,
+                                shadows: isSpecial
+                                    ? [
+                                        Shadow(
+                                          offset: const Offset(1, 1),
+                                          blurRadius: 2.0,
+                                          color: Colors.black.withOpacity(0.5),
+                                        ),
+                                        Shadow(
+                                          offset: const Offset(0, 0),
+                                          blurRadius: 6.0,
+                                          color: Colors.amber.withOpacity(0.5),
+                                        ),
+                                      ]
+                                    : null)),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -2652,7 +2666,21 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                 fontSize: 28,
                                 fontWeight: FontWeight.w900,
                                 color: textColor,
-                                letterSpacing: -0.5),
+                                letterSpacing: -0.5,
+                                shadows: isSpecial
+                                    ? [
+                                        Shadow(
+                                          offset: const Offset(1, 1),
+                                          blurRadius: 2.0,
+                                          color: Colors.black.withOpacity(0.5),
+                                        ),
+                                        Shadow(
+                                          offset: const Offset(0, 0),
+                                          blurRadius: 6.0,
+                                          color: Colors.white.withOpacity(0.3),
+                                        ),
+                                      ]
+                                    : null),
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -2702,7 +2730,21 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                   fontWeight: FontWeight.w900,
                                   color: isSpecial
                                       ? Colors.amber
-                                      : Colors.black87)),
+                                      : Colors.black87,
+                                  shadows: isSpecial
+                                      ? [
+                                          Shadow(
+                                            offset: const Offset(1, 1),
+                                            blurRadius: 2.0,
+                                            color: Colors.black.withOpacity(0.5),
+                                          ),
+                                          Shadow(
+                                            offset: const Offset(0, 0),
+                                            blurRadius: 6.0,
+                                            color: Colors.amber.withOpacity(0.5),
+                                          ),
+                                        ]
+                                      : null)),
                           const SizedBox(width: 8),
                         ],
                       ),
