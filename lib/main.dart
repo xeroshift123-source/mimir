@@ -13,6 +13,7 @@ import 'screens/my_nikke_screen.dart';
 import 'providers/nikke_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/auth_provider.dart';
+import 'utils/cp_calculator.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -26,6 +27,7 @@ void main() async {
   } catch (e) {
     debugPrint("Firebase initialization failed in main: $e");
   }
+  await CpCalculator.init();
   runApp(const MimirApp());
 }
 

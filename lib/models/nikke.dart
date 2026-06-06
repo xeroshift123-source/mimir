@@ -9,6 +9,7 @@ class Nikke {
   final WeaponType weaponType; // 무기 타입
   final Company company; // 소속 회사
   final int coolTime; // 버스트 쿨타임
+  final String type; // 니케 클래스 (Attacker, Defender, Supporter)
 
   /// ✅ enum 제거 → 문자열 키워드 리스트로
   final List<String> ability;
@@ -25,6 +26,7 @@ class Nikke {
     required this.weaponType,
     required this.company,
     required this.coolTime,
+    required this.type, // ✅ 추가된 type 정보
     required this.ability, // ✅ 여기
     this.squadNum = 0,
     required this.rank,
@@ -74,6 +76,7 @@ class Nikke {
       weaponType: weaponType,
       company: company,
       coolTime: json['coolTime'] as int? ?? 0,
+      type: json['type'] as String? ?? 'ATK', // ✅ JSON에서 type 읽기 (기본값 ATK)
       ability: ability,
       squadNum: json['squadNum'] as int? ?? 0,
       rank: Rank.values.byName(json['rank'] as String),
@@ -90,6 +93,7 @@ class Nikke {
       'element': element.name,
       'weaponType': weaponType.name,
       'company': company.name,
+      'type': type, // ✅ type 저장
 
       // ✅ 문자열 리스트는 그대로 저장
       'ability': ability,
