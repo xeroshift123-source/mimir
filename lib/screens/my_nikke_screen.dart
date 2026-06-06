@@ -45,6 +45,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final Set<Company> _companyFilters = {};
   bool _filterExpanded = false;
   bool _assumeCube15 = false;
+  bool _showNicknameOnLicense = false;
 
   @override
   void didChangeDependencies() {
@@ -1639,6 +1640,26 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                 color: isDark ? Colors.white : Colors.black87,
               ),
             ),
+            const Spacer(),
+            Text("면허증 닉네임 보이기",
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+            SizedBox(
+              height: 20,
+              child: Transform.scale(
+                scale: 0.7,
+                child: Switch(
+                  value: _showNicknameOnLicense,
+                  onChanged: (val) {
+                    setState(() {
+                      _showNicknameOnLicense = val;
+                    });
+                  },
+                ),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 12),
@@ -1971,11 +1992,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                       height: 26,
                       child: ElevatedButton.icon(
                         onPressed: () => _showLicenseDialog(char, localNikke),
-                        icon: const Icon(Icons.badge, color: Colors.white, size: 14),
+                        icon: const Icon(Icons.badge,
+                            color: Colors.white, size: 14),
                         label: const Text("면허 발급",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 12)),
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
                           backgroundColor: Colors.purple.shade400,
                           foregroundColor: Colors.white,
                           elevation: 0,
@@ -2469,6 +2493,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final nameCode = char['name_code'] as int? ?? 0;
     final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
     final nickname = _profileData?['nickname'] ?? '지휘관';
+    final displayName = _showNicknameOnLicense ? "$nickname의 $mappedName" : mappedName;
     final String formattedPow40 = cp40 == -1.0
         ? '측정 불가'
         : (cp40 > 0 ? NumberFormat('#,###').format(cp40.round()) : '계산중...');
@@ -2487,35 +2512,54 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     }
 
     String licenseType = "1종 보통";
-    if (cp40 >= 60000) {
+    if (cp40 >= 70000) {
+      licenseType = "1종 특수";
+    } else if (cp40 >= 60000) {
       licenseType = "1종 대형";
+    } else if (cp40 > 0 && cp40 < 40000) {
+      licenseType = "자전거 면허";
     } else if (cp40 > 0 && cp40 < 50000) {
       licenseType = "1종 소형";
     }
 
+    final bool isSpecial = licenseType == "1종 특수";
+    final Color textColor = isSpecial ? Colors.white : Colors.black87;
+    final Color subTextColor = isSpecial ? Colors.white70 : Colors.black54;
+
     return Container(
       width: 640,
-      height: 380,
       decoration: BoxDecoration(
-        color: Colors.white,
-        gradient: const RadialGradient(
-          center: Alignment.centerRight,
-          radius: 1.5,
-          colors: [
-            Color(0xFFE8F4F8),
-            Color(0xFFFDE8F3),
-            Color(0xFFFFF6E5),
-          ],
-        ),
+        color: isSpecial ? const Color(0xFF151515) : Colors.white,
+        gradient: isSpecial
+            ? const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF2C2C35),
+                  Color(0xFF0F0F13),
+                ],
+              )
+            : const RadialGradient(
+                center: Alignment.centerRight,
+                radius: 1.5,
+                colors: [
+                  Color(0xFFE8F4F8),
+                  Color(0xFFFDE8F3),
+                  Color(0xFFFFF6E5),
+                ],
+              ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black12, width: 1),
+        border: Border.all(
+            color: isSpecial ? Colors.amber.shade500 : Colors.black12,
+            width: isSpecial ? 4 : 1),
       ),
       child: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.all(24.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -2523,45 +2567,61 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     Row(
                       children: [
                         Text(licenseType,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w900,
-                                color: Colors.black87)),
+                                color:
+                                    isSpecial ? Colors.amber : Colors.black87)),
                       ],
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      color: Colors.yellow.shade200,
-                      child: const Text("이 면허증은 현실에서",
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isSpecial ? 0 : 6, vertical: 2),
+                      color: isSpecial
+                          ? Colors.transparent
+                          : Colors.yellow.shade200,
+                      child: Text("이 면허증은 현실에서",
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87)),
+                              color: isSpecial
+                                  ? Colors.red.shade400
+                                  : Colors.black87)),
                     ),
                     const SizedBox(height: 2),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      color: Colors.yellow.shade200,
-                      child: const Text("쓰면 안 돼요! (진짜임)",
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isSpecial ? 0 : 6, vertical: 2),
+                      color: isSpecial
+                          ? Colors.transparent
+                          : Colors.yellow.shade200,
+                      child: Text("쓰면 안 돼요! (진짜임)",
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87)),
+                              color: isSpecial
+                                  ? Colors.red.shade400
+                                  : Colors.black87)),
                     ),
                     const SizedBox(height: 12),
                     Container(
                       width: 170,
-                      height: 230,
+                      height: 240,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.black12, width: 1),
-                          color: Colors.grey.shade200,
+                          border: Border.all(
+                              color: isSpecial
+                                  ? Colors.amber.withOpacity(0.3)
+                                  : Colors.black12,
+                              width: 1),
+                          color: isSpecial
+                              ? Colors.grey.shade900
+                              : Colors.grey.shade200,
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black
+                                    .withOpacity(isSpecial ? 0.5 : 0.1),
                                 blurRadius: 4,
                                 offset: const Offset(2, 2))
                           ]),
@@ -2586,40 +2646,44 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
+                          Text(
                             "협전 운전 면허증",
                             style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.w900,
-                                color: Colors.black87,
+                                color: textColor,
                                 letterSpacing: -0.5),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             "(Driver's License)",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.black54),
+                                color: subTextColor),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      Container(height: 2, color: Colors.pink.shade200),
+                      Container(
+                          height: 2,
+                          color: isSpecial
+                              ? Colors.amber.withOpacity(0.6)
+                              : Colors.pink.shade200),
                       const SizedBox(height: 40),
                       Row(
                         children: [
-                          const Text("이름 : ",
+                          Text("이름 : ",
                               style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87)),
+                                  color: textColor)),
                           Expanded(
-                              child: Text("$mappedName",
-                                  style: const TextStyle(
+                              child: Text(displayName,
+                                  style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.w900,
-                                      color: Colors.black87,
+                                      color: textColor,
                                       letterSpacing: 1.0),
                                   overflow: TextOverflow.ellipsis)),
                         ],
@@ -2627,27 +2691,29 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          const Text("전투력 : ",
+                          Text("전투력 : ",
                               style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87)),
+                                  color: textColor)),
                           Text(formattedPow40,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.w900,
-                                  color: Colors.black87)),
+                                  color: isSpecial
+                                      ? Colors.amber
+                                      : Colors.black87)),
                           const SizedBox(width: 8),
                         ],
                       ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          const Text("한계 돌파 : ",
+                          Text("한계 돌파 : ",
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87)),
+                                  color: textColor)),
                           Text(starStr,
                               style: const TextStyle(
                                   fontSize: 18,
@@ -2658,40 +2724,39 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          const Text("스킬 레벨 : ",
+                          Text("스킬 레벨 : ",
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87)),
+                                  color: textColor)),
                           Text("$skill1 / $skill2 / $burst",
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
-                                  color: Colors.black87)),
+                                  color: textColor)),
                         ],
                       ),
-                      const SizedBox(height: 16),
                       const Spacer(),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           const Spacer(),
                           Text(today,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: textColor,
                                   letterSpacing: 1.0)),
                           const Spacer(),
                           Stack(
                             clipBehavior: Clip.none,
                             alignment: Alignment.center,
                             children: [
-                              const Text("발급기관 : 미미르만만세",
+                              Text("발급기관 : 미미르만만세",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w900,
-                                      color: Colors.black87)),
+                                      color: textColor)),
                               Positioned(
                                 right: -10,
                                 top: -60,
@@ -2716,6 +2781,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   ),
                 ),
               ],
+            ),
             ),
           ),
         ],

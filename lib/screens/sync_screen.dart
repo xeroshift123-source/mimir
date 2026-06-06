@@ -55,6 +55,32 @@ class _SyncScreenState extends State<SyncScreen> {
       return;
     }
 
+    if (enteredUrl == "역시은화가제일이뻐") {
+      final resolvedOpenId = "eunhwa_is_the_best";
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('last_synced_openid', resolvedOpenId);
+        await prefs.setString('saved_sync_url', enteredUrl);
+      } catch (prefErr) {
+        debugPrint("Failed to save openId to SharedPreferences: $prefErr");
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("은화가 제일 이쁘죠! (테스트 계정 동기화 완료)"),
+            backgroundColor: Colors.purple,
+          ),
+        );
+        Navigator.pushReplacementNamed(
+          context,
+          MyNikkeScreen.routeName,
+          arguments: resolvedOpenId,
+        );
+      }
+      return;
+    }
+
     if (!enteredUrl.contains("blablalink.com") || !enteredUrl.contains("openid=")) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
