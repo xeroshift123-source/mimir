@@ -138,8 +138,13 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         double overAtk = 0;
         
         if (CpCalculator.isInitialized) {
-          final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
-          atk400 = stats['atk'] ?? 0;
+          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+          if (cp != -1.0) {
+            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+            atk400 = stats['atk'] ?? 0;
+          } else {
+            atk400 = 0;
+          }
         }
         
         final equips = modChar['equipment'] as List<dynamic>? ?? [];
@@ -153,10 +158,8 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
           }
         }
         
-        if (atk400 > 0) {
-          atkCtrl.text = _formatter.format(atk400.round());
-          overCtrl.text = overAtk.toStringAsFixed(2);
-        }
+        atkCtrl.text = atk400 > 0 ? _formatter.format(atk400.round()) : "0";
+        overCtrl.text = overAtk.toStringAsFixed(2);
       }
 
       if (nayutaChar != null) applyCharStats(nayutaChar, '나유타', _nayutaAtkController, _nayutaOverController);

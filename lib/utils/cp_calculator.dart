@@ -193,7 +193,8 @@ class CpCalculator {
       final int eqLevel = eq['level'] as int? ?? 0;
       final int eqTier = eq['tier'] as int? ?? 1;
       final String eqSlot = eq['slot'] as String? ?? '';
-      final eqOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+      final rawOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+      final eqOptions = rawOptions.where((opt) => opt != 0 && opt != "0" && opt != "").toList();
       final bool isOverload = eqOptions.isNotEmpty || eqTier >= 10;
       
       final st = getEquipmentStats(role, eqSlot, eqTier, eqLevel, isOverload);
@@ -226,7 +227,8 @@ class CpCalculator {
     for (final eq in equips) {
       if (eq == null) continue;
       final eqTier = eq['tier'] as int? ?? 1;
-      final eqOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+      final rawOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+      final eqOptions = rawOptions.where((opt) => opt != 0 && opt != "0" && opt != "").toList();
       final bool isOverload = eqOptions.isNotEmpty || eqTier >= 10;
       if (!isOverload) {
         allOverload = false;
@@ -341,7 +343,8 @@ class CpCalculator {
       final int eqLevel = eq['level'] as int? ?? 0;
       final int eqTier = eq['tier'] as int? ?? 1;
       final String eqSlot = eq['slot'] as String? ?? '';
-      final eqOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+      final rawOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+      final eqOptions = rawOptions.where((opt) => opt != 0 && opt != "0" && opt != "").toList();
       final bool isOverload = eqOptions.isNotEmpty || eqTier >= 10;
       final st = getEquipmentStats(role, eqSlot, eqTier, eqLevel, isOverload);
       equipHp += st['hp']!; equipAtk += st['atk']!; equipDef += st['def']!;

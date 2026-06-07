@@ -133,8 +133,13 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
         double overAtk = 0;
         
         if (CpCalculator.isInitialized) {
-          final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
-          atk400 = stats['atk'] ?? 0;
+          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+          if (cp != -1.0) {
+            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+            atk400 = stats['atk'] ?? 0;
+          } else {
+            atk400 = 0;
+          }
         }
         
         if (overCtrl != null) {
@@ -150,10 +155,8 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
           }
         }
         
-        if (atk400 > 0) {
-          atkCtrl.text = _formatter.format(atk400.round());
-          if (overCtrl != null) overCtrl.text = overAtk.toStringAsFixed(2);
-        }
+        atkCtrl.text = atk400 > 0 ? _formatter.format(atk400.round()) : "0";
+        if (overCtrl != null) overCtrl.text = overAtk.toStringAsFixed(2);
       }
 
       if (libChar != null) applyCharStats(libChar, '리버렐리오', _libAtkController, _libOverController);
