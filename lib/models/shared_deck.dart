@@ -3,6 +3,7 @@ class SharedDeck {
   final String authorName;
   final String title;
   final String description;
+  final String season;
   
   /// 5 squads, each contains 5 Nikke IDs (e.g. [[id1, id2...], [id6, id7...], ...])
   final List<List<String?>> squadsNikkeIds;
@@ -15,6 +16,7 @@ class SharedDeck {
     required this.authorName,
     required this.title,
     required this.description,
+    required this.season,
     required this.squadsNikkeIds,
     required this.upvotes,
     required this.downvotes,
@@ -29,6 +31,7 @@ class SharedDeck {
       authorName: json['authorName'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
+      season: json['season'] as String? ?? 'SEASON 37',
       squadsNikkeIds: (json['squadsNikkeIds'] as List)
           .map((squad) => (squad as List).map((id) => id as String?).toList())
           .toList(),
@@ -44,6 +47,7 @@ class SharedDeck {
       'authorName': authorName,
       'title': title,
       'description': description,
+      'season': season,
       'squadsNikkeIds': squadsNikkeIds,
       'upvotes': upvotes,
       'downvotes': downvotes,

@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 
+import 'package:mimir/services/database_service.dart';
+import 'package:mimir/utils/cp_calculator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mimir/providers/nikke_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:mimir/utils/blabla_map.dart';
+import 'package:mimir/models/nikke.dart';
+
 class EinAdaCalculatorForm extends StatefulWidget {
   const EinAdaCalculatorForm({super.key});
 
@@ -37,6 +45,148 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
   String needOverloadMessage = "";
   bool isError = false;
   final NumberFormat _formatter = NumberFormat('#,###');
+
+  bool _isSyncing = false;
+
+  Future<void> _handleAutoSync() async {
+    setState(() => _isSyncing = true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final openId = prefs.getString('last_synced_openid');
+      if (openId == null || openId.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('동기화된 프로필이 없습니다. 블라블라링크 동기화를 먼저 진행해주세요.')),
+          );
+        }
+        return;
+      }
+
+      final dbService = DatabaseService();
+      final profile = await dbService.getCommanderProfile(openId);
+      if (profile == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('프로필 데이터를 불러올 수 없습니다.')),
+          );
+        }
+        return;
+      }
+
+      final characters = profile['characters'] as List<dynamic>? ?? [];
+      final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
+      final localNikkes = context.read<NikkeProvider>().nikkeList;
+      final Map<String, Nikke> nikkeNameMap = {
+        for (final n in localNikkes) n.name: n
+      };
+
+      Map<String, dynamic> injectConsoleLevels(Map<String, dynamic> c, Nikke? n) {
+        int common = 0, classConsole = 0, companyConsole = 0;
+        for (final item in recycleRoom) {
+          if (item is Map) {
+            final tid = item['tid'] as int? ?? 0;
+            final lv = item['lv'] as int? ?? 0;
+            if (tid == 1001) common = lv;
+            if (n != null) {
+              if (n.type == 'ATK' && tid == 1101) classConsole = lv;
+              if (n.type == 'DEF' && tid == 1102) classConsole = lv;
+              if (n.type == 'SUP' && tid == 1103) classConsole = lv;
+              final compStr = n.company.toString().split('.').last;
+              if (compStr == 'Elysion' && tid == 1201) companyConsole = lv;
+              if (compStr == 'Missilis' && tid == 1202) companyConsole = lv;
+              if (compStr == 'Tetra' && tid == 1203) companyConsole = lv;
+              if (compStr == 'Pilgrim' && tid == 1204) companyConsole = lv;
+              if (compStr == 'Abnormal' && tid == 1205) companyConsole = lv;
+            }
+          }
+        }
+        final mod = Map<String, dynamic>.from(c);
+        mod['commonConsoleLevel'] = common;
+        mod['classConsoleLevel'] = classConsole;
+        mod['companyConsoleLevel'] = companyConsole;
+        return mod;
+      }
+
+      Map<String, dynamic>? einChar;
+      Map<String, dynamic>? adaChar;
+      Map<String, dynamic>? takinaChar;
+      
+      for (final char in characters) {
+        final nameCode = char['name_code'] as int? ?? 0;
+        final mappedName = BlablaMap.characterNames[nameCode] ?? '';
+        if (mappedName == '아인') einChar = char;
+        if (mappedName == '에이다') adaChar = char;
+        if (mappedName == '타키나') takinaChar = char;
+      }
+
+      if (einChar == null && adaChar == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('동기화된 데이터에서 아인과 에이다를 찾을 수 없습니다.')),
+          );
+        }
+        return;
+      }
+
+      if (!CpCalculator.isInitialized) {
+        await CpCalculator.init();
+      }
+
+      void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController overCtrl) {
+        final localNikke = nikkeNameMap[name];
+        final modChar = injectConsoleLevels(char, localNikke);
+        
+        double atk400 = 0;
+        double overAtk = 0;
+        
+        if (CpCalculator.isInitialized) {
+          final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+          atk400 = stats['atk'] ?? 0;
+        }
+        
+        final equips = modChar['equipment'] as List<dynamic>? ?? [];
+        for (final eq in equips) {
+          final options = eq['overloadOptions'] as List<dynamic>? ?? [];
+          for (final opt in options) {
+            final int id = opt as int? ?? 0;
+            if (id >= 7000801 && id <= 7000815) { // 공격력 옵션
+              overAtk += BlablaMap.getOptionPercent(id);
+            }
+          }
+        }
+        
+        if (atk400 > 0) {
+          atkCtrl.text = _formatter.format(atk400.round());
+          overCtrl.text = overAtk.toStringAsFixed(2);
+        }
+      }
+
+      if (einChar != null) applyCharStats(einChar, '아인', _einAtkController, _einOverController);
+      if (adaChar != null) applyCharStats(adaChar, '에이다', _adaAtkController, _adaOverController);
+      if (takinaChar != null) {
+        applyCharStats(takinaChar, '타키나', _takinaAtkController, _takinaOverController);
+        if (!_useTakina) {
+          _useTakina = true;
+        }
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('동기화된 스탯 정보를 성공적으로 불러왔습니다! 🚀')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('자동 입력 중 오류가 발생했습니다: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSyncing = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -174,6 +324,30 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
         ],
 
         const SizedBox(height: 24),
+
+        // 동기화 자동 입력 버튼
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: ElevatedButton.icon(
+            onPressed: _isSyncing ? null : _handleAutoSync,
+            icon: _isSyncing 
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+              : const Icon(Icons.sync, color: Colors.white),
+            label: Text(
+              _isSyncing ? "동기화 정보 불러오는 중..." : "동기화 스탯 자동 입력",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal.shade500,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
 
         // 버튼 영역
         Row(

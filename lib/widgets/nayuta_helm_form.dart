@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'package:mimir/services/database_service.dart';
+import 'package:mimir/utils/cp_calculator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mimir/providers/nikke_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:mimir/utils/blabla_map.dart';
+import 'package:mimir/models/nikke.dart';
+
 class NayutaHelmCalculatorForm extends StatefulWidget {
   const NayutaHelmCalculatorForm({super.key});
 
@@ -33,6 +41,155 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
   String needOverloadMessage = "";
   bool isError = false;
   final NumberFormat _formatter = NumberFormat('#,###');
+
+  bool _isSyncing = false;
+
+  Future<void> _handleAutoSync() async {
+    setState(() => _isSyncing = true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final openId = prefs.getString('last_synced_openid');
+      if (openId == null || openId.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('동기화된 프로필이 없습니다. 블라블라링크 동기화를 먼저 진행해주세요.')),
+          );
+        }
+        return;
+      }
+
+      final dbService = DatabaseService();
+      final profile = await dbService.getCommanderProfile(openId);
+      if (profile == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('프로필 데이터를 불러올 수 없습니다.')),
+          );
+        }
+        return;
+      }
+
+      final characters = profile['characters'] as List<dynamic>? ?? [];
+      final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
+      final localNikkes = context.read<NikkeProvider>().nikkeList;
+      final Map<String, Nikke> nikkeNameMap = {
+        for (final n in localNikkes) n.name: n
+      };
+
+      Map<String, dynamic> injectConsoleLevels(Map<String, dynamic> c, Nikke? n) {
+        int common = 0, classConsole = 0, companyConsole = 0;
+        for (final item in recycleRoom) {
+          if (item is Map) {
+            final tid = item['tid'] as int? ?? 0;
+            final lv = item['lv'] as int? ?? 0;
+            if (tid == 1001) common = lv;
+            if (n != null) {
+              if (n.type == 'ATK' && tid == 1101) classConsole = lv;
+              if (n.type == 'DEF' && tid == 1102) classConsole = lv;
+              if (n.type == 'SUP' && tid == 1103) classConsole = lv;
+              final compStr = n.company.toString().split('.').last;
+              if (compStr == 'Elysion' && tid == 1201) companyConsole = lv;
+              if (compStr == 'Missilis' && tid == 1202) companyConsole = lv;
+              if (compStr == 'Tetra' && tid == 1203) companyConsole = lv;
+              if (compStr == 'Pilgrim' && tid == 1204) companyConsole = lv;
+              if (compStr == 'Abnormal' && tid == 1205) companyConsole = lv;
+            }
+          }
+        }
+        final mod = Map<String, dynamic>.from(c);
+        mod['commonConsoleLevel'] = common;
+        mod['classConsoleLevel'] = classConsole;
+        mod['companyConsoleLevel'] = companyConsole;
+        return mod;
+      }
+
+      Map<String, dynamic>? nayutaChar;
+      Map<String, dynamic>? helmChar;
+      Map<String, dynamic>? cludChar;
+      Map<String, dynamic>? cdieselChar;
+      
+      for (final char in characters) {
+        final nameCode = char['name_code'] as int? ?? 0;
+        final mappedName = BlablaMap.characterNames[nameCode] ?? '';
+        if (mappedName == '나유타') nayutaChar = char;
+        if (mappedName == '헬름') helmChar = char;
+        if (mappedName == '루드밀라 : 윈터 오너') cludChar = char;
+        if (mappedName == '디젤 : 윈터 스위츠') cdieselChar = char;
+      }
+
+      if (nayutaChar == null && helmChar == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('동기화된 데이터에서 나유타와 헬름을 찾을 수 없습니다.')),
+          );
+        }
+        return;
+      }
+
+      if (!CpCalculator.isInitialized) {
+        await CpCalculator.init();
+      }
+
+      void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController overCtrl) {
+        final localNikke = nikkeNameMap[name];
+        final modChar = injectConsoleLevels(char, localNikke);
+        
+        double atk400 = 0;
+        double overAtk = 0;
+        
+        if (CpCalculator.isInitialized) {
+          final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+          atk400 = stats['atk'] ?? 0;
+        }
+        
+        final equips = modChar['equipment'] as List<dynamic>? ?? [];
+        for (final eq in equips) {
+          final options = eq['overloadOptions'] as List<dynamic>? ?? [];
+          for (final opt in options) {
+            final int id = opt as int? ?? 0;
+            if (id >= 7000801 && id <= 7000815) { // 공격력 옵션
+              overAtk += BlablaMap.getOptionPercent(id);
+            }
+          }
+        }
+        
+        if (atk400 > 0) {
+          atkCtrl.text = _formatter.format(atk400.round());
+          overCtrl.text = overAtk.toStringAsFixed(2);
+        }
+      }
+
+      if (nayutaChar != null) applyCharStats(nayutaChar, '나유타', _nayutaAtkController, _nayutaOverController);
+      if (helmChar != null) applyCharStats(helmChar, '헬름', _helmAtkController, _helmOverController);
+      if (cludChar != null) {
+        applyCharStats(cludChar, '루드밀라 : 윈터 오너', _extraAtkController, _extraOverController);
+        if (_extraNikkeType == null) {
+          _extraNikkeType = 'clud';
+        }
+      } else if (cdieselChar != null) {
+        applyCharStats(cdieselChar, '디젤 : 윈터 스위츠', _extraAtkController, _extraOverController);
+        if (_extraNikkeType == null) {
+          _extraNikkeType = 'cdiesel';
+        }
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('동기화된 스탯 정보를 성공적으로 불러왔습니다! 🚀')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('자동 입력 중 오류가 발생했습니다: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSyncing = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -101,7 +258,7 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       }
       if (_extraNikkeType != null && resExtraFinal > maxAtk) {
         maxAtk = resExtraFinal;
-        rival = (_extraNikkeType == 'clud') ? "클루드" : "일반 니케";
+        rival = (_extraNikkeType == 'clud') ? "클루드" : ((_extraNikkeType == 'cdiesel') ? "클디젤" : "일반 니케");
       }
 
       if (maxAtk == resNayutaFinal) {
@@ -112,7 +269,7 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
 
         if (_extraNikkeType != null && resExtraFinal > resHelmFinal) {
           secondMaxAtk = resExtraFinal;
-          secondRival = (_extraNikkeType == 'clud') ? "클루드" : "일반 니케";
+          secondRival = (_extraNikkeType == 'clud') ? "클루드" : ((_extraNikkeType == 'cdiesel') ? "클디젤" : "일반 니케");
           secondRivalBase = eBase;
         }
 
@@ -204,10 +361,10 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         if (_extraNikkeType != null) ...[
           const SizedBox(height: 16),
           _buildCharacterInputRow(
-            label: _extraNikkeType == 'clud' ? "루드밀라:윈터오너" : "일반3버",
+            label: _extraNikkeType == 'clud' ? "루드밀라:윈터오너" : (_extraNikkeType == 'cdiesel' ? "디젤:윈터스위츠" : "일반3버"),
             imagePath: _extraNikkeType == 'clud'
                 ? "assets/nikke/ludmilla_winter_owner.webp"
-                : "assets/nikke/soldiereg.webp",
+                : (_extraNikkeType == 'cdiesel' ? "assets/nikke/diesel_winter_sweets.webp" : "assets/nikke/soldiereg.webp"),
             color: Colors.cyan,
             atkCtrl: _extraAtkController,
             overCtrl: _extraOverController,
@@ -215,6 +372,29 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
           ),
         ],
         const SizedBox(height: 24),
+        // 동기화 자동 입력 버튼
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: ElevatedButton.icon(
+            onPressed: _isSyncing ? null : _handleAutoSync,
+            icon: _isSyncing 
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+              : const Icon(Icons.sync, color: Colors.white),
+            label: Text(
+              _isSyncing ? "동기화 정보 불러오는 중..." : "동기화 스탯 자동 입력",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal.shade500,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         _buildActionButtons(),
         const SizedBox(height: 20),
         _buildResultCard(
@@ -226,11 +406,13 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
             "헬름: 오버${helmHasMiranda ? ' + 미란다(${_mirandaAtkController.text}%)' : ''}",
             if (_extraNikkeType == 'clud')
               "클루드: 오버 + 자버프(${_cludBurstController.text}%)${extraHasMiranda ? ' + 미란다(${_mirandaAtkController.text}%)' : ''}",
+            if (_extraNikkeType == 'cdiesel')
+              "클디젤: 오버${extraHasMiranda ? ' + 미란다(${_mirandaAtkController.text}%)' : ''}",
             if (_extraNikkeType == 'general')
               "일반3버: 오버${extraHasMiranda ? ' + 미란다(${_mirandaAtkController.text}%)' : ''}",
           ],
           extraVal: _extraNikkeType != null ? resExtraFinal : null,
-          extraName: _extraNikkeType == 'clud' ? "클루드" : "일반3버",
+          extraName: _extraNikkeType == 'clud' ? "클루드" : (_extraNikkeType == 'cdiesel' ? "클디젤" : "일반3버"),
           onSettingsTap: _showMirandaSettingsDialog,
         ),
         const SizedBox(height: 16),
@@ -271,6 +453,8 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
                       itemBuilder: (context) => [
                             const PopupMenuItem(
                                 value: 'clud', child: Text("클루드")),
+                            const PopupMenuItem(
+                                value: 'cdiesel', child: Text("클디젤")),
                             const PopupMenuItem(
                                 value: 'general', child: Text("일반 니케")),
                             const PopupMenuItem(

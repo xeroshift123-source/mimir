@@ -13,6 +13,7 @@ class MockDeckRepository {
           "• 3번 스쿼드: 125.3억.\n"
           "• 4번 스쿼드: 160.7억.\n"
           "• 5번 스쿼드: 101.3억.\n",
+      season: "SEASON 37",
       upvotes: 24,
       downvotes: 1,
       createdAt: DateTime.now().subtract(const Duration(hours: 4)),
@@ -58,6 +59,7 @@ class MockDeckRepository {
           "• 3번 스쿼드: 113.1억.\n"
           "• 4번 스쿼드: 61.8억.\n"
           "• 5번 스쿼드: 93.0억.\n",
+      season: "SEASON 37",
       upvotes: 16,
       downvotes: 0,
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -104,6 +106,7 @@ class MockDeckRepository {
       authorName: "MIMIR",
       title: "클루드, 민트 + 프리카 없는 덱 (339억)",
       description: "한정 수냉 딜러인 클루드를 획득하지 못해 조합에 어려움을 겪는 유저들을 위한 덱입니다.\n",
+      season: "SEASON 37",
       upvotes: 12,
       downvotes: 2,
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -150,6 +153,7 @@ class MockDeckRepository {
       authorName: "MIMIR",
       title: "한정캐 하나도 없는 덱 (고뇨)",
       description: "민트, 프리카 없을 경우에 리타, 바니에이드 넣어서 노힐덱으로 진행합니다.",
+      season: "SEASON 37",
       upvotes: 0,
       downvotes: 0,
       createdAt: DateTime.parse("2026-05-31T22:35:22.118"),
@@ -191,6 +195,7 @@ class MockDeckRepository {
       title: "정석조합덱",
       description:
           "빵순이에 클디젤 붙이고 앵커 톡톡이\n경우에 따라 2덱에 크라운 붙이고 1덱에 나유타 붙이는게 쌜 수 있습니다.",
+      season: "SEASON 37",
       upvotes: 0,
       downvotes: 0,
       createdAt: DateTime.parse("2026-05-31T22:40:48.632"),

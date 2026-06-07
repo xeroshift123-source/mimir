@@ -482,6 +482,7 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
                       authorName: authProvider.nickname!,
                       title: title,
                       description: descController.text.trim(),
+                      season: "SEASON 37",
                       squadsNikkeIds: squadIds,
                       upvotes: 0,
                       downvotes: 0,

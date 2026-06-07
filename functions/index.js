@@ -233,7 +233,7 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
         const payloadToSave = {
             nickname: results.profile ? (results.profile.info ? results.profile.info.username : '지휘관') : '지휘관',
             server: results.gameInfo ? (() => {
-                const sMap = { '81': '일본', '82': '일본', '83': '한국', '84': '북미', '85': '글로벌', '86': '동남아' };
+                const sMap = { '81': '일본', '82': '일본', '83': '한국', '84': '글로벌', '85': '글로벌', '86': '동남아' };
                 const aId = results.gameInfo.area_id ? results.gameInfo.area_id.toString() : '';
                 return sMap[aId] || `기타 (${aId})`;
             })() : '알 수 없음',

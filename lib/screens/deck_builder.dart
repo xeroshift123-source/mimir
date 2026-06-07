@@ -460,6 +460,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                       authorName: authProvider.nickname!,
                       title: title,
                       description: descController.text.trim(),
+                      season: "SEASON 37",
                       squadsNikkeIds: squadIds,
                       upvotes: 0,
                       downvotes: 0,
@@ -1165,6 +1166,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                   candidateSquad: _candidateSquad,
                   onAddCandidate: _addCandidate,
                   onRemoveCandidate: _removeCandidate,
+                  syncedCharsByName: syncedCharacters,
                 ),
               ),
             ),
@@ -1205,6 +1207,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     candidateSquad: _candidateSquad,
                     onAddCandidate: _addCandidate,
                     onRemoveCandidate: _removeCandidate,
+                    syncedCharsByName: syncedCharacters,
                   ),
                 ),
               ),
@@ -1807,6 +1810,7 @@ class SquadPanel extends StatelessWidget {
   final List<Nikke?> candidateSquad;
   final VoidCallback? onAddCandidate;
   final VoidCallback? onRemoveCandidate;
+  final Map<String, Map<String, dynamic>>? syncedCharsByName;
 
   const SquadPanel({
     super.key,
@@ -1822,6 +1826,7 @@ class SquadPanel extends StatelessWidget {
     required this.candidateSquad,
     this.onAddCandidate,
     this.onRemoveCandidate,
+    this.syncedCharsByName,
   });
 
   @override
@@ -1848,6 +1853,7 @@ class SquadPanel extends StatelessWidget {
                   onNameChanged: null, // 후보 덱은 이름 변경 필요 없음
                   onReset: () => onResetSquad?.call(5),
                   onDelete: onRemoveCandidate,
+                  syncedCharsByName: syncedCharsByName,
                 ),
               );
             } else {
@@ -1908,6 +1914,7 @@ class SquadPanel extends StatelessWidget {
               onSwapSlots: onSwapSlots,
               onNameChanged: (newName) => onEditName?.call(index, newName),
               onReset: () => onResetSquad?.call(index),
+              syncedCharsByName: syncedCharsByName,
             ),
           );
         },
@@ -1931,6 +1938,7 @@ class SquadCard extends StatefulWidget {
 
   // ✅ 이름 확정 콜백 (부모가 _squadNames 갱신 + 저장)
   final ValueChanged<String>? onNameChanged;
+  final Map<String, Map<String, dynamic>>? syncedCharsByName;
 
   const SquadCard({
     super.key,
@@ -1945,6 +1953,7 @@ class SquadCard extends StatefulWidget {
     this.squadIndex,
     this.onSwapSlots,
     this.onNameChanged,
+    this.syncedCharsByName,
   });
 
   @override
@@ -2141,6 +2150,7 @@ class _SquadCardState extends State<SquadCard> {
                             slotIndex: colIndex,
                             displayIndex: colIndex + 1,
                             nikke: nikke,
+                            charData: nikke != null && widget.syncedCharsByName != null ? widget.syncedCharsByName![nikke.name] : null,
                             onTap: widget.onSlotTap == null
                                 ? null
                                 : () => widget.onSlotTap!(colIndex),
@@ -2169,6 +2179,7 @@ class _SquadCardState extends State<SquadCard> {
                               slotIndex: actualIndex,
                               displayIndex: actualIndex + 1,
                               nikke: nikke,
+                              charData: nikke != null && widget.syncedCharsByName != null ? widget.syncedCharsByName![nikke.name] : null,
                               onTap: widget.onSlotTap == null
                                   ? null
                                   : () => widget.onSlotTap!(actualIndex),
@@ -2197,6 +2208,7 @@ class _SquadSlot extends StatelessWidget {
   final int slotIndex; // 스쿼드 내 슬롯 인덱스 (0-based)
   final int displayIndex; // 화면에 보여줄 번호 (1,2,3,...)
   final Nikke? nikke;
+  final Map<String, dynamic>? charData;
   final VoidCallback? onTap;
 
   /// from → to 스왑 콜백
@@ -2208,6 +2220,7 @@ class _SquadSlot extends StatelessWidget {
     required this.slotIndex,
     required this.displayIndex,
     required this.nikke,
+    this.charData,
     this.onTap,
     this.onSwap,
   });
@@ -2284,7 +2297,7 @@ class _SquadSlot extends StatelessWidget {
     }
 
     // 3) DragTarget으로 감싸기 (그대로 유지)
-    return DragTarget<_SlotDragData>(
+    Widget finalContent = DragTarget<_SlotDragData>(
       onWillAcceptWithDetails: (details) {
         final drag = details.data;
         if (drag.squadIndex == squadIndex && drag.slotIndex == slotIndex) {
@@ -2319,6 +2332,16 @@ class _SquadSlot extends StatelessWidget {
         return content;
       },
     );
+
+    if (nikke != null && charData != null) {
+      return NikkeHoverTooltip(
+        charData: charData!,
+        nikke: nikke!,
+        child: finalContent,
+      );
+    }
+
+    return finalContent;
   }
 }
 

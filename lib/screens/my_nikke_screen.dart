@@ -1028,13 +1028,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           minChildSize: 0.5,
           expand: false,
           builder: (context, scrollController) {
-            return SingleChildScrollView(
-              controller: scrollController,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 24.0),
-                child: _buildDetailPanel(char, nameMap, isDark),
-              ),
-            );
+            return _buildDetailPanel(char, nameMap, isDark, scrollController: scrollController);
           },
         );
       },
@@ -1615,7 +1609,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   }
 
   Widget _buildDetailPanel(
-      Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark) {
+      Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark, {ScrollController? scrollController}) {
     final nameCode = char['name_code'] as int? ?? 0;
     final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
     final localNikke = nameMap[mappedName];
@@ -1623,42 +1617,54 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final modifiableChar = _getCharWithConsoleLevels(char, localNikke);
 
     return ListView(
-      padding: const EdgeInsets.all(20.0),
+      controller: scrollController,
+      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 44.0),
       children: [
         _buildDetailHeader(char, localNikke, isDark),
         const SizedBox(height: 16),
-        Row(
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          alignment: WrapAlignment.spaceBetween,
           children: [
-            Icon(Icons.analytics_outlined,
-                color: Colors.orange.shade700, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              "계산된 상세 스펙 스탯",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-            ),
-            const Spacer(),
-            Text("면허증 닉네임 보이기",
-                style: TextStyle(
-                    fontSize: 12,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.analytics_outlined,
+                    color: Colors.orange.shade700, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  "계산된 상세 스펙 스탯",
+                  style: TextStyle(
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
-            SizedBox(
-              height: 20,
-              child: Transform.scale(
-                scale: 0.7,
-                child: Switch(
-                  value: _showNicknameOnLicense,
-                  onChanged: (val) {
-                    setState(() {
-                      _showNicknameOnLicense = val;
-                    });
-                  },
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
-              ),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("면허증 닉네임 보이기",
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+                SizedBox(
+                  height: 20,
+                  child: Transform.scale(
+                    scale: 0.7,
+                    child: Switch(
+                      value: _showNicknameOnLicense,
+                      onChanged: (val) {
+                        setState(() {
+                          _showNicknameOnLicense = val;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -1689,9 +1695,107 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           ],
         ),
         const SizedBox(height: 12),
+        _buildOverloadOptionsSum(char['equipment'] as List<dynamic>? ?? []),
+        if ((char['equipment'] as List<dynamic>? ?? []).any((eq) => (eq['overloadOptions'] as List<dynamic>? ?? []).any((opt) => opt != 0)))
+          const SizedBox(height: 12),
         _buildEquipmentOverloadList(
             char['equipment'] as List<dynamic>? ?? [], isDark),
       ],
+    );
+  }
+
+  Widget _buildOverloadOptionsSum(List<dynamic> equips) {
+    final Map<String, List<int>> groups = {};
+    for (final eq in equips) {
+      final options = eq['overloadOptions'] as List<dynamic>? ?? [];
+      for (final optId in options) {
+        final int id = optId as int? ?? 0;
+        if (id == 0) continue;
+        final String optName = _getOptionName(id);
+        groups.putIfAbsent(optName, () => []).add(id);
+      }
+    }
+
+    final List<Map<String, dynamic>> overloadSummaries = [];
+    groups.forEach((optName, ids) {
+      double sumPercent = 0.0;
+      int maxLevel = 0;
+      for (final id in ids) {
+        sumPercent += BlablaMap.getOptionPercent(id);
+        final int lvl = id % 100;
+        if (lvl > maxLevel) {
+          maxLevel = lvl;
+        }
+      }
+      overloadSummaries.add({
+        'name': optName,
+        'sumPercent': sumPercent,
+        'maxLevel': maxLevel,
+        'count': ids.length,
+      });
+    });
+
+    if (overloadSummaries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    overloadSummaries.sort((a, b) {
+      final int countCompare = b['count'].compareTo(a['count']);
+      if (countCompare != 0) return countCompare;
+      return b['sumPercent'].compareTo(a['sumPercent']);
+    });
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: overloadSummaries.map((info) {
+        final String optName = info['name'];
+        final double sumPercent = info['sumPercent'];
+        final int maxLevel = info['maxLevel'] as int? ?? 0;
+        final bool isLevel15 = maxLevel == 15;
+        final bool isHighLevel = maxLevel >= 12;
+
+        final Color boxBgColor = isLevel15
+            ? const Color(0xFF232323)
+            : const Color(0xFFEAEAEA);
+
+        final Color labelColor = isLevel15
+            ? const Color(0xFFFFFFFF)
+            : const Color(0xFF333333);
+
+        final Color valueColor = isHighLevel
+            ? const Color(0xFF049EE7)
+            : const Color(0xFF7F8C8D);
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 6.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: boxBgColor,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                optName,
+                style: TextStyle(
+                  color: labelColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '+${sumPercent.toStringAsFixed(2)}%',
+                style: TextStyle(
+                  color: valueColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -1854,9 +1958,16 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final combat = char['combat'] as int? ?? 0;
 
     double cp40 = 0;
+    double cp400 = 0;
+    Map<String, double> stats400 = {'hp': 0.0, 'atk': 0.0, 'def': 0.0};
+
     if (CpCalculator.isInitialized) {
       cp40 = CpCalculator.calculateCp(char, localNikke,
           targetLevel: 40, assumeCube15: _assumeCube15);
+      cp400 = CpCalculator.calculateCp(char, localNikke,
+          targetLevel: 400, assumeCube15: _assumeCube15);
+      stats400 = CpCalculator.calculateTargetStats(char, localNikke,
+          targetLevel: 400, assumeCube15: _assumeCube15);
     }
 
     final skills = char['skills'] as Map<String, dynamic>? ?? {};
@@ -1868,6 +1979,13 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     final String formattedPow40 = cp40 == -1.0
         ? '측정 불가'
         : (cp40 > 0 ? NumberFormat('#,###').format(cp40.round()) : '계산중...');
+    final String formattedPow400 = cp400 == -1.0
+        ? '측정 불가'
+        : (cp400 > 0 ? NumberFormat('#,###').format(cp400.round()) : '계산중...');
+    
+    final String formattedHp400 = stats400['hp']! > 0 ? NumberFormat('#,###').format(stats400['hp']!.round()) : '-';
+    final String formattedAtk400 = stats400['atk']! > 0 ? NumberFormat('#,###').format(stats400['atk']!.round()) : '-';
+    final String formattedDef400 = stats400['def']! > 0 ? NumberFormat('#,###').format(stats400['def']!.round()) : '-';
 
     final String skillText = "$skill1 / $skill2 / $burst";
 
@@ -1895,6 +2013,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         "showLicenseButton": true,
       },
       {
+        "label": "400Lv 투력 (Pow)",
+        "value": formattedPow400,
+        "color": Colors.redAccent.shade400,
+      },
+      {
         "label": "스킬 레벨 (Skill)",
         "value": skillText,
         "color": Colors.purpleAccent.shade100,
@@ -1918,7 +2041,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         crossAxisCount: 2,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
-        childAspectRatio: 3.4,
+        mainAxisExtent: 78,
       ),
       itemCount: statItems.length,
       itemBuilder: (context, index) {
@@ -1939,12 +2062,16 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    item['label'],
-                    style: TextStyle(
-                      color:
-                          isDark ? Colors.grey.shade500 : Colors.grey.shade600,
-                      fontSize: 14.5,
+                  Expanded(
+                    child: Text(
+                      item['label'],
+                      style: TextStyle(
+                        color:
+                            isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                        fontSize: 14.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (item['showToggle'] == true)
@@ -1990,22 +2117,21 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   if (item['showLicenseButton'] == true)
                     SizedBox(
                       height: 26,
-                      child: ElevatedButton.icon(
+                      child: ElevatedButton(
                         onPressed: () => _showLicenseDialog(char, localNikke),
-                        icon: const Icon(Icons.badge,
-                            color: Colors.white, size: 14),
-                        label: const Text("면허 발급",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12)),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 0),
+                              horizontal: 8, vertical: 0),
                           backgroundColor: Colors.purple.shade400,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6)),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
                         ),
+                        child: const Text("면허 발급",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 11)),
                       ),
                     ),
                 ],

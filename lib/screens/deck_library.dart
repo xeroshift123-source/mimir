@@ -10,6 +10,8 @@ import 'package:mimir/screens/login.dart';
 import 'package:mimir/repository/mock_deck_repository.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/nikke_card.dart';
+import 'package:mimir/data/raid_data.dart';
+import 'package:mimir/models/raid_info.dart';
 
 class DeckLibraryScreen extends StatefulWidget {
   static const routeName = '/deck-library';
@@ -36,6 +38,9 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
 
   // --- 정렬 상태 ---
   bool _sortByLatest = true; // true = 최신순, false = 추천순
+
+  // --- 레이드 시즌 상태 ---
+  RaidInfo? _selectedSeason;
 
   // --- 목록 상태 ---
   List<SharedDeck> _allDecks = [];
@@ -233,6 +238,12 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           }
         }
       }
+
+      // 3. 레이드 시즌 필터 검사
+      if (_selectedSeason != null && deck.season != _selectedSeason!.seasonName) {
+        return false;
+      }
+
       return true;
     }).toList();
 
@@ -258,7 +269,28 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
     }
   }
 
+  String _getElementEnumName(String? koreanName) {
+    switch (koreanName) {
+      case '철갑': return 'Iron';
+      case '수냉': return 'Water';
+      case '전격': return 'Electric';
+      case '작열': return 'Fire';
+      case '풍압': return 'Wind';
+      default: return 'Water';
+    }
+  }
+
   Widget _buildSeasonHeader(bool isDark) {
+    final soloRaids = raidHistory.where((r) => r.type == RaidType.solo).toList();
+    
+    if (_selectedSeason == null && soloRaids.isNotEmpty) {
+      _selectedSeason = soloRaids.last;
+    }
+    
+    if (_selectedSeason == null) return const SizedBox.shrink();
+    
+    final currentRaid = _selectedSeason!;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       margin: const EdgeInsets.only(bottom: 12),
@@ -278,9 +310,9 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
               border: Border.all(color: Colors.red.withOpacity(0.7), width: 1.2),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: const Text(
-              "SEASON 37",
-              style: TextStyle(
+            child: Text(
+              currentRaid.seasonName,
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: Colors.redAccent,
@@ -289,15 +321,16 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           ),
           const SizedBox(width: 12),
           Image.asset(
-            "assets/icons/elements/icon-elements-Water.webp",
+            "assets/icons/elements/icon-elements-${_getElementEnumName(currentRaid.weakness)}.webp",
             width: 18,
             height: 18,
+            errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, size: 18),
           ),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Text(
-              "보스: 울트라 (수냉 약점)",
-              style: TextStyle(
+              "보스: ${currentRaid.bossName ?? ''} (${currentRaid.weakness != null ? '${currentRaid.weakness} 약점' : '약점 없음'})",
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
@@ -306,8 +339,9 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           SizedBox(
             width: 160,
             child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: "SEASON 37",
+              child: DropdownButton<RaidInfo>(
+                value: currentRaid,
+                isExpanded: true,
                 icon: const Icon(Icons.arrow_drop_down, color: Colors.orange),
                 style: TextStyle(
                   fontSize: 13,
@@ -316,13 +350,23 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                 ),
                 dropdownColor: isDark ? const Color(0xFF2D2D2D) : Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                onChanged: (val) {},
-                items: const [
-                  DropdownMenuItem(
-                    value: "SEASON 37",
-                    child: Text("시즌 37 - 울트라"),
-                  ),
-                ],
+                onChanged: (RaidInfo? val) {
+                  if (val != null) {
+                    setState(() {
+                      _selectedSeason = val;
+                      // Later, decks can be filtered by this _selectedSeason!
+                    });
+                  }
+                },
+                items: soloRaids.map((raid) {
+                  return DropdownMenuItem<RaidInfo>(
+                    value: raid,
+                    child: Text(
+                      "${raid.seasonName.replaceAll('SEASON ', '시즌 ')} - ${raid.bossName ?? ''}",
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
               ),
             ),
           ),
