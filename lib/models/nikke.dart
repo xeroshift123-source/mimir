@@ -16,6 +16,7 @@ class Nikke {
 
   final Rank rank;
   int squadNum; // 배치된 스쿼드 번호 (0: 미배치, 1~5)
+  final bool isTemporary; // 임시 니케 여부 (미실장 등)
 
   Nikke({
     required this.id,
@@ -30,6 +31,7 @@ class Nikke {
     required this.ability, // ✅ 여기
     this.squadNum = 0,
     required this.rank,
+    this.isTemporary = false,
   });
 
   /// JSON → Nikke
@@ -80,6 +82,7 @@ class Nikke {
       ability: ability,
       squadNum: json['squadNum'] as int? ?? 0,
       rank: Rank.values.byName(json['rank'] as String),
+      isTemporary: json['isTemporary'] as bool? ?? false,
     );
   }
 
@@ -101,6 +104,7 @@ class Nikke {
       'coolTime': coolTime,
       'squadNum': squadNum,
       'rank': rank.name, // ✅ enum은 name으로 저장하는 게 안전
+      'isTemporary': isTemporary,
     };
   }
 

@@ -1596,7 +1596,7 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                 final bool isAssigned = squadIndex != null;
 
                 final bool isSynced = widget.syncedCharacters.isNotEmpty;
-                final bool isNotOwned = isSynced && !widget.syncedCharacters.containsKey(nikke.name);
+                final bool isNotOwned = isSynced && !widget.syncedCharacters.containsKey(nikke.name) && !nikke.isTemporary;
 
                 final bool isSelected =
                     !isAssigned && !isNotOwned && widget.selectedNikkeId == nikke.id;

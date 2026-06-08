@@ -3140,6 +3140,7 @@
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR",
-    "type": "ATK"
+    "type": "ATK",
+    "isTemporary": true
   }
 ]

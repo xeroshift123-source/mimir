@@ -1550,7 +1550,8 @@ class _NikkeListPanelState extends State<NikkeListPanel>
 
                 final bool isSynced = widget.syncedCharacters.isNotEmpty;
                 final bool isNotOwned = isSynced &&
-                    !widget.syncedCharacters.containsKey(nikke.name);
+                    !widget.syncedCharacters.containsKey(nikke.name) &&
+                    !nikke.isTemporary;
 
                 final bool isSelected = !isAssigned &&
                     !isNotOwned &&
