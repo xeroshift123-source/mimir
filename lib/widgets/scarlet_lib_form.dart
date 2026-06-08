@@ -8,6 +8,7 @@ import 'package:mimir/providers/nikke_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/models/nikke.dart';
+import 'package:mimir/widgets/cube_level_dialog.dart';
 
 class ScarletLibCalculatorForm extends StatefulWidget {
   const ScarletLibCalculatorForm({super.key});
@@ -68,7 +69,11 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
 
       final characters = profile['characters'] as List<dynamic>? ?? [];
       final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
-      final localNikkes = context.read<NikkeProvider>().nikkeList;
+      var localNikkes = context.read<NikkeProvider>().nikkeList;
+      if (localNikkes.isEmpty) {
+        await context.read<NikkeProvider>().loadNikkes();
+        localNikkes = context.read<NikkeProvider>().nikkeList;
+      }
       final Map<String, Nikke> nikkeNameMap = {
         for (final n in localNikkes) n.name: n
       };
@@ -121,6 +126,28 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
         return;
       }
 
+      final List<Map<String, dynamic>> dialogNikkes = [];
+      if (libChar != null) {
+        dialogNikkes.add({'name': '리버렐리오', 'char': libChar, 'image': 'assets/nikke/liberalio.webp'});
+      }
+      if (scarletChar != null) {
+        dialogNikkes.add({'name': '홍련 : 흑영', 'char': scarletChar, 'image': 'assets/nikke/scarlet_black_shadow.webp'});
+      }
+      if (_useCrown && crownChar != null) {
+        dialogNikkes.add({'name': '크라운', 'char': crownChar, 'image': 'assets/nikke/crown.webp'});
+      }
+
+      if (!mounted) return;
+      final selectedCubeLevels = await showDialog<Map<String, int>>(
+        context: context,
+        builder: (context) => CubeLevelDialog(nikkes: dialogNikkes),
+      );
+
+      if (selectedCubeLevels == null) {
+        if (mounted) setState(() => _isSyncing = false);
+        return;
+      }
+
       if (!CpCalculator.isInitialized) {
         await CpCalculator.init();
       }
@@ -128,14 +155,15 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
       void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController? overCtrl) {
         final localNikke = nikkeNameMap[name];
         final modChar = injectConsoleLevels(char, localNikke);
+        final customCube = selectedCubeLevels[name] ?? 0;
         
         double atk400 = 0;
         double overAtk = 0;
         
         if (CpCalculator.isInitialized) {
-          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false, customCubeLevel: customCube);
           if (cp != -1.0) {
-            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false, customCubeLevel: customCube);
             atk400 = stats['atk'] ?? 0;
           } else {
             atk400 = 0;
@@ -161,13 +189,8 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
 
       if (libChar != null) applyCharStats(libChar, '리버렐리오', _libAtkController, _libOverController);
       if (scarletChar != null) applyCharStats(scarletChar, '홍련 : 흑영', _scarletAtkController, _scarletOverController);
-      if (crownChar != null) {
+      if (_useCrown && crownChar != null) {
         applyCharStats(crownChar, '크라운', _crownAtkController, null);
-        if (_bufferType != 'crown' && _bufferType != 'both') {
-          if (_bufferType == 'rita') _bufferType = 'both';
-          else _bufferType = 'crown';
-          _useCrown = true;
-        }
       }
 
       if (mounted) {

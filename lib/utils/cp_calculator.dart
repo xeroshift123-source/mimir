@@ -10,10 +10,16 @@ class CpCalculator {
   static Map<String, dynamic>? _cubeStats;
   static Map<String, dynamic>? _colStats;
 
-  static bool get isInitialized => _baseStats != null;
+  static Future<void>? _initFuture;
 
-  static Future<void> init() async {
-    if (_baseStats != null) return;
+  static bool get isInitialized => _initFuture != null;
+
+  static Future<void> init() {
+    _initFuture ??= _doInit();
+    return _initFuture!;
+  }
+
+  static Future<void> _doInit() async {
     try { _baseStats = jsonDecode(await rootBundle.loadString('assets/data/nikke_base_stats.json')); } catch (e) { print("base: $e"); }
     try { _equipStats = jsonDecode(await rootBundle.loadString('assets/data/nikke_equipment_stats.json')); } catch (e) { print("equip: $e"); }
     try { _bondStats = jsonDecode(await rootBundle.loadString('assets/data/nikke_bond_stats.json')); } catch (e) { print("bond: $e"); }
@@ -145,7 +151,7 @@ class CpCalculator {
     return 0.0;
   }
 
-  static Map<String, double> calculateTargetStats(Map<String, dynamic> char, Nikke? localNikke, {required int targetLevel, bool assumeCube15 = false}) {
+  static Map<String, double> calculateTargetStats(Map<String, dynamic> char, Nikke? localNikke, {required int targetLevel, bool assumeCube15 = false, int? customCubeLevel}) {
     final int grade = char['grade'] as int? ?? 0;
     final int core = char['core'] as int? ?? 0;
     final int bondLv = char['bondLevel'] as int? ?? 0;
@@ -157,6 +163,7 @@ class CpCalculator {
     final cubeMap = char['harmonyCube'] as Map<String, dynamic>?;
     int cubeLv = cubeMap != null ? (cubeMap['level'] as int? ?? 0) : 0;
     if (assumeCube15) cubeLv = 15;
+    if (customCubeLevel != null) cubeLv = customCubeLevel;
 
     final colMap = char['favoriteItem'] as Map<String, dynamic>?;
     int colLv = 0;
@@ -220,7 +227,7 @@ class CpCalculator {
     };
   }
 
-  static double calculateCp(Map<String, dynamic> char, Nikke? localNikke, {int targetLevel = 40, bool assumeCube15 = false}) {
+  static double calculateCp(Map<String, dynamic> char, Nikke? localNikke, {int targetLevel = 40, bool assumeCube15 = false, int? customCubeLevel}) {
     final equips = char['equipment'] as List<dynamic>? ?? [];
     int validEquips = 0;
     bool allOverload = true;
@@ -241,7 +248,7 @@ class CpCalculator {
       return -1.0;
     }
 
-    final stats = calculateTargetStats(char, localNikke, targetLevel: targetLevel, assumeCube15: assumeCube15);
+    final stats = calculateTargetStats(char, localNikke, targetLevel: targetLevel, assumeCube15: assumeCube15, customCubeLevel: customCubeLevel);
     double score = 0.7 * stats['hp']! + 19.35 * stats['atk']! + 70.0 * stats['def']!;
 
     final skills = char['skills'] as Map<String, dynamic>? ?? {};
@@ -269,6 +276,7 @@ class CpCalculator {
     final cubeMap = char['harmonyCube'] as Map<String, dynamic>?;
     int cubeLv = cubeMap != null ? (cubeMap['level'] as int? ?? 0) : 0;
     if (assumeCube15) cubeLv = 15;
+    if (customCubeLevel != null) cubeLv = customCubeLevel;
 
     final colMap = char['favoriteItem'] as Map<String, dynamic>?;
     int colLv = 0;

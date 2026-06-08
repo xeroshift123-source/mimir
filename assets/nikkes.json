@@ -3125,5 +3125,21 @@
     "squadNum": 0,
     "rank": "SSR",
     "type": "SUP"
+  },
+  {
+    "id": "ark_ranger_black",
+    "name": "아크레인저 블랙",
+    "imageUrl": "assets/nikke/ark_ranger_black.png",
+    "burst": "3",
+    "element": "Wind",
+    "weaponType": "AR",
+    "company": "Tetra",
+    "ability": [
+      "아레블"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK"
   }
 ]

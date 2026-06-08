@@ -8,6 +8,7 @@ import 'package:mimir/providers/nikke_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/models/nikke.dart';
+import 'package:mimir/widgets/cube_level_dialog.dart';
 
 class NayutaHelmCalculatorForm extends StatefulWidget {
   const NayutaHelmCalculatorForm({super.key});
@@ -71,7 +72,11 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
 
       final characters = profile['characters'] as List<dynamic>? ?? [];
       final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
-      final localNikkes = context.read<NikkeProvider>().nikkeList;
+      var localNikkes = context.read<NikkeProvider>().nikkeList;
+      if (localNikkes.isEmpty) {
+        await context.read<NikkeProvider>().loadNikkes();
+        localNikkes = context.read<NikkeProvider>().nikkeList;
+      }
       final Map<String, Nikke> nikkeNameMap = {
         for (final n in localNikkes) n.name: n
       };
@@ -126,6 +131,30 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         return;
       }
 
+      final List<Map<String, dynamic>> dialogNikkes = [];
+      if (nayutaChar != null) {
+        dialogNikkes.add({'name': '나유타', 'char': nayutaChar, 'image': 'assets/nikke/nayuta.webp'});
+      }
+      if (helmChar != null) {
+        dialogNikkes.add({'name': '헬름', 'char': helmChar, 'image': 'assets/nikke/helm.webp'});
+      }
+      if (_extraNikkeType == 'clud' && cludChar != null) {
+        dialogNikkes.add({'name': '루드밀라 : 윈터 오너', 'char': cludChar, 'image': 'assets/nikke/ludmilla_winter_owner.webp'});
+      } else if (_extraNikkeType == 'cdiesel' && cdieselChar != null) {
+        dialogNikkes.add({'name': '디젤 : 윈터 스위츠', 'char': cdieselChar, 'image': 'assets/nikke/diesel_winter_sweets.webp'});
+      }
+
+      if (!mounted) return;
+      final selectedCubeLevels = await showDialog<Map<String, int>>(
+        context: context,
+        builder: (context) => CubeLevelDialog(nikkes: dialogNikkes),
+      );
+
+      if (selectedCubeLevels == null) {
+        if (mounted) setState(() => _isSyncing = false);
+        return;
+      }
+
       if (!CpCalculator.isInitialized) {
         await CpCalculator.init();
       }
@@ -133,14 +162,15 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController overCtrl) {
         final localNikke = nikkeNameMap[name];
         final modChar = injectConsoleLevels(char, localNikke);
+        final customCube = selectedCubeLevels[name] ?? 0;
         
         double atk400 = 0;
         double overAtk = 0;
         
         if (CpCalculator.isInitialized) {
-          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false, customCubeLevel: customCube);
           if (cp != -1.0) {
-            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false, customCubeLevel: customCube);
             atk400 = stats['atk'] ?? 0;
           } else {
             atk400 = 0;
@@ -164,16 +194,10 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
 
       if (nayutaChar != null) applyCharStats(nayutaChar, '나유타', _nayutaAtkController, _nayutaOverController);
       if (helmChar != null) applyCharStats(helmChar, '헬름', _helmAtkController, _helmOverController);
-      if (cludChar != null) {
+      if (_extraNikkeType == 'clud' && cludChar != null) {
         applyCharStats(cludChar, '루드밀라 : 윈터 오너', _extraAtkController, _extraOverController);
-        if (_extraNikkeType == null) {
-          _extraNikkeType = 'clud';
-        }
-      } else if (cdieselChar != null) {
+      } else if (_extraNikkeType == 'cdiesel' && cdieselChar != null) {
         applyCharStats(cdieselChar, '디젤 : 윈터 스위츠', _extraAtkController, _extraOverController);
-        if (_extraNikkeType == null) {
-          _extraNikkeType = 'cdiesel';
-        }
       }
 
       if (mounted) {

@@ -9,6 +9,7 @@ import 'package:mimir/providers/nikke_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/models/nikke.dart';
+import 'package:mimir/widgets/cube_level_dialog.dart';
 
 class EinAdaCalculatorForm extends StatefulWidget {
   const EinAdaCalculatorForm({super.key});
@@ -75,7 +76,11 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
 
       final characters = profile['characters'] as List<dynamic>? ?? [];
       final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
-      final localNikkes = context.read<NikkeProvider>().nikkeList;
+      var localNikkes = context.read<NikkeProvider>().nikkeList;
+      if (localNikkes.isEmpty) {
+        await context.read<NikkeProvider>().loadNikkes();
+        localNikkes = context.read<NikkeProvider>().nikkeList;
+      }
       final Map<String, Nikke> nikkeNameMap = {
         for (final n in localNikkes) n.name: n
       };
@@ -128,6 +133,28 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
         return;
       }
 
+      final List<Map<String, dynamic>> dialogNikkes = [];
+      if (einChar != null) {
+        dialogNikkes.add({'name': '아인', 'char': einChar, 'image': 'assets/nikke/ein.webp'});
+      }
+      if (adaChar != null) {
+        dialogNikkes.add({'name': '에이다', 'char': adaChar, 'image': 'assets/nikke/ada.webp'});
+      }
+      if (_useTakina && takinaChar != null) {
+        dialogNikkes.add({'name': '타키나', 'char': takinaChar, 'image': 'assets/nikke/takina.webp'});
+      }
+
+      if (!mounted) return;
+      final selectedCubeLevels = await showDialog<Map<String, int>>(
+        context: context,
+        builder: (context) => CubeLevelDialog(nikkes: dialogNikkes),
+      );
+
+      if (selectedCubeLevels == null) {
+        if (mounted) setState(() => _isSyncing = false);
+        return;
+      }
+
       if (!CpCalculator.isInitialized) {
         await CpCalculator.init();
       }
@@ -135,14 +162,15 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
       void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController overCtrl) {
         final localNikke = nikkeNameMap[name];
         final modChar = injectConsoleLevels(char, localNikke);
+        final customCube = selectedCubeLevels[name] ?? 0;
         
         double atk400 = 0;
         double overAtk = 0;
         
         if (CpCalculator.isInitialized) {
-          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false, customCubeLevel: customCube);
           if (cp != -1.0) {
-            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false);
+            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false, customCubeLevel: customCube);
             atk400 = stats['atk'] ?? 0;
           } else {
             atk400 = 0;
@@ -166,11 +194,8 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
 
       if (einChar != null) applyCharStats(einChar, '아인', _einAtkController, _einOverController);
       if (adaChar != null) applyCharStats(adaChar, '에이다', _adaAtkController, _adaOverController);
-      if (takinaChar != null) {
+      if (_useTakina && takinaChar != null) {
         applyCharStats(takinaChar, '타키나', _takinaAtkController, _takinaOverController);
-        if (!_useTakina) {
-          _useTakina = true;
-        }
       }
 
       if (mounted) {

@@ -16,8 +16,10 @@ class DatabaseService {
     }
 
     try {
-      DocumentSnapshot doc =
-          await _db.collection('commanders').doc(openId).get();
+      DocumentSnapshot doc = await _db
+          .collection('commanders')
+          .doc(openId)
+          .get(const GetOptions(source: Source.server));
       if (doc.exists) {
         return doc.data() as Map<String, dynamic>?;
       }
