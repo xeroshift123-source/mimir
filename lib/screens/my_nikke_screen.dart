@@ -2680,7 +2680,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
             width: isSpecial ? 0 : 1),
       ),
       child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
         children: [
+
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: IntrinsicHeight(

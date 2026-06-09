@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 
 import 'package:mimir/services/database_service.dart';
 import 'package:mimir/utils/cp_calculator.dart';
@@ -30,6 +31,11 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
   final _extraOverController = TextEditingController(text: "0");
   final _cludBurstController = TextEditingController(text: "62.54");
   final _mirandaAtkController = TextEditingController(text: "40.4");
+
+  double targetNayuta = 0;
+  double targetHelm = 0;
+  double targetExtra = 0;
+  List<String> bufferedNikkes = [];
 
   double resNayutaFinal = 0;
   double resHelmFinal = 0;
@@ -251,15 +257,21 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       double eOver = _parse(_extraOverController.text) / 100;
       double ePre = (_extraNikkeType != null) ? (eBase * (1 + eOver)) : -1.0;
 
+      targetNayuta = nPre;
+      targetHelm = hPre;
+      targetExtra = _extraNikkeType != null ? ePre : 0;
+
       List<Map<String, dynamic>> comparisonList = [
-        {'id': 'nayuta', 'val': nPre},
-        {'id': 'helm', 'val': hPre}
+        {'id': 'nayuta', 'name': '나유타', 'val': nPre},
+        {'id': 'helm', 'name': '헬름', 'val': hPre}
       ];
       if (_extraNikkeType != null) {
-        comparisonList.add({'id': 'extra', 'val': ePre});
+        String eName = _extraNikkeType == 'clud' ? '클루드' : (_extraNikkeType == 'cdiesel' ? '클디젤' : '일반3버');
+        comparisonList.add({'id': 'extra', 'name': eName, 'val': ePre});
       }
       comparisonList.sort((a, b) => b['val'].compareTo(a['val']));
       Set<String> top2 = {comparisonList[0]['id'], comparisonList[1]['id']};
+      bufferedNikkes = [comparisonList[0]['name'] as String, comparisonList[1]['name'] as String];
 
       nayutaHasMiranda = top2.contains('nayuta');
       helmHasMiranda = top2.contains('helm');
@@ -288,7 +300,19 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         rival = (_extraNikkeType == 'clud') ? "클루드" : ((_extraNikkeType == 'cdiesel') ? "클디젤" : "일반 니케");
       }
 
-      if (maxAtk == resNayutaFinal) {
+      if (_extraNikkeType != null && !nayutaHasMiranda) {
+        isError = true;
+        resultMessage = "❌ 경고: 나유타가 미란다 버프 타겟에서 밀려났습니다!";
+        double targetDiff = min(targetHelm, targetExtra) - targetNayuta;
+        double neededIncrease = (targetDiff / nBase) * 100;
+        needOverloadMessage = "나유타가 미란다 버프를 받으려면 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.";
+      } else if (maxAtk != resNayutaFinal) {
+        isError = true;
+        double currentTotalBuff = nOver + nayutaSkill2 + (nayutaHasMiranda ? mirandaVal : 0);
+        double neededOver = ((maxAtk / nBase) - 1 - currentTotalBuff) * 100;
+        resultMessage = "❌ 경고: $rival이 나유타보다 최종 공격력이 높습니다!";
+        needOverloadMessage = "나유타의 오버공증이 최소 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
+      } else {
         isError = false;
         double secondMaxAtk = resHelmFinal;
         String secondRival = "헬름";
@@ -308,14 +332,6 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         needOverloadMessage = "💡 현재 상태 기준 여유 수치\n"
             "• 나유타 오버공증: ${nayutaAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
             "• $secondRival 오버공증: ${rivalAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
-      } else {
-        isError = true;
-        double currentTotalBuff =
-            nOver + nayutaSkill2 + (nayutaHasMiranda ? mirandaVal : 0);
-        double neededOver = ((maxAtk / nBase) - 1 - currentTotalBuff) * 100;
-        resultMessage = "❌ 경고: $rival이 나유타보다 높습니다!";
-        needOverloadMessage =
-            "나유타의 오버공증이 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
       }
     });
   }
@@ -424,6 +440,10 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         const SizedBox(height: 12),
         _buildActionButtons(),
         const SizedBox(height: 20),
+        if (_extraNikkeType != null) ...[
+          _buildTargetingCheckCard(),
+          const SizedBox(height: 12),
+        ],
         _buildResultCard(
           "미란다 버프 우선순위 및 최종 결과",
           resNayutaFinal,
@@ -499,6 +519,74 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
                                     fontSize: 13)),
                             Icon(Icons.arrow_drop_down, color: Colors.orange)
                           ]))))),
+    ]);
+  }
+
+  Widget _buildTargetingCheckCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? Colors.purple.shade800 : Colors.purple.shade200,
+          width: 1.5,
+        ),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(children: [
+          Icon(Icons.gps_fixed, size: 16, color: Colors.purple),
+          SizedBox(width: 6),
+          Text("미란다 버프 타겟팅 판정 (버스트 전)",
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: Colors.purple)),
+        ]),
+        const SizedBox(height: 12),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          _targetUnitColumn("나유타", targetNayuta, nayutaHasMiranda),
+          _targetUnitColumn("헬름", targetHelm, helmHasMiranda),
+          if (_extraNikkeType != null)
+            _targetUnitColumn(
+                _extraNikkeType == 'clud' ? "클루드" : (_extraNikkeType == 'cdiesel' ? "클디젤" : "일반3버"),
+                targetExtra,
+                extraHasMiranda),
+        ]),
+        const Divider(height: 20),
+        Text("• 미란다 버프 수혜자: ${bufferedNikkes.join(', ')}",
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87)),
+      ]),
+    );
+  }
+
+  Widget _targetUnitColumn(String name, double val, bool isBuffered) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Column(children: [
+      Text(name,
+          style: TextStyle(
+              fontSize: 11,
+              color: isBuffered
+                  ? (isDark ? Colors.white : Colors.black)
+                  : Colors.grey)),
+      const SizedBox(height: 4),
+      Text(_formatter.format(val.toInt()),
+          style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: isBuffered
+                  ? Colors.purple
+                  : (isDark ? Colors.grey.shade400 : Colors.grey))),
+      if (isBuffered)
+        Container(
+            margin: const EdgeInsets.only(top: 2),
+            width: 30,
+            height: 2,
+            color: Colors.purple),
     ]);
   }
 
