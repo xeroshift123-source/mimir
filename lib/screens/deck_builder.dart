@@ -303,8 +303,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     } else {
       await ImageGallerySaver.saveImage(bytes,
           name: "mimir_deck_${DateTime.now().millisecondsSinceEpoch}");
-      if (mounted) {
-      }
+      if (mounted) {}
     }
   }
 
@@ -318,7 +317,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
           final isDark = Theme.of(context).brightness == Brightness.dark;
           return AlertDialog(
             backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: const Row(
               children: [
                 Icon(Icons.info_outline, color: Colors.orange),
@@ -355,7 +355,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     }
 
     // User is logged in, show elegant Publish Form Dialog
-    final titleController = TextEditingController(text: "${authProvider.nickname}의 시즌 37 솔로레이드 공략 덱");
+    final titleController = TextEditingController(
+        text: "${authProvider.nickname}의 시즌 37 솔로레이드 공략 덱");
     final descController = TextEditingController();
 
     showDialog(
@@ -367,12 +368,15 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
           builder: (context, setDialogState) {
             return AlertDialog(
               backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18)),
               title: Row(
                 children: [
                   const Icon(Icons.cloud_upload, color: Colors.orange),
                   const SizedBox(width: 8),
-                  const Text("공유 라이브러리에 덱 등록", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const Text("공유 라이브러리에 덱 등록",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   const Spacer(),
                   Text(
                     "작성자: ${authProvider.nickname}",
@@ -390,12 +394,17 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     children: [
                       const Text(
                         "현재 구성하신 5개 스쿼드(총 25인)를 공유 덱 라이브러리에 실시간으로 업로드합니다. 보스 공략을 위한 상세한 설명을 함께 작성해 보세요!",
-                        style: TextStyle(fontSize: 12, color: Colors.grey, height: 1.5),
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.grey, height: 1.5),
                       ),
                       const SizedBox(height: 18),
-                      
+
                       // Title textfield
-                      const Text("덱 제목", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange)),
+                      const Text("덱 제목",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.orange)),
                       const SizedBox(height: 6),
                       TextField(
                         controller: titleController,
@@ -404,30 +413,43 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                           hintText: "사령관님만의 덱 제목을 입력해 주세요",
                           isDense: true,
                           filled: true,
-                          fillColor: isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          fillColor: isDark
+                              ? const Color(0xFF14151B)
+                              : Colors.grey.shade50,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
                           focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                            borderSide:
+                                BorderSide(color: Colors.orange, width: 1.5),
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
 
                       // Description textfield
-                      const Text("상세 설명 및 공략 팁", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange)),
+                      const Text("상세 설명 및 공략 팁",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.orange)),
                       const SizedBox(height: 6),
                       TextField(
                         controller: descController,
                         maxLines: 4,
                         style: const TextStyle(fontSize: 13),
                         decoration: InputDecoration(
-                          hintText: "크라운/클루드 등 핵심 메인 딜러 연동과 5개 스쿼드 배치 팁을 꼼꼼히 채워주시면 다른 사령관님들께 큰 도움이 됩니다!",
+                          hintText:
+                              "크라운/클루드 등 핵심 메인 딜러 연동과 5개 스쿼드 배치 팁을 꼼꼼히 채워주시면 다른 사령관님들께 큰 도움이 됩니다!",
                           isDense: true,
                           filled: true,
-                          fillColor: isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          fillColor: isDark
+                              ? const Color(0xFF14151B)
+                              : Colors.grey.shade50,
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
                           focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                            borderSide:
+                                BorderSide(color: Colors.orange, width: 1.5),
                           ),
                         ),
                       ),
@@ -475,14 +497,15 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                       final code = generateDeckCode(newDeck);
                       Clipboard.setData(ClipboardData(text: code));
                       debugPrint("\n====================================");
-                      debugPrint("Generated Deck Code for mock_deck_repository.dart:");
+                      debugPrint(
+                          "Generated Deck Code for mock_deck_repository.dart:");
                       debugPrint(code);
                       debugPrint("====================================\n");
                     }
 
                     // Pop AlertDialog
                     Navigator.pop(context);
-                    
+
                     // Pop Preview Dialog as well!
                     Navigator.pop(context);
 
@@ -515,7 +538,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     backgroundColor: Colors.orange,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   child: const Text("등록하기"),
                 ),
@@ -712,7 +736,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                           if (AuthProvider.showLoginFeatures) ...[
                             const SizedBox(width: 8),
                             ElevatedButton.icon(
-                              icon: const Icon(Icons.cloud_upload_rounded, color: Colors.white),
+                              icon: const Icon(Icons.cloud_upload_rounded,
+                                  color: Colors.white),
                               label: const Text('라이브러리에 공유',
                                   style: TextStyle(color: Colors.white)),
                               style: ElevatedButton.styleFrom(
@@ -978,7 +1003,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                   }
                 },
                 selectedItemBuilder: (BuildContext context) {
-                  return <String>['전격', '철갑', '작열', '수냉', '풍압'].map<Widget>((String value) {
+                  return <String>['전격', '철갑', '작열', '수냉', '풍압']
+                      .map<Widget>((String value) {
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -1017,9 +1043,10 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                         Text(
                           value,
                           style: TextStyle(
-                            color: Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : Colors.black87,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black87,
                             fontSize: 13,
                           ),
                         ),
@@ -1064,8 +1091,11 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                               radius: 14,
                               backgroundColor: Colors.orange,
                               child: Text(
-                                (auth.nickname != null && auth.nickname!.isNotEmpty)
-                                    ? auth.nickname!.substring(0, 1).toUpperCase()
+                                (auth.nickname != null &&
+                                        auth.nickname!.isNotEmpty)
+                                    ? auth.nickname!
+                                        .substring(0, 1)
+                                        .toUpperCase()
                                     : 'C',
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -1086,10 +1116,14 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                       onPressed: () {
                         Navigator.pushNamed(context, LoginScreen.routeName);
                       },
-                      icon: const Icon(Icons.login_rounded, size: 16, color: Colors.white),
+                      icon: const Icon(Icons.login_rounded,
+                          size: 16, color: Colors.white),
                       label: const Text(
                         "로그인",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13),
                       ),
                     ),
                   );
@@ -1104,10 +1138,12 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
           if (isMobile) {
             // 📱 모바일 레이아웃
-            return _buildMobileLayout(context, nikkeList, assignedSquadMap, syncedCharsByName);
+            return _buildMobileLayout(
+                context, nikkeList, assignedSquadMap, syncedCharsByName);
           } else {
             // 💻 데스크탑 / 태블릿 레이아웃
-            return _buildDesktopLayout(context, nikkeList, assignedSquadMap, syncedCharsByName);
+            return _buildDesktopLayout(
+                context, nikkeList, assignedSquadMap, syncedCharsByName);
           }
         },
       ),
@@ -1483,7 +1519,8 @@ class _NikkeListPanelState extends State<NikkeListPanel>
     // 속성 필터
     if (widget.elementFilters.isNotEmpty) {
       filtered = filtered.where((n) {
-        if (n.id == 'rapi_red_hood' && widget.elementFilters.contains(ElementType.Iron)) return true;
+        if (n.id == 'rapi_red_hood' &&
+            widget.elementFilters.contains(ElementType.Iron)) return true;
         return widget.elementFilters.contains(n.element);
       }).toList();
     }
@@ -1596,11 +1633,15 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                 final bool isAssigned = squadIndex != null;
 
                 final bool isSynced = widget.syncedCharacters.isNotEmpty;
-                final bool isNotOwned = isSynced && !widget.syncedCharacters.containsKey(nikke.name) && !nikke.isTemporary;
+                final bool isNotOwned = isSynced &&
+                    !widget.syncedCharacters.containsKey(nikke.name) &&
+                    !nikke.isTemporary;
 
-                final bool isSelected =
-                    !isAssigned && !isNotOwned && widget.selectedNikkeId == nikke.id;
-                final bool isDimmed = isAssigned || isNotOwned ||
+                final bool isSelected = !isAssigned &&
+                    !isNotOwned &&
+                    widget.selectedNikkeId == nikke.id;
+                final bool isDimmed = isAssigned ||
+                    isNotOwned ||
                     (widget.selectedNikkeId != null &&
                         widget.selectedNikkeId != nikke.id);
 
@@ -1610,7 +1651,8 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                         ? '후보 덱'
                         : widget.squadNames[squadIndex]);
 
-                final Map<String, dynamic>? syncedChar = widget.syncedCharacters[nikke.name];
+                final Map<String, dynamic>? syncedChar =
+                    widget.syncedCharacters[nikke.name];
 
                 final card = NikkeCard(
                   nikke: nikke,
@@ -2150,7 +2192,10 @@ class _SquadCardState extends State<SquadCard> {
                             slotIndex: colIndex,
                             displayIndex: colIndex + 1,
                             nikke: nikke,
-                            charData: nikke != null && widget.syncedCharsByName != null ? widget.syncedCharsByName![nikke.name] : null,
+                            charData: nikke != null &&
+                                    widget.syncedCharsByName != null
+                                ? widget.syncedCharsByName![nikke.name]
+                                : null,
                             onTap: widget.onSlotTap == null
                                 ? null
                                 : () => widget.onSlotTap!(colIndex),
@@ -2179,7 +2224,10 @@ class _SquadCardState extends State<SquadCard> {
                               slotIndex: actualIndex,
                               displayIndex: actualIndex + 1,
                               nikke: nikke,
-                              charData: nikke != null && widget.syncedCharsByName != null ? widget.syncedCharsByName![nikke.name] : null,
+                              charData: nikke != null &&
+                                      widget.syncedCharsByName != null
+                                  ? widget.syncedCharsByName![nikke.name]
+                                  : null,
                               onTap: widget.onSlotTap == null
                                   ? null
                                   : () => widget.onSlotTap!(actualIndex),
@@ -2929,7 +2977,6 @@ class _NikkeHoverTooltipState extends State<NikkeHoverTooltip> {
           ],
         ),
         const SizedBox(height: 12),
-
         Row(
           children: [
             Expanded(
@@ -2959,7 +3006,6 @@ class _NikkeHoverTooltipState extends State<NikkeHoverTooltip> {
           ],
         ),
         const Divider(color: Colors.grey, height: 24),
-
         const Text(
           '장비 강화',
           style: TextStyle(
@@ -3028,7 +3074,6 @@ class _NikkeHoverTooltipState extends State<NikkeHoverTooltip> {
             ),
           ],
         ),
-
         if (overloadSummaries.isNotEmpty) ...[
           const Divider(color: Colors.grey, height: 24),
           ...overloadSummaries.map((info) {
@@ -3038,17 +3083,14 @@ class _NikkeHoverTooltipState extends State<NikkeHoverTooltip> {
             final bool isLevel15 = maxLevel == 15;
             final bool isHighLevel = maxLevel >= 12;
 
-            final Color boxBgColor = isLevel15
-                ? const Color(0xFF232323)
-                : const Color(0xFFEAEAEA);
+            final Color boxBgColor =
+                isLevel15 ? const Color(0xFF232323) : const Color(0xFFEAEAEA);
 
-            final Color labelColor = isLevel15
-                ? const Color(0xFFFFFFFF)
-                : const Color(0xFF333333);
+            final Color labelColor =
+                isLevel15 ? const Color(0xFFFFFFFF) : const Color(0xFF333333);
 
-            final Color valueColor = isHighLevel
-                ? const Color(0xFF049EE7)
-                : const Color(0xFF7F8C8D);
+            final Color valueColor =
+                isHighLevel ? const Color(0xFF049EE7) : const Color(0xFF7F8C8D);
 
             return Container(
               margin: const EdgeInsets.symmetric(vertical: 3.0),

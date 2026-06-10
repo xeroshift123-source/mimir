@@ -45,9 +45,10 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
   // --- 목록 상태 ---
   List<SharedDeck> _allDecks = [];
   final Set<String> _expandedDeckIds = {};
-  
+
   // --- 투표 기록 추적 (로컬 세션 중복 방지) ---
-  final Map<String, int> _userVotes = {}; // deckId -> 1 (upvote) or -1 (downvote)
+  final Map<String, int> _userVotes =
+      {}; // deckId -> 1 (upvote) or -1 (downvote)
 
   @override
   void initState() {
@@ -216,8 +217,6 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
     });
   }
 
-
-
   // --- 핵심 필터 연산 ---
   List<SharedDeck> _getFilteredDecks() {
     final includeSet = _includeIds.whereType<String>().toSet();
@@ -225,7 +224,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
 
     List<SharedDeck> results = _allDecks.where((deck) {
       // 1. 제외 조건 검사: 덱의 어떤 슬롯에도 제외 대상 니케가 포함되어 있으면 안 됨
-      final allIdsInDeck = deck.squadsNikkeIds.expand((s) => s).whereType<String>().toSet();
+      final allIdsInDeck =
+          deck.squadsNikkeIds.expand((s) => s).whereType<String>().toSet();
       if (allIdsInDeck.any((id) => excludeSet.contains(id))) {
         return false;
       }
@@ -240,7 +240,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
       }
 
       // 3. 레이드 시즌 필터 검사
-      if (_selectedSeason != null && deck.season != _selectedSeason!.seasonName) {
+      if (_selectedSeason != null &&
+          deck.season != _selectedSeason!.seasonName) {
         return false;
       }
 
@@ -271,26 +272,33 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
 
   String _getElementEnumName(String? koreanName) {
     switch (koreanName) {
-      case '철갑': return 'Iron';
-      case '수냉': return 'Water';
-      case '전격': return 'Electric';
-      case '작열': return 'Fire';
-      case '풍압': return 'Wind';
-      default: return 'Water';
+      case '철갑':
+        return 'Iron';
+      case '수냉':
+        return 'Water';
+      case '전격':
+        return 'Electric';
+      case '작열':
+        return 'Fire';
+      case '풍압':
+        return 'Wind';
+      default:
+        return 'Water';
     }
   }
 
   Widget _buildSeasonHeader(bool isDark) {
-    final soloRaids = raidHistory.where((r) => r.type == RaidType.solo).toList();
-    
+    final soloRaids =
+        raidHistory.where((r) => r.type == RaidType.solo).toList();
+
     if (_selectedSeason == null && soloRaids.isNotEmpty) {
       _selectedSeason = soloRaids.last;
     }
-    
+
     if (_selectedSeason == null) return const SizedBox.shrink();
-    
+
     final currentRaid = _selectedSeason!;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       margin: const EdgeInsets.only(bottom: 12),
@@ -307,7 +315,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: Colors.red.withOpacity(0.12),
-              border: Border.all(color: Colors.red.withOpacity(0.7), width: 1.2),
+              border:
+                  Border.all(color: Colors.red.withOpacity(0.7), width: 1.2),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -324,7 +333,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
             "assets/icons/elements/icon-elements-${_getElementEnumName(currentRaid.weakness)}.webp",
             width: 18,
             height: 18,
-            errorBuilder: (context, error, stackTrace) => const Icon(Icons.error, size: 18),
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.error, size: 18),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -385,7 +395,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
     final filteredDecks = _getFilteredDecks();
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7),
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -393,7 +404,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           children: [
             const Text(
               "공유 덱 라이브러리",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(width: 8),
             Container(
@@ -441,8 +453,11 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                               radius: 14,
                               backgroundColor: Colors.orange,
                               child: Text(
-                                (auth.nickname != null && auth.nickname!.isNotEmpty)
-                                    ? auth.nickname!.substring(0, 1).toUpperCase()
+                                (auth.nickname != null &&
+                                        auth.nickname!.isNotEmpty)
+                                    ? auth.nickname!
+                                        .substring(0, 1)
+                                        .toUpperCase()
                                     : 'C',
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -463,10 +478,14 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                       onPressed: () {
                         Navigator.pushNamed(context, LoginScreen.routeName);
                       },
-                      icon: const Icon(Icons.login_rounded, size: 16, color: Colors.white),
+                      icon: const Icon(Icons.login_rounded,
+                          size: 16, color: Colors.white),
                       label: const Text(
                         "로그인",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13),
                       ),
                     ),
                   );
@@ -492,11 +511,13 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final isMobile = constraints.maxWidth < 900;
-                      
+
                       if (isMobile) {
-                        return _buildMobileLayout(nikkeList, nikkeMap, filteredDecks, isDark);
+                        return _buildMobileLayout(
+                            nikkeList, nikkeMap, filteredDecks, isDark);
                       } else {
-                        return _buildDesktopLayout(nikkeList, nikkeMap, filteredDecks, isDark);
+                        return _buildDesktopLayout(
+                            nikkeList, nikkeMap, filteredDecks, isDark);
                       }
                     },
                   ),
@@ -525,7 +546,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
             child: Card(
               elevation: 1,
               color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: ExpansionTile(
                 title: const Text(
                   "필터 및 검색 패널 접기 / 펼치기",
@@ -589,7 +611,7 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
             ),
           ),
         ),
-        
+
         // 우측 결과 덱 목록 (페이징/아코디언)
         Expanded(
           child: Padding(
@@ -622,7 +644,10 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           children: [
             const Text(
               "포함 니케:",
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blue),
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -646,7 +671,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           children: [
             const Text(
               "제외 니케:",
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red),
+              style: TextStyle(
+                  fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -657,7 +683,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                   itemCount: 5,
                   itemBuilder: (context, index) {
                     final id = _excludeIds[index];
-                    return _buildCompactSlot(nikkeMap[id], false, index, isDark);
+                    return _buildCompactSlot(
+                        nikkeMap[id], false, index, isDark);
                   },
                 ),
               ),
@@ -669,7 +696,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
   }
 
   // 포함/제외 콤팩트 프로필 아바타 슬롯 (50x50)
-  Widget _buildCompactSlot(Nikke? nikke, bool isInclude, int index, bool isDark) {
+  Widget _buildCompactSlot(
+      Nikke? nikke, bool isInclude, int index, bool isDark) {
     final bool hasSelection = _selectedNikkeId != null;
     final borderColor = hasSelection
         ? (isInclude ? Colors.blue.shade400 : Colors.red.shade400)
@@ -703,8 +731,12 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                             color: hasSelection
-                                ? (isInclude ? Colors.blue.shade300 : Colors.red.shade300)
-                                : (isDark ? Colors.grey.shade600 : Colors.grey.shade500),
+                                ? (isInclude
+                                    ? Colors.blue.shade300
+                                    : Colors.red.shade300)
+                                : (isDark
+                                    ? Colors.grey.shade600
+                                    : Colors.grey.shade500),
                           ),
                         ),
                       ),
@@ -781,7 +813,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
             isDense: true,
             filled: true,
             fillColor: isDark ? const Color(0xFF2A2822) : Colors.grey.shade100,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
@@ -789,11 +822,12 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // 버스트 타입 토글 + 필터 열기 버튼
         Row(
           children: [
-            const Text("버스트: ", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+            const Text("버스트: ",
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
             const SizedBox(width: 4),
             _buildToggleTag(
               label: 'I',
@@ -829,7 +863,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.orange,
-                  fontWeight: _filterExpanded ? FontWeight.bold : FontWeight.normal,
+                  fontWeight:
+                      _filterExpanded ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
               style: TextButton.styleFrom(
@@ -839,7 +874,7 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
             ),
           ],
         ),
-        
+
         // 상세 필터 확장 패널 (속성, 무기, 기업)
         AnimatedSize(
           curve: Curves.easeInOut,
@@ -894,7 +929,7 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
               : const SizedBox.shrink(),
         ),
         const SizedBox(height: 8),
-        
+
         // 그리드 리스트 (NikkeCard를 사용하여 일관성 부여)
         Expanded(
           child: GridView.builder(
@@ -907,14 +942,14 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
             itemCount: filteredGrid.length,
             itemBuilder: (context, index) {
               final nikke = filteredGrid[index];
-              
+
               // 포함/제외 배치 상태 매칭
               int? assignedIdx;
               String? assignedName;
-              
+
               final int incIdx = _includeIds.indexOf(nikke.id);
               final int excIdx = _excludeIds.indexOf(nikke.id);
-              
+
               if (incIdx != -1) {
                 assignedIdx = incIdx;
                 assignedName = '포함 ${incIdx + 1}';
@@ -924,7 +959,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
               }
 
               final bool isSelected = _selectedNikkeId == nikke.id;
-              final bool isDimmed = _selectedNikkeId != null && _selectedNikkeId != nikke.id;
+              final bool isDimmed =
+                  _selectedNikkeId != null && _selectedNikkeId != nikke.id;
 
               return NikkeCard(
                 nikke: nikke,
@@ -945,7 +981,10 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
     );
   }
 
-  Widget _buildToggleTag({required String label, required bool selected, required VoidCallback onTap}) {
+  Widget _buildToggleTag(
+      {required String label,
+      required bool selected,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -970,7 +1009,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
     );
   }
 
-  Widget _buildSubFilterRow<T>(String category, List<T> items, Widget Function(T) builder) {
+  Widget _buildSubFilterRow<T>(
+      String category, List<T> items, Widget Function(T) builder) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -980,7 +1020,10 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
             padding: const EdgeInsets.only(top: 4.0),
             child: Text(
               "$category:",
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey),
+              style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey),
             ),
           ),
         ),
@@ -1013,8 +1056,13 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                   "최신순",
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: _sortByLatest ? FontWeight.bold : FontWeight.normal,
-                    color: _sortByLatest ? Colors.orange : (isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+                    fontWeight:
+                        _sortByLatest ? FontWeight.bold : FontWeight.normal,
+                    color: _sortByLatest
+                        ? Colors.orange
+                        : (isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600),
                   ),
                 ),
               ),
@@ -1025,8 +1073,13 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                   "추천순",
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: !_sortByLatest ? FontWeight.bold : FontWeight.normal,
-                    color: !_sortByLatest ? Colors.orange : (isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+                    fontWeight:
+                        !_sortByLatest ? FontWeight.bold : FontWeight.normal,
+                    color: !_sortByLatest
+                        ? Colors.orange
+                        : (isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600),
                   ),
                 ),
               ),
@@ -1037,17 +1090,23 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
   }
 
   // 4. 덱 아코디언 목록 렌더링
-  Widget _buildDeckList(List<SharedDeck> decks, Map<String, Nikke> nikkeMap, bool isDark) {
+  Widget _buildDeckList(
+      List<SharedDeck> decks, Map<String, Nikke> nikkeMap, bool isDark) {
     if (decks.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.folder_off_outlined, size: 48, color: isDark ? Colors.grey.shade700 : Colors.grey.shade400),
+            Icon(Icons.folder_off_outlined,
+                size: 48,
+                color: isDark ? Colors.grey.shade700 : Colors.grey.shade400),
             const SizedBox(height: 12),
             const Text(
               "조건에 매칭되는 덱 조합이 없습니다.",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey),
             ),
           ],
         ),
@@ -1064,7 +1123,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           elevation: 1.5,
           margin: const EdgeInsets.only(bottom: 12),
           color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Column(
             children: [
               // 접혀있을 때 보이는 헤더
@@ -1089,7 +1149,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                           children: [
                             Text(
                               deck.title,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
@@ -1098,7 +1159,9 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                               "작성자: ${deck.authorName}${AuthProvider.showLoginFeatures ? ' • ${_formatDateTime(deck.createdAt)}' : ''}",
                               style: TextStyle(
                                 fontSize: 11.5,
-                                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                                color: isDark
+                                    ? Colors.grey.shade400
+                                    : Colors.grey.shade600,
                               ),
                             ),
                           ],
@@ -1108,7 +1171,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                       // 추천 수 뱃지
                       if (AuthProvider.showLoginFeatures)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(12),
@@ -1116,7 +1180,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.arrow_drop_up, color: Colors.orange, size: 18),
+                              const Icon(Icons.arrow_drop_up,
+                                  color: Colors.orange, size: 18),
                               const SizedBox(width: 4),
                               Text(
                                 "${deck.score}",
@@ -1132,13 +1197,15 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                       const SizedBox(width: 8),
                       Icon(
                         isExpanded ? Icons.expand_less : Icons.expand_more,
-                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade700,
                       )
                     ],
                   ),
                 ),
               ),
-              
+
               // 펼쳐진 상태 아코디언 콘텐츠
               AnimatedCrossFade(
                 firstChild: const SizedBox(width: double.infinity),
@@ -1151,40 +1218,51 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                       // 5개 스쿼드 목록 그리기
                       _buildFiveSquadsSummaryPanel(deck, nikkeMap, isDark),
                       const SizedBox(height: 12),
-                      
+
                       // 설명란
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF262421) : Colors.grey.shade50,
+                          color: isDark
+                              ? const Color(0xFF262421)
+                              : Colors.grey.shade50,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+                          border: Border.all(
+                              color: isDark
+                                  ? Colors.grey.shade800
+                                  : Colors.grey.shade200),
                         ),
                         child: Text(
                           deck.description,
                           style: TextStyle(
                             fontSize: 12.5,
-                            color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                            color: isDark
+                                ? Colors.grey.shade300
+                                : Colors.grey.shade800,
                             height: 1.5,
                           ),
                         ),
                       ),
                       const SizedBox(height: 12),
-                      
+
                       // 하단 액션바 (투표만 제공하며 우측 정렬)
                       if (AuthProvider.showLoginFeatures)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            _buildVoteButton(deck, 1, Icons.arrow_drop_up, Colors.orange),
+                            _buildVoteButton(
+                                deck, 1, Icons.arrow_drop_up, Colors.orange),
                             const SizedBox(width: 8),
-                            _buildVoteButton(deck, -1, Icons.arrow_drop_down, Colors.blue),
+                            _buildVoteButton(
+                                deck, -1, Icons.arrow_drop_down, Colors.blue),
                           ],
                         ),
                     ],
                   ),
                 ),
-                crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                crossFadeState: isExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
                 duration: const Duration(milliseconds: 200),
                 sizeCurve: Curves.easeOut,
               ),
@@ -1195,7 +1273,8 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
     );
   }
 
-  Widget _buildVoteButton(SharedDeck deck, int voteVal, IconData icon, Color color) {
+  Widget _buildVoteButton(
+      SharedDeck deck, int voteVal, IconData icon, Color color) {
     final bool active = _userVotes[deck.id] == voteVal;
     return InkWell(
       onTap: () => _vote(deck.id, voteVal),
@@ -1205,15 +1284,18 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
         decoration: BoxDecoration(
           color: active ? color.withOpacity(0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: active ? color : Colors.grey.shade400, width: 1.2),
+          border: Border.all(
+              color: active ? color : Colors.grey.shade400, width: 1.2),
         ),
-        child: Icon(icon, color: active ? color : Colors.grey.shade500, size: 16),
+        child:
+            Icon(icon, color: active ? color : Colors.grey.shade500, size: 16),
       ),
     );
   }
 
   // 5개 스쿼드 목록 그리기 - 덱 빌더 미리보기 팝업 UI와 100% 일치
-  Widget _buildFiveSquadsSummaryPanel(SharedDeck deck, Map<String, Nikke> nikkeMap, bool isDark) {
+  Widget _buildFiveSquadsSummaryPanel(
+      SharedDeck deck, Map<String, Nikke> nikkeMap, bool isDark) {
     return FittedBox(
       fit: BoxFit.scaleDown,
       alignment: Alignment.center,
@@ -1227,8 +1309,10 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           children: [
             ...List.generate(5, (index) {
               final squadIds = deck.squadsNikkeIds[index];
-              final List<Nikke?> slots = squadIds.map((id) => id != null ? nikkeMap[id] : null).toList();
-              
+              final List<Nikke?> slots = squadIds
+                  .map((id) => id != null ? nikkeMap[id] : null)
+                  .toList();
+
               return Padding(
                 padding: EdgeInsets.only(bottom: index == 4 ? 0 : 8),
                 child: _LibraryShareSquadPanel(
@@ -1349,9 +1433,12 @@ class _LibraryShareSquadPanel extends StatelessWidget {
       '작열': ElementType.Fire,
       '풍압': ElementType.Wind,
     };
-    final targetEnum = elementKoreanToEnum[weaknessElement] ?? ElementType.Electric;
-    final bool hasWeaknessMatch = activeNikkes.any((n) => n.element == targetEnum);
-    final bool hasCooldownReduction = activeNikkes.any((n) => n.ability.contains("버스트 쿨타임 감소"));
+    final targetEnum =
+        elementKoreanToEnum[weaknessElement] ?? ElementType.Electric;
+    final bool hasWeaknessMatch =
+        activeNikkes.any((n) => n.element == targetEnum);
+    final bool hasCooldownReduction =
+        activeNikkes.any((n) => n.ability.contains("버스트 쿨타임 감소"));
 
     // 2. 동적 키워드 로직
     final List<String> dynamicTags = [];
@@ -1498,7 +1585,8 @@ class _LibraryShareSquadPanel extends StatelessWidget {
 class _LibraryShareSlotThumb extends StatelessWidget {
   final Nikke? nikke;
   final int displayIndex;
-  const _LibraryShareSlotThumb({required this.nikke, required this.displayIndex});
+  const _LibraryShareSlotThumb(
+      {required this.nikke, required this.displayIndex});
 
   @override
   Widget build(BuildContext context) {
