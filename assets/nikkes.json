@@ -110,7 +110,8 @@
     "company": "Tetra",
     "ability": [
       "관통뎀",
-      "관통데미지"
+      "관통데미지",
+      "차지속도증가"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -518,7 +519,10 @@
     "weaponType": "RL",
     "company": "Tetra",
     "ability": [
-      "분배데미지"
+      "분배데미지",
+      "지속데미지",
+      "지속딜",
+      "지딜"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -975,7 +979,10 @@
     "ability": [
       "시전자 기준 공격력",
       "시공증",
-      "클로틴"
+      "클로틴",
+      "지속데미지",
+      "지속딜",
+      "지딜"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1239,7 +1246,8 @@
     "weaponType": "SR",
     "company": "Pilgrim",
     "ability": [
-      "리버렐루"
+      "리버렐루",
+      "차지속도증가"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1389,7 +1397,13 @@
     "company": "Missilis",
     "ability": [
       "힐",
-      "갓경누나"
+      "갓경누나",
+      "지속데미지",
+      "지속딜",
+      "지딜",
+      "차지속도증가",
+      "버스트 충전",
+      "부활"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1571,6 +1585,7 @@
     "ability": [
       "지속데미지",
       "지속딜",
+      "지딜",
       "애란다"
     ],
     "coolTime": 40,
@@ -1688,7 +1703,14 @@
     "element": "Wind",
     "weaponType": "AR",
     "company": "Missilis",
-    "ability": [],
+    "ability": [
+      "지속데미지",
+      "지속딜",
+      "지딜",
+      "파츠",
+      "도발",
+      "보호막"
+    ],
     "coolTime": 20,
     "squadNum": 0,
     "rank": "SSR",
@@ -2165,7 +2187,12 @@
     "element": "Iron",
     "weaponType": "RL",
     "company": "Abnormal",
-    "ability": [],
+    "ability": [
+      "지속데미지",
+      "지속딜",
+      "지딜",
+      "파츠"
+    ],
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR",
@@ -2282,7 +2309,13 @@
     "ability": [
       "수산나",
       "받는데미지증가",
-      "받뎀증"
+      "받뎀증",
+      "시전자 기준 공격력",
+      "시공증",
+      "파츠",
+      "지속데미지",
+      "지속딜",
+      "지딜"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -2393,7 +2426,11 @@
     "weaponType": "AR",
     "company": "Tetra",
     "ability": [
-      "수쿠라"
+      "수쿠라",
+      "지속데미지",
+      "지속딜",
+      "지딜",
+      "파츠"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -2614,7 +2651,8 @@
     "ability": [
       "시전자 기준 공격력",
       "시공증",
-      "힐"
+      "힐",
+      "파츠"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -2741,7 +2779,12 @@
     "element": "Water",
     "weaponType": "SG",
     "company": "Tetra",
-    "ability": [],
+    "ability": [
+      "지속데미지",
+      "지속딜",
+      "지딜",
+      "버스트 재진입"
+    ],
     "coolTime": 20,
     "squadNum": 0,
     "rank": "SSR",
@@ -2834,7 +2877,11 @@
     "ability": [
       "클디젤",
       "받는데미지증가",
-      "받뎀증"
+      "받뎀증",
+      "지속데미지",
+      "지속딜",
+      "지딜",
+      "파츠"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -2875,7 +2922,8 @@
       "받는데미지증가",
       "받뎀증",
       "관통뎀",
-      "관통데미지"
+      "관통데미지",
+      "파츠"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -2978,7 +3026,8 @@
       "EH",
       "eh",
       "두쫀쿠",
-      "엘리시온하퍼"
+      "엘리시온하퍼",
+      "파츠"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -3135,7 +3184,12 @@
     "weaponType": "AR",
     "company": "Tetra",
     "ability": [
-      "아레블"
+      "아레블",
+      "아블",
+      "지속데미지",
+      "지속딜",
+      "지딜",
+      "파츠"
     ],
     "coolTime": 40,
     "squadNum": 0,
