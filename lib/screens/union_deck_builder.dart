@@ -2348,6 +2348,12 @@ class _ShareSquadPanel extends StatelessWidget {
     if (activeNikkes.where((n) => n.ability.contains("관통데미지")).length >= 2) {
       dynamicTags.add("관통뎀");
     }
+    if (activeNikkes.where((n) => n.ability.contains("지속데미지")).length >= 2) {
+      dynamicTags.add("지속딜");
+    }
+    if (activeNikkes.where((n) => n.ability.contains("파츠")).length >= 2) {
+      dynamicTags.add("파츠");
+    }
     if (activeNikkes.where((n) => n.ability.contains("받는데미지증가")).length >= 2) {
       dynamicTags.add("받뎀증");
     }
