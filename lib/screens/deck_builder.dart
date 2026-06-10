@@ -2320,6 +2320,7 @@ class _SquadSlot extends StatelessWidget {
       );
 
       content = LongPressDraggable<_SlotDragData>(
+        delay: const Duration(milliseconds: 200),
         data: dragData,
         feedback: Material(
           color: Colors.transparent,

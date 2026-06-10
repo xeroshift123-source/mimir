@@ -58,13 +58,19 @@ class MimirApp extends StatelessWidget {
             themeMode: themeProvider.themeMode,
             shortcuts: {
               ...WidgetsApp.defaultShortcuts,
-              const SingleActivator(LogicalKeyboardKey.space): const DoNothingAndStopPropagationIntent(),
+              const SingleActivator(LogicalKeyboardKey.space):
+                  const DoNothingAndStopPropagationIntent(),
             },
 
             // 💡 라이트 테마: 기존의 밝고 경쾌한 톤 유지 (오렌지/블랙 대비)
             theme: ThemeData(
               brightness: Brightness.light,
-              fontFamilyFallback: const ['Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans CJK KR', 'sans-serif'],
+              fontFamilyFallback: const [
+                'Malgun Gothic',
+                'Apple SD Gothic Neo',
+                'Noto Sans CJK KR',
+                'sans-serif'
+              ],
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.orange,
                 brightness: Brightness.light,
@@ -81,7 +87,12 @@ class MimirApp extends StatelessWidget {
             // 💡 다크 테마: 로딩 화면의 명품 조합(다크 백그라운드 #0D0E12 + 오렌지 액센트 #F77C00) 매칭
             darkTheme: ThemeData(
               brightness: Brightness.dark,
-              fontFamilyFallback: const ['Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans CJK KR', 'sans-serif'],
+              fontFamilyFallback: const [
+                'Malgun Gothic',
+                'Apple SD Gothic Neo',
+                'Noto Sans CJK KR',
+                'sans-serif'
+              ],
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.orange,
                 brightness: Brightness.dark,
@@ -108,12 +119,9 @@ class MimirApp extends StatelessWidget {
                   const DeckLibraryScreen(),
               CalculateListScreen.routeName: (context) =>
                   const CalculateListScreen(),
-              LoginScreen.routeName: (context) =>
-                  const LoginScreen(),
-              SyncScreen.routeName: (context) =>
-                  const SyncScreen(),
-              MyNikkeScreen.routeName: (context) =>
-                  const MyNikkeScreen(),
+              LoginScreen.routeName: (context) => const LoginScreen(),
+              SyncScreen.routeName: (context) => const SyncScreen(),
+              MyNikkeScreen.routeName: (context) => const MyNikkeScreen(),
             },
           );
         },
