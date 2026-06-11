@@ -388,7 +388,7 @@
     "imageUrl": "assets/nikke/centi.webp",
     "burst": "2",
     "element": "Iron",
-    "weaponType": "MG",
+    "weaponType": "RL",
     "company": "Missilis",
     "ability": [],
     "coolTime": 20,
@@ -2714,7 +2714,7 @@
     "imageUrl": "assets/nikke/trina.webp",
     "burst": "2",
     "element": "Electric",
-    "weaponType": "MG",
+    "weaponType": "RL",
     "company": "Missilis",
     "ability": [
       "재장전속도증가"
