@@ -192,6 +192,7 @@ class BlablaMap {
     5171: "아비스타",
     5172: "민트",
     5173: "프리카",
+    5174: "아크레인저 블랙"
   };
 
   static const Map<int, String> equipmentNames = {
