@@ -25,6 +25,7 @@ import 'package:mimir/widgets/nikke_card.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/services/database_service.dart';
 import 'package:mimir/utils/blabla_map.dart';
+import 'package:mimir/utils/deck_code_utils.dart';
 
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -931,6 +932,132 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     // 여기서 _squads에 바로 적용하지 말고, provider 준비되면 적용!
   }
 
+  void _showDeckCodeDialog() {
+    final TextEditingController importController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.qr_code_2, color: Colors.orange),
+              SizedBox(width: 8),
+              Text("덱 코드 관리", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
+          ),
+          content: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 360),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton.icon(
+                icon: const Icon(Icons.copy, color: Colors.white, size: 18),
+                label: const Text("현재 덱 코드 복사하기", style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _exportDeckCode();
+                },
+              ),
+              const SizedBox(height: 24),
+              const Text("덱 코드 불러오기", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: importController,
+                decoration: InputDecoration(
+                  hintText: "여기에 덱 코드를 붙여넣으세요",
+                  isDense: true,
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                  ),
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  final code = importController.text.trim();
+                  if (code.isNotEmpty) {
+                    Navigator.pop(context);
+                    _importDeckCode(code);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green.shade600,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text("불러오기 적용"),
+              ),
+            ],
+          ),
+        ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("닫기", style: TextStyle(color: Colors.grey)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _exportDeckCode() {
+    final List<List<String?>> squadIds = _squads.map((squad) => squad.map((n) => n?.id).toList()).toList();
+    final code = DeckCodeUtils.encodeDeck(type: 'solo', squads: squadIds);
+    if (code.isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: code));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('현재 덱 코드가 클립보드에 복사되었습니다!')),
+      );
+    }
+  }
+
+  void _importDeckCode(String code) {
+    final result = DeckCodeUtils.decodeDeck(code);
+    if (result != null && result.type == 'solo') {
+      final decodedSquads = result.squads;
+      final nikkeList = context.read<NikkeProvider>().nikkeList;
+      final mapById = {for (final n in nikkeList) n.id: n};
+
+      setState(() {
+        for (int s = 0; s < 5 && s < decodedSquads.length; s++) {
+          for (int i = 0; i < 5; i++) {
+            final id = decodedSquads[s][i];
+            _squads[s][i] = id != null ? mapById[id] : null;
+          }
+        }
+        _activeSquadIndex = 0; // 첫 번째 스쿼드로 이동
+      });
+      _saveDeckToLocal();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('덱을 성공적으로 불러왔습니다!')),
+      );
+    } else if (result != null && result.type == 'union') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('유니온레이드 덱입니다! 솔로레이드 덱 빌더에서는 불러올 수 없습니다.')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('잘못된 덱 코드입니다. 다시 확인해 주세요.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final nikkeList = context.watch<NikkeProvider>().nikkeList;
@@ -1058,6 +1185,13 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
             ),
           ),
           const SizedBox(width: 8),
+          IconButton(
+            tooltip: '덱 코드 관리',
+            icon: const Icon(Icons.qr_code_2, color: Colors.white),
+            onPressed: () {
+              _showDeckCodeDialog();
+            },
+          ),
           IconButton(
             tooltip: '덱 캡쳐',
             icon: const Icon(Icons.camera_alt, color: Colors.white),
