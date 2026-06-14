@@ -3178,7 +3178,7 @@
   {
     "id": "ark_ranger_black",
     "name": "아크레인저 블랙",
-    "imageUrl": "assets/nikke/ark_ranger_black.png",
+    "imageUrl": "assets/nikke/ark_ranger_black.webp",
     "burst": "3",
     "element": "Wind",
     "weaponType": "AR",
