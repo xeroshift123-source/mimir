@@ -44,6 +44,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final Set<WeaponType> _weaponFilters = {};
   final Set<Company> _companyFilters = {};
   bool _filterExpanded = false;
+  bool _profileExpanded = true;
   bool _assumeCube15 = false;
   bool _showNicknameOnLicense = false;
 
@@ -378,54 +379,69 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.shield, color: Colors.orange.shade400, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "$nickname (Lv.$level)",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87,
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              setState(() {
+                _profileExpanded = !_profileExpanded;
+              });
+            },
+            child: Row(
+              children: [
+                Icon(Icons.shield, color: Colors.orange.shade400, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    "$nickname (Lv.$level)",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    server,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
-                child: Text(
-                  server,
-                  style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.orange,
-                      fontWeight: FontWeight.bold),
+                const SizedBox(width: 8),
+                Icon(
+                  _profileExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildSummaryItem("유니온", union, isDark),
-              _buildSummaryItem("총 전투력", formattedCP, isDark),
-              _buildSummaryItem("싱크로 레벨", "Lv.$synchro", isDark),
-              _buildSummaryItem("보유 니케", "$count명", isDark),
+          if (_profileExpanded) ...[
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildSummaryItem("유니온", union, isDark),
+                _buildSummaryItem("총 전투력", formattedCP, isDark),
+                _buildSummaryItem("싱크로 레벨", "Lv.$synchro", isDark),
+                _buildSummaryItem("보유 니케", "$count명", isDark),
+              ],
+            ),
+            if (recycleRoom.isNotEmpty || infraCoreLevel > 0) ...[
+              const SizedBox(height: 12),
+              Divider(
+                  height: 1,
+                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+              const SizedBox(height: 12),
+              _buildRecycleRoomSection(recycleRoom, infraCoreLevel, isDark),
             ],
-          ),
-          if (recycleRoom.isNotEmpty || infraCoreLevel > 0) ...[
-            const SizedBox(height: 12),
-            Divider(
-                height: 1,
-                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
-            const SizedBox(height: 12),
-            _buildRecycleRoomSection(recycleRoom, infraCoreLevel, isDark),
           ],
         ],
       ),
