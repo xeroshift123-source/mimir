@@ -26,6 +26,8 @@ import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/services/database_service.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/utils/deck_code_utils.dart';
+import 'package:mimir/data/raid_data.dart';
+import 'package:mimir/models/raid_info.dart';
 
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,6 +56,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   };
   List<List<String?>>? _pendingSquadsIds;
   bool _restoredOnce = false;
+  bool _isImportedDeck = false;
   final GlobalKey _deckCaptureKey = GlobalKey();
   final GlobalKey _previewCaptureKey = GlobalKey();
 
@@ -120,10 +123,21 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
     if (_restoredOnce) return;
 
-    // Retrieve weakness element from route arguments if available
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as String?;
-    if (routeArgs != null) {
+    // Retrieve route arguments if available
+    final routeArgs = ModalRoute.of(context)?.settings.arguments;
+    if (routeArgs is String) {
       _weaknessElement = routeArgs;
+    } else if (routeArgs is SharedDeck) {
+      _pendingSquadsIds = routeArgs.squadsNikkeIds;
+      _isImportedDeck = true;
+      try {
+        final raidInfo = raidHistory.firstWhere(
+          (r) => r.type == RaidType.solo && r.seasonName == routeArgs.season,
+        );
+        if (raidInfo.weakness != null) {
+          _weaknessElement = raidInfo.weakness;
+        }
+      } catch (_) {}
     }
 
     final nikkeList = context.watch<NikkeProvider>().nikkeList;
@@ -886,6 +900,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   }
 
   Future<void> _loadDeckFromLocal() async {
+    if (_isImportedDeck) return;
+
     final prefs = await SharedPreferences.getInstance();
 
     final raw = prefs.getString(_kSquadsKey);

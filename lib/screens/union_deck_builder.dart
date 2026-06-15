@@ -54,6 +54,7 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
   };
   List<List<String?>>? _pendingSquadsIds;
   bool _restoredOnce = false;
+  bool _isImportedDeck = false;
   final GlobalKey _deckCaptureKey = GlobalKey();
   final GlobalKey _previewCaptureKey = GlobalKey();
 
@@ -120,10 +121,13 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
 
     if (_restoredOnce) return;
 
-    // Retrieve weakness element from route arguments if available
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as String?;
-    if (routeArgs != null) {
+    // Retrieve route arguments if available
+    final routeArgs = ModalRoute.of(context)?.settings.arguments;
+    if (routeArgs is String) {
       _weaknessElement = routeArgs;
+    } else if (routeArgs is SharedDeck) {
+      _pendingSquadsIds = routeArgs.squadsNikkeIds;
+      _isImportedDeck = true;
     }
 
     final nikkeList = context.watch<NikkeProvider>().nikkeList;
@@ -885,6 +889,8 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
   }
 
   Future<void> _loadDeckFromLocal() async {
+    if (_isImportedDeck) return;
+
     final prefs = await SharedPreferences.getInstance();
 
     final raw = prefs.getString(_kSquadsKey);

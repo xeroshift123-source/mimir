@@ -46,7 +46,7 @@ class AppFooter extends StatelessWidget {
                   }),
                   _buildDivider(isDark),
                   _buildFooterLink(context, "문의 및 제보", () async {
-                    final Uri url = Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSdlV1B3UQAlM8WaPbeUjhiROZ1uv_LTVBj07_wzkLHkAch-ow/viewform?usp=publish-editor');
+                    final Uri url = Uri.parse('https://naver.me/G2Yyk5AK');
                     if (!await launchUrl(url)) {
                       debugPrint('Could not launch \$url');
                     }
@@ -81,7 +81,8 @@ class AppFooter extends StatelessWidget {
     );
   }
 
-  Widget _buildFooterLink(BuildContext context, String text, VoidCallback onTap) {
+  Widget _buildFooterLink(
+      BuildContext context, String text, VoidCallback onTap) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: onTap,
@@ -109,6 +110,4 @@ class AppFooter extends StatelessWidget {
       ),
     );
   }
-
-
 }

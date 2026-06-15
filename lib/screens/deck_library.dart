@@ -12,6 +12,8 @@ import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/nikke_card.dart';
 import 'package:mimir/data/raid_data.dart';
 import 'package:mimir/models/raid_info.dart';
+import 'package:mimir/screens/deck_builder.dart';
+import 'package:mimir/screens/union_deck_builder.dart';
 
 class DeckLibraryScreen extends StatefulWidget {
   static const routeName = '/deck-library';
@@ -1245,18 +1247,46 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      // 하단 액션바 (투표만 제공하며 우측 정렬)
-                      if (AuthProvider.showLoginFeatures)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            _buildVoteButton(
-                                deck, 1, Icons.arrow_drop_up, Colors.orange),
-                            const SizedBox(width: 8),
-                            _buildVoteButton(
-                                deck, -1, Icons.arrow_drop_down, Colors.blue),
-                          ],
-                        ),
+                      // 하단 액션바
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              if (deck.squadsNikkeIds.length == 3) {
+                                Navigator.pushNamed(
+                                  context,
+                                  UnionDeckBuilderScreen.routeName,
+                                  arguments: deck,
+                                );
+                              } else {
+                                Navigator.pushNamed(
+                                  context,
+                                  DeckBuilderScreen.routeName,
+                                  arguments: deck,
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.copy, size: 16),
+                            label: const Text('덱 빌더로 복사'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange.withOpacity(0.1),
+                              foregroundColor: Colors.orange,
+                              elevation: 0,
+                            ),
+                          ),
+                          if (AuthProvider.showLoginFeatures)
+                            Row(
+                              children: [
+                                _buildVoteButton(
+                                    deck, 1, Icons.arrow_drop_up, Colors.orange),
+                                const SizedBox(width: 8),
+                                _buildVoteButton(
+                                    deck, -1, Icons.arrow_drop_down, Colors.blue),
+                              ],
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
