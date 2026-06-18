@@ -15,6 +15,7 @@ class RaidInfo {
 
   // Union Raid specific
   final Map<String, String>? unionBosses;
+  final List<String>? keyword;
 
   const RaidInfo({
     required this.type,
@@ -25,6 +26,7 @@ class RaidInfo {
     this.bossElement,
     this.weakness,
     this.unionBosses,
+    this.keyword,
   });
 
   String get typeLabel {

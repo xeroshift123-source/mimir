@@ -25,7 +25,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late int _currentRaidPage = raidHistory.length - 1;
-  late final PageController _raidPageController = PageController(initialPage: raidHistory.length - 1, viewportFraction: 1.0);
+  late final PageController _raidPageController = PageController(
+      initialPage: raidHistory.length - 1, viewportFraction: 1.0);
 
   @override
   void dispose() {
@@ -34,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool _isHoveringRaid = false;
-  
+
   String _selectedWeakness = '수냉';
 
   static const Map<String, String> _elementIconMap = {
@@ -55,18 +56,22 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, setStateDialog) {
             return AlertDialog(
               backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-              title: const Text("공략 약점 속성 선택", style: TextStyle(fontWeight: FontWeight.bold)),
+              title: const Text("공략 약점 속성 선택",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               content: DropdownButtonHideUnderline(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange.shade300, width: 1.5),
+                    border:
+                        Border.all(color: Colors.orange.shade300, width: 1.5),
                   ),
                   child: DropdownButton<String>(
                     value: tempWeakness,
                     isExpanded: true,
-                    dropdownColor: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+                    dropdownColor:
+                        isDark ? const Color(0xFF2D2D2D) : Colors.white,
                     onChanged: (String? newValue) {
                       if (newValue != null) {
                         setStateDialog(() {
@@ -83,9 +88,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         value: value,
                         child: Row(
                           children: [
-                            Image.asset(_elementIconMap[value]!, width: 20, height: 20),
+                            Image.asset(_elementIconMap[value]!,
+                                width: 20, height: 20),
                             const SizedBox(width: 10),
-                            Text(value, style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                            Text(value,
+                                style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87)),
                           ],
                         ),
                       );
@@ -99,7 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: const Text("취소", style: TextStyle(color: Colors.grey)),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white),
                   onPressed: () {
                     Navigator.pop(dialogContext);
                     Navigator.pushNamed(
@@ -125,7 +137,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMenuButton(BuildContext context, {required String title, required IconData icon, required Color color, required VoidCallback onTap, bool isOutlined = false}) {
+  Widget _buildMenuButton(BuildContext context,
+      {required String title,
+      required IconData icon,
+      required Color color,
+      required VoidCallback onTap,
+      bool isOutlined = false}) {
     if (isOutlined) {
       return SizedBox(
         height: 56,
@@ -133,10 +150,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: OutlinedButton.icon(
           onPressed: onTap,
           icon: Icon(icon, color: color, size: 20),
-          label: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+          label: Text(title,
+              style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.bold, color: color)),
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: color, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
       );
@@ -147,11 +167,16 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ElevatedButton.icon(
           onPressed: onTap,
           icon: Icon(icon, color: Colors.white, size: 20),
-          label: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+          label: Text(title,
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white)),
           style: ElevatedButton.styleFrom(
             backgroundColor: color,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
       );
@@ -188,13 +213,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 100,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
-                        return Container(height: 100, color: Colors.grey.shade800, child: const Center(child: Icon(Icons.broken_image, color: Colors.white, size: 50)));
+                        return Container(
+                            height: 100,
+                            color: Colors.grey.shade800,
+                            child: const Center(
+                                child: Icon(Icons.broken_image,
+                                    color: Colors.white, size: 50)));
                       },
                     ),
                   ),
                 // ✅ 카드 본문
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -254,12 +285,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: isDark ? Colors.grey.shade400 : Colors.black,
+                              color:
+                                  isDark ? Colors.grey.shade400 : Colors.black,
                             ),
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 12),
                       if (raid.unionBosses != null)
                         ...raid.unionBosses!.entries.map((entry) {
@@ -271,7 +302,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Image.asset(
-                                    _elementIconMap[entry.key] ?? "assets/icons/elements/icon-elements-Electric.webp",
+                                    _elementIconMap[entry.key] ??
+                                        "assets/icons/elements/icon-elements-Electric.webp",
                                     width: 20,
                                     height: 20,
                                   ),
@@ -282,7 +314,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,
-                                        color: isDark ? Colors.white : Colors.black,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                   ),
@@ -325,14 +359,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 140,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
-                    return Container(height: 140, color: Colors.grey.shade800, child: const Center(child: Icon(Icons.broken_image, color: Colors.white, size: 50)));
+                    return Container(
+                        height: 140,
+                        color: Colors.grey.shade800,
+                        child: const Center(
+                            child: Icon(Icons.broken_image,
+                                color: Colors.white, size: 50)));
                   },
                 ),
               ),
 
               // ✅ 카드 본문
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, top: 16, bottom: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -426,6 +466,73 @@ class _HomeScreenState extends State<HomeScreen> {
                           value: raid.weakness ?? '',
                         ),
                       ],
+                    ),
+                    if (raid.keyword != null && raid.keyword!.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF1E1E1E)
+                              : const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          alignment: WrapAlignment.start,
+                          children: raid.keyword!.map((kw) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2.5),
+                              decoration: BoxDecoration(
+                                color: Colors.orange,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Text(
+                                "#$kw",
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            DeckBuilderScreen.routeName,
+                            arguments: raid,
+                          );
+                        },
+                        icon:
+                            const Icon(Icons.build_circle, color: Colors.white),
+                        label: const Text(
+                          "덱 구성하기",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange.shade600,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -538,8 +645,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               radius: 14,
                               backgroundColor: Colors.orange,
                               child: Text(
-                                (auth.nickname != null && auth.nickname!.isNotEmpty)
-                                    ? auth.nickname!.substring(0, 1).toUpperCase()
+                                (auth.nickname != null &&
+                                        auth.nickname!.isNotEmpty)
+                                    ? auth.nickname!
+                                        .substring(0, 1)
+                                        .toUpperCase()
                                     : 'C',
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -560,10 +670,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         Navigator.pushNamed(context, LoginScreen.routeName);
                       },
-                      icon: const Icon(Icons.login_rounded, size: 16, color: Colors.white),
+                      icon: const Icon(Icons.login_rounded,
+                          size: 16, color: Colors.white),
                       label: const Text(
                         "로그인",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13),
                       ),
                     ),
                   );
@@ -586,107 +700,117 @@ class _HomeScreenState extends State<HomeScreen> {
                   onExit: (_) => setState(() => _isHoveringRaid = false),
                   child: Stack(
                     alignment: Alignment.center,
-                  children: [
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 420),
-                      child: SizedBox(
-                        height: 380,
-                        child: PageView.builder(
-                          controller: _raidPageController,
-                          clipBehavior: Clip.none,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentRaidPage = index;
-                            });
-                          },
-                          itemCount: raidHistory.length,
-                          itemBuilder: (context, index) {
-                            return AnimatedBuilder(
-                              animation: _raidPageController,
-                              builder: (context, child) {
-                                double page = index.toDouble();
-                                if (_raidPageController.position.haveDimensions) {
-                                  page = _raidPageController.page ?? page;
-                                } else {
-                                  page = _raidPageController.initialPage.toDouble();
-                                }
-                                double diff = (page - index).abs();
-                                double scale = (1 - (diff * 0.15)).clamp(0.85, 1.0);
-                                double opacity = (1 - (diff * 0.5)).clamp(0.4, 1.0);
+                    children: [
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 420),
+                        child: SizedBox(
+                          height: 495,
+                          child: PageView.builder(
+                            controller: _raidPageController,
+                            clipBehavior: Clip.none,
+                            onPageChanged: (index) {
+                              setState(() {
+                                _currentRaidPage = index;
+                              });
+                            },
+                            itemCount: raidHistory.length,
+                            itemBuilder: (context, index) {
+                              return AnimatedBuilder(
+                                animation: _raidPageController,
+                                builder: (context, child) {
+                                  double page = index.toDouble();
+                                  if (_raidPageController
+                                      .position.haveDimensions) {
+                                    page = _raidPageController.page ?? page;
+                                  } else {
+                                    page = _raidPageController.initialPage
+                                        .toDouble();
+                                  }
+                                  double diff = (page - index).abs();
+                                  double scale =
+                                      (1 - (diff * 0.15)).clamp(0.85, 1.0);
+                                  double opacity =
+                                      (1 - (diff * 0.5)).clamp(0.4, 1.0);
 
-                                return Opacity(
-                                  opacity: opacity,
-                                  child: Transform.scale(
-                                    scale: scale,
-                                    child: child,
-                                  ),
-                                );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                child: _buildRaidSummaryCard(context, raidHistory[index]),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    // 좌측 화살표
-                    if (_currentRaidPage > 0)
-                      Positioned(
-                        left: 0,
-                        child: IgnorePointer(
-                          ignoring: !_isHoveringRaid,
-                          child: AnimatedOpacity(
-                            opacity: _isHoveringRaid ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 200),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.4),
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.chevron_left, color: Colors.white, size: 32),
-                                onPressed: () {
-                                  _raidPageController.previousPage(
-                                    duration: const Duration(milliseconds: 400),
-                                    curve: Curves.easeOutCubic,
+                                  return Opacity(
+                                    opacity: opacity,
+                                    child: Transform.scale(
+                                      scale: scale,
+                                      child: child,
+                                    ),
                                   );
                                 },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0),
+                                  child: _buildRaidSummaryCard(
+                                      context, raidHistory[index]),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      // 좌측 화살표
+                      if (_currentRaidPage > 0)
+                        Positioned(
+                          left: 0,
+                          child: IgnorePointer(
+                            ignoring: !_isHoveringRaid,
+                            child: AnimatedOpacity(
+                              opacity: _isHoveringRaid ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 200),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.4),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(Icons.chevron_left,
+                                      color: Colors.white, size: 32),
+                                  onPressed: () {
+                                    _raidPageController.previousPage(
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      curve: Curves.easeOutCubic,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    // 우측 화살표
-                    if (_currentRaidPage < raidHistory.length - 1)
-                      Positioned(
-                        right: 0,
-                        child: IgnorePointer(
-                          ignoring: !_isHoveringRaid,
-                          child: AnimatedOpacity(
-                            opacity: _isHoveringRaid ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 200),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.4),
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.chevron_right, color: Colors.white, size: 32),
-                                onPressed: () {
-                                  _raidPageController.nextPage(
-                                    duration: const Duration(milliseconds: 400),
-                                    curve: Curves.easeOutCubic,
-                                  );
-                                },
+                      // 우측 화살표
+                      if (_currentRaidPage < raidHistory.length - 1)
+                        Positioned(
+                          right: 0,
+                          child: IgnorePointer(
+                            ignoring: !_isHoveringRaid,
+                            child: AnimatedOpacity(
+                              opacity: _isHoveringRaid ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 200),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.4),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(Icons.chevron_right,
+                                      color: Colors.white, size: 32),
+                                  onPressed: () {
+                                    _raidPageController.nextPage(
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      curve: Curves.easeOutCubic,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -716,7 +840,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "솔로 레이드 덱 구성",
                         icon: Icons.dashboard_customize,
                         color: Colors.orange,
-                        onTap: () => _showWeaknessDialog(context, initialWeakness: raidHistory[_currentRaidPage].weakness),
+                        onTap: () => _showWeaknessDialog(context,
+                            initialWeakness:
+                                raidHistory[_currentRaidPage].weakness),
                       ),
                       const SizedBox(height: 12),
                       _buildMenuButton(
@@ -724,7 +850,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "유니온 레이드 덱 구성",
                         icon: Icons.group_work,
                         color: Colors.orange.shade700,
-                        onTap: () => Navigator.pushNamed(context, UnionDeckBuilderScreen.routeName),
+                        onTap: () => Navigator.pushNamed(
+                            context, UnionDeckBuilderScreen.routeName),
                       ),
                       const SizedBox(height: 12),
                       _buildMenuButton(
@@ -732,7 +859,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "공유 덱 라이브러리 바로가기",
                         icon: Icons.auto_awesome_motion,
                         color: Colors.deepOrange,
-                        onTap: () => Navigator.pushNamed(context, DeckLibraryScreen.routeName),
+                        onTap: () => Navigator.pushNamed(
+                            context, DeckLibraryScreen.routeName),
                       ),
                       const SizedBox(height: 12),
                       _buildMenuButton(
@@ -740,7 +868,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "전투 정보 동기화",
                         icon: Icons.sync_rounded,
                         color: Colors.blueAccent,
-                        onTap: () => Navigator.pushNamed(context, SyncScreen.routeName),
+                        onTap: () =>
+                            Navigator.pushNamed(context, SyncScreen.routeName),
                         isOutlined: true,
                       ),
                       const SizedBox(height: 12),
@@ -764,16 +893,25 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icons.person_search,
                               color: Colors.purple,
                               onTap: () async {
-                                final prefs = await SharedPreferences.getInstance();
+                                final prefs =
+                                    await SharedPreferences.getInstance();
                                 if (!context.mounted) return;
-                                final savedOpenId = prefs.getString('last_synced_openid');
-                                if (savedOpenId != null && savedOpenId.isNotEmpty) {
-                                  Navigator.pushNamed(context, MyNikkeScreen.routeName, arguments: savedOpenId);
+                                final savedOpenId =
+                                    prefs.getString('last_synced_openid');
+                                if (savedOpenId != null &&
+                                    savedOpenId.isNotEmpty) {
+                                  Navigator.pushNamed(
+                                      context, MyNikkeScreen.routeName,
+                                      arguments: savedOpenId);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("먼저 블라블라링크 프로필 동기화를 진행해 주세요."), backgroundColor: Colors.orange),
+                                    const SnackBar(
+                                        content:
+                                            Text("먼저 블라블라링크 프로필 동기화를 진행해 주세요."),
+                                        backgroundColor: Colors.orange),
                                   );
-                                  Navigator.pushNamed(context, SyncScreen.routeName);
+                                  Navigator.pushNamed(
+                                      context, SyncScreen.routeName);
                                 }
                               },
                               isOutlined: true,

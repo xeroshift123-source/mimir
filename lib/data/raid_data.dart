@@ -12,6 +12,7 @@ final List<RaidInfo> raidHistory = [
         "assets/images/raids/wigobi.png", // Replace with correct image later
     bossElement: "수냉",
     weakness: "전격",
+    keyword: ["파츠"],
   ),
   const RaidInfo(
     type: RaidType.union,
@@ -34,6 +35,7 @@ final List<RaidInfo> raidHistory = [
     imagePath: "assets/images/raids/ultra.webp",
     bossElement: "작열",
     weakness: "수냉",
+    keyword: ["관통데미지", "코어", "파츠"],
   ),
   const RaidInfo(
     type: RaidType.union,
@@ -56,5 +58,6 @@ final List<RaidInfo> raidHistory = [
     imagePath: "assets/images/raids/annihilio.png",
     bossElement: "철갑",
     weakness: "풍압",
+    keyword: ["코어", "파츠"],
   ),
 ];

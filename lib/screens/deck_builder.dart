@@ -86,6 +86,9 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   /// 지금 니케를 채워넣을 대상 스쿼드 인덱스 (0 = Squad 1)
   int _activeSquadIndex = 0;
 
+  bool _isSpecificRaid = false;
+  List<String> _currentRaidKeywords = [];
+
   @override
   void initState() {
     super.initState();
@@ -127,6 +130,12 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     final routeArgs = ModalRoute.of(context)?.settings.arguments;
     if (routeArgs is String) {
       _weaknessElement = routeArgs;
+    } else if (routeArgs is RaidInfo) {
+      _isSpecificRaid = true;
+      _weaknessElement = routeArgs.weakness ?? '전격';
+      if (routeArgs.keyword != null) {
+        _currentRaidKeywords = routeArgs.keyword!;
+      }
     } else if (routeArgs is SharedDeck) {
       _pendingSquadsIds = routeArgs.squadsNikkeIds;
       _isImportedDeck = true;
@@ -593,6 +602,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   Widget _buildFiveSquadsShareCanvas(String weaknessElement) {
     const double w = 600;
 
+    final List<String> raidKeywordsToPass = _isSpecificRaid ? _currentRaidKeywords : [];
+
     return Container(
       width: w,
       color: const Color(0xFF090A0F),
@@ -611,6 +622,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                 isActive: index == _activeSquadIndex,
                 slots: _squads[index],
                 weaknessElement: weaknessElement,
+                raidKeywords: raidKeywordsToPass,
               ),
             );
           }),
@@ -623,6 +635,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                 slots: _candidateSquad,
                 weaknessElement: weaknessElement,
                 isCandidate: true,
+                raidKeywords: raidKeywordsToPass,
               ),
             ),
           const SizedBox(height: 10),
@@ -1122,13 +1135,14 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
         backgroundColor: Colors.orange,
         actions: [
           // Sleek Element Selector Dropdown
-          Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF2D2D2D) // M2 8dp surface
-                  : Colors.white,
-            ),
-            child: DropdownButtonHideUnderline(
+          if (!_isSpecificRaid)
+            Theme(
+              data: Theme.of(context).copyWith(
+                canvasColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF2D2D2D) // M2 8dp surface
+                    : Colors.white,
+              ),
+              child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: _weaknessElement ?? '전격',
                 icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
@@ -2560,6 +2574,7 @@ class _ShareSquadPanel extends StatelessWidget {
   final List<Nikke?> slots;
   final String weaknessElement;
   final bool isCandidate;
+  final List<String> raidKeywords;
 
   const _ShareSquadPanel({
     required this.title,
@@ -2567,6 +2582,7 @@ class _ShareSquadPanel extends StatelessWidget {
     required this.slots,
     required this.weaknessElement,
     this.isCandidate = false,
+    this.raidKeywords = const [],
   });
 
   Widget _buildBadge({
@@ -2614,6 +2630,42 @@ class _ShareSquadPanel extends StatelessWidget {
     }
   }
 
+  Widget _buildGradientBadge(String text) {
+    return Container(
+      padding: const EdgeInsets.all(1.2), // Border width
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFD4A5FF),
+            Color(0xFF80FFEA),
+            Color(0xFFB185DB),
+            Color(0xFFFF9CEE),
+            Color(0xFF8A2BE2),
+          ],
+          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+        decoration: BoxDecoration(
+          color: const Color(0xFF11141B), // Matches panel background
+          borderRadius: BorderRadius.circular(4.8),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // Changed to white as requested
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDynamicBadge(String text) {
     const goldColor = Color(0xFFFFA000);
     return Container(
@@ -2654,39 +2706,83 @@ class _ShareSquadPanel extends StatelessWidget {
         activeNikkes.any((n) => n.ability.contains("버스트 쿨타임 감소"));
 
     // 2. 동적 키워드 로직
+    final List<String> specialTags = [];
     final List<String> dynamicTags = [];
-    if (activeNikkes.any((n) => n.ability.contains("힐"))) {
-      dynamicTags.add("힐");
+
+    // 코어
+    if (raidKeywords.contains("코어") && activeNikkes.any((n) => n.ability.contains("코어데미지증가"))) {
+      specialTags.add("코어");
     }
-    if (activeNikkes.any((n) => n.name == "토브")) {
-      dynamicTags.add("샷건");
-    }
-    if (activeNikkes.where((n) => n.ability.contains("방어력무시데미지")).length >= 2) {
-      dynamicTags.add("방무뎀");
-    }
-    if (activeNikkes.where((n) => n.ability.contains("관통데미지")).length >= 2) {
-      dynamicTags.add("관통뎀");
-    }
-    if (activeNikkes.where((n) => n.ability.contains("지속데미지")).length >= 2) {
-      dynamicTags.add("지속딜");
-    }
-    if (activeNikkes.where((n) => n.ability.contains("파츠")).length >= 2) {
+
+    // 파츠
+    if (raidKeywords.contains("파츠") && activeNikkes.any((n) => n.ability.contains("파츠"))) {
+      specialTags.add("파츠");
+    } else if (activeNikkes.where((n) => n.ability.contains("파츠")).length >= 2) {
       dynamicTags.add("파츠");
     }
-    if (activeNikkes.where((n) => n.ability.contains("받는데미지증가")).length >= 2) {
+
+    // 힐
+    if (raidKeywords.contains("힐") && activeNikkes.any((n) => n.ability.contains("힐"))) {
+      specialTags.add("힐");
+    } else if (activeNikkes.any((n) => n.ability.contains("힐"))) {
+      dynamicTags.add("힐");
+    }
+
+    // 샷건
+    if (raidKeywords.contains("샷건") && activeNikkes.any((n) => n.name == "토브")) {
+      specialTags.add("샷건");
+    } else if (activeNikkes.any((n) => n.name == "토브")) {
+      dynamicTags.add("샷건");
+    }
+
+    // 방무뎀
+    if ((raidKeywords.contains("방어력무시데미지") || raidKeywords.contains("방무뎀")) && activeNikkes.any((n) => n.ability.contains("방어력무시데미지"))) {
+      specialTags.add("방무뎀");
+    } else if (activeNikkes.where((n) => n.ability.contains("방어력무시데미지")).length >= 2) {
+      dynamicTags.add("방무뎀");
+    }
+
+    // 관통뎀
+    if ((raidKeywords.contains("관통데미지") || raidKeywords.contains("관통뎀")) && activeNikkes.any((n) => n.ability.contains("관통데미지"))) {
+      specialTags.add("관통뎀");
+    } else if (activeNikkes.where((n) => n.ability.contains("관통데미지")).length >= 2) {
+      dynamicTags.add("관통뎀");
+    }
+
+    // 지속딜
+    if ((raidKeywords.contains("지속데미지") || raidKeywords.contains("지속딜")) && activeNikkes.any((n) => n.ability.contains("지속데미지"))) {
+      specialTags.add("지속딜");
+    } else if (activeNikkes.where((n) => n.ability.contains("지속데미지")).length >= 2) {
+      dynamicTags.add("지속딜");
+    }
+
+    // 받뎀증
+    if ((raidKeywords.contains("받는데미지증가") || raidKeywords.contains("받뎀증")) && activeNikkes.any((n) => n.ability.contains("받는데미지증가"))) {
+      specialTags.add("받뎀증");
+    } else if (activeNikkes.where((n) => n.ability.contains("받는데미지증가")).length >= 2) {
       dynamicTags.add("받뎀증");
     }
-    if (activeNikkes.where((n) => n.ability.contains("분배데미지")).length >= 2) {
+
+    // 분배뎀
+    if ((raidKeywords.contains("분배데미지") || raidKeywords.contains("분배뎀")) && activeNikkes.any((n) => n.ability.contains("분배데미지"))) {
+      specialTags.add("분배뎀");
+    } else if (activeNikkes.where((n) => n.ability.contains("분배데미지")).length >= 2) {
       dynamicTags.add("분배뎀");
     }
-    if (activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
+
+    // 재장전
+    if ((raidKeywords.contains("재장전속도증가") || raidKeywords.contains("재장전")) && activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
+      specialTags.add("재장전");
+    } else if (activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
       dynamicTags.add("재장전");
     }
-    final explosionCount =
-        activeNikkes.where((n) => n.ability.contains("폭발데미지")).length;
-    final rlCount =
-        activeNikkes.where((n) => n.weaponType == WeaponType.RL).length;
-    if (explosionCount >= 2 || (explosionCount >= 1 && rlCount >= 1)) {
+
+    // 폭발뎀
+    final explosionCount = activeNikkes.where((n) => n.ability.contains("폭발데미지")).length;
+    final rlCount = activeNikkes.where((n) => n.weaponType == WeaponType.RL).length;
+    if ((raidKeywords.contains("폭발데미지") || raidKeywords.contains("폭발뎀")) && activeNikkes.any((n) => n.ability.contains("폭발데미지"))) {
+      specialTags.add("폭발뎀");
+    } else if (explosionCount >= 2 || (explosionCount >= 1 && rlCount >= 1)) {
       dynamicTags.add("폭발뎀");
     }
 
@@ -2761,13 +2857,14 @@ class _ShareSquadPanel extends StatelessWidget {
                     color: Colors.white.withOpacity(0.06),
                   ),
                   const SizedBox(height: 5),
-                  if (dynamicTags.isNotEmpty)
+                  if (dynamicTags.isNotEmpty || specialTags.isNotEmpty)
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
-                      children: dynamicTags.map((tag) {
-                        return _buildDynamicBadge(tag);
-                      }).toList(),
+                      children: [
+                        ...specialTags.map((tag) => _buildGradientBadge(tag)),
+                        ...dynamicTags.map((tag) => _buildDynamicBadge(tag)),
+                      ],
                     ),
                 ],
               ],
