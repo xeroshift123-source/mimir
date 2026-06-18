@@ -18,7 +18,7 @@ class AuthProvider extends ChangeNotifier {
   String? get profileImageUrl => _profileImageUrl;
   String? get loginProvider => _loginProvider;
 
-  static const bool showLoginFeatures = true;
+  static const bool showLoginFeatures = false;
 
   /// Returns whether actual Firebase Authentication backend is operational.
   bool get isRealAuthActive =>
