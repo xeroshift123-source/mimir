@@ -52,9 +52,9 @@ final List<RaidInfo> raidHistory = [
   ),
   const RaidInfo(
     type: RaidType.solo,
-    seasonName: "SEASON 38",
-    bossName: "애니힐리오",
-    period: "6/18(목) 12:00 ~ 6/25(목) 4:59",
+    seasonName: "SEASON 38.5",
+    bossName: "애니힐리오(RE)",
+    period: " 7/3(금) 12:00 ~ 7/8(수) 4:59",
     imagePath: "assets/images/raids/annihilio.png",
     bossElement: "철갑",
     weakness: "풍압",
