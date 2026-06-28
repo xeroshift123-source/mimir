@@ -10,9 +10,28 @@ class OverloadSimulatorProvider with ChangeNotifier {
   final bool assumeCube15;
   late List<OverloadEquipment> equipments;
 
-  int totalModulesUsed = 0;
+  int _modulesSpentOnRolls = 0;
   int totalLockKeysUsed = 0;
   double currentCp = 0;
+
+  int get totalModulesUsed {
+    int lockCost = 0;
+    for (final eq in equipments) {
+      int initial = eq.initialLockedCount;
+      int module = eq.moduleLockedCount;
+      int total = initial + module;
+      lockCost += _getLockCostFor(total) - _getLockCostFor(initial);
+    }
+    return _modulesSpentOnRolls + lockCost;
+  }
+
+  int _getLockCostFor(int count) {
+    if (count <= 0) return 0;
+    if (count == 1) return 2;
+    if (count == 2) return 5;
+    if (count >= 3) return 9;
+    return 0;
+  }
 
   final Random _random = Random();
 
@@ -127,19 +146,29 @@ class OverloadSimulatorProvider with ChangeNotifier {
     if (slot.isEmpty) return; // 빈 슬롯은 잠금 불가
 
     final bool wasLocked = slot.isModuleLocked;
-    slot.isModuleLocked = !wasLocked;
-
-    if (slot.isModuleLocked) {
-      // 잠금을 켤 때 모듈 소모 (첫 번째 잠금: 2개, 두 번째 잠금: 3개)
-      int lockCost = eq.moduleLockedCount + 1;
-      totalModulesUsed += lockCost;
-      slot.isKeyLocked = false; // 중복 잠금 방지
-    } else {
-      // 잠금을 풀 때 시뮬레이터 편의상 비용 환불
-      int refundAmount = eq.moduleLockedCount + 2; 
-      totalModulesUsed -= refundAmount;
-      if (totalModulesUsed < 0) totalModulesUsed = 0;
+    
+    if (!wasLocked) {
+      slot.isInitialLocked = false;
+      slot.isKeyLocked = false;
     }
+
+    slot.isModuleLocked = !wasLocked;
+    notifyListeners();
+  }
+
+  void toggleInitialLock(EquipmentPart part, int slotIndex) {
+    final eq = _getEquipment(part);
+    final slot = eq.slots[slotIndex];
+    if (slot.isEmpty) return;
+
+    final bool wasLocked = slot.isInitialLocked;
+
+    if (!wasLocked) {
+      slot.isModuleLocked = false;
+      slot.isKeyLocked = false;
+    }
+
+    slot.isInitialLocked = !wasLocked;
     notifyListeners();
   }
 
@@ -151,12 +180,13 @@ class OverloadSimulatorProvider with ChangeNotifier {
     slot.isKeyLocked = !slot.isKeyLocked;
     if (slot.isKeyLocked) {
       slot.isModuleLocked = false;
+      slot.isInitialLocked = false;
     }
     notifyListeners();
   }
 
   void reset() {
-    totalModulesUsed = 0;
+    _modulesSpentOnRolls = 0;
     totalLockKeysUsed = 0;
     _initializeEquipments();
     _calculateCP();
@@ -186,7 +216,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
     if (kLockCount == 1) keyCost = 20;
     else if (kLockCount == 2) keyCost = 50;
 
-    totalModulesUsed += moduleCost;
+    _modulesSpentOnRolls += moduleCost;
     totalLockKeysUsed += keyCost;
 
     // 2. 잠금 해제될 락키 옵션 미리 확인
@@ -237,7 +267,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
     if (kLockCount == 1) keyCost = 20;
     else if (kLockCount == 2) keyCost = 50;
 
-    totalModulesUsed += moduleCost;
+    _modulesSpentOnRolls += moduleCost;
     totalLockKeysUsed += keyCost;
 
     final keyLockedSlots = eq.slots.where((s) => s.isKeyLocked).toList();

@@ -22,20 +22,23 @@ class OverloadSlot {
   int? skillLevel;
   bool isModuleLocked;
   bool isKeyLocked;
+  bool isInitialLocked;
 
   OverloadSlot({
     this.optionType,
     this.skillLevel,
     this.isModuleLocked = false,
     this.isKeyLocked = false,
+    this.isInitialLocked = false,
   });
 
-  bool get isLocked => isModuleLocked || isKeyLocked;
+  bool get isLocked => isModuleLocked || isKeyLocked || isInitialLocked;
   bool get isEmpty => optionType == null;
 
   void unlock() {
     isModuleLocked = false;
     isKeyLocked = false;
+    isInitialLocked = false;
   }
 }
 
@@ -49,6 +52,7 @@ class OverloadEquipment {
   }) : slots = slots ?? List.generate(3, (_) => OverloadSlot());
 
   int get moduleLockedCount => slots.where((s) => s.isModuleLocked).length;
+  int get initialLockedCount => slots.where((s) => s.isInitialLocked).length;
   int get keyLockedCount => slots.where((s) => s.isKeyLocked).length;
   int get lockedCount => slots.where((s) => s.isLocked).length;
 }

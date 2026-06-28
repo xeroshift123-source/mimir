@@ -374,7 +374,9 @@ class _OverloadSimulatorView extends StatelessWidget {
         ? Colors.blue
         : slot.isKeyLocked
             ? Colors.orange
-            : Colors.transparent;
+            : slot.isInitialLocked
+                ? Colors.purple
+                : Colors.transparent;
 
     final String slotPrefix = "[${index + 1}슬롯] ";
 
@@ -448,6 +450,8 @@ class _OverloadSimulatorView extends StatelessWidget {
                 const Icon(Icons.lock, color: Colors.blue, size: 20)
               else if (slot.isKeyLocked)
                 const Icon(Icons.key, color: Colors.orange, size: 20)
+              else if (slot.isInitialLocked)
+                const Icon(Icons.lock, color: Colors.purple, size: 20)
               else
                 const Icon(Icons.lock_open, color: Colors.grey, size: 20),
             ],
@@ -474,6 +478,15 @@ class _OverloadSimulatorView extends StatelessWidget {
                 subtitle: const Text('비용: 1슬롯-2개, 2슬롯-3개'),
                 onTap: () {
                   provider.toggleModuleLock(part, slotIndex);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.lock, color: Colors.purple, size: 24),
+                title: const Text('초기 상태로 잠금'),
+                subtitle: const Text('비용 없음 (미리 잠겨있던 옵션)'),
+                onTap: () {
+                  provider.toggleInitialLock(part, slotIndex);
                   Navigator.pop(context);
                 },
               ),
