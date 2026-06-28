@@ -1698,23 +1698,27 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.shield_outlined,
-                    color: Colors.orange.shade700, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  "각 부위별 장비 오버로드 상세 정보",
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87,
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(Icons.shield_outlined,
+                      color: Colors.orange.shade700, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "각 부위별 장비 오버로드 상세 정보",
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            if (localNikke != null)
+            if (localNikke != null) ...[
+              const SizedBox(width: 8),
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pushNamed(
@@ -1735,6 +1739,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   foregroundColor: Colors.white,
                 ),
               ),
+            ],
           ],
         ),
         const SizedBox(height: 12),

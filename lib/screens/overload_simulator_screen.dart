@@ -50,41 +50,62 @@ class _OverloadSimulatorView extends StatelessWidget {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 왼쪽: 옵션 총합 패널
-                      Expanded(
-                        flex: 1,
-                        child: _buildTotalOverloadStats(provider, isDark),
-                      ),
-                      const SizedBox(width: 24),
-                      // 오른쪽: 2x2 그리드
-                      Expanded(
-                        flex: 2,
-                        child: Column(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (constraints.maxWidth < 800) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: _buildEquipmentSection(context, provider, EquipmentPart.head, '머리', isDark)),
-                                const SizedBox(width: 16),
-                                Expanded(child: _buildEquipmentSection(context, provider, EquipmentPart.torso, '몸통', isDark)),
-                              ],
-                            ),
+                            _buildTotalOverloadStats(provider, isDark),
                             const SizedBox(height: 16),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(child: _buildEquipmentSection(context, provider, EquipmentPart.arm, '팔', isDark)),
-                                const SizedBox(width: 16),
-                                Expanded(child: _buildEquipmentSection(context, provider, EquipmentPart.leg, '다리', isDark)),
-                              ],
+                            _buildEquipmentSection(context, provider, EquipmentPart.head, '머리', isDark),
+                            const SizedBox(height: 16),
+                            _buildEquipmentSection(context, provider, EquipmentPart.torso, '몸통', isDark),
+                            const SizedBox(height: 16),
+                            _buildEquipmentSection(context, provider, EquipmentPart.arm, '팔', isDark),
+                            const SizedBox(height: 16),
+                            _buildEquipmentSection(context, provider, EquipmentPart.leg, '다리', isDark),
+                          ],
+                        );
+                      } else {
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 왼쪽: 옵션 총합 패널
+                            Expanded(
+                              flex: 1,
+                              child: _buildTotalOverloadStats(provider, isDark),
+                            ),
+                            const SizedBox(width: 24),
+                            // 오른쪽: 2x2 그리드
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(child: _buildEquipmentSection(context, provider, EquipmentPart.head, '머리', isDark)),
+                                      const SizedBox(width: 16),
+                                      Expanded(child: _buildEquipmentSection(context, provider, EquipmentPart.torso, '몸통', isDark)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(child: _buildEquipmentSection(context, provider, EquipmentPart.arm, '팔', isDark)),
+                                      const SizedBox(width: 16),
+                                      Expanded(child: _buildEquipmentSection(context, provider, EquipmentPart.leg, '다리', isDark)),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
-                        ),
-                      ),
-                    ],
+                        );
+                      }
+                    },
                   ),
                 ),
               ),
