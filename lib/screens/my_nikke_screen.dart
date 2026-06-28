@@ -1696,18 +1696,45 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         }),
         const SizedBox(height: 24),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(Icons.shield_outlined,
-                color: Colors.orange.shade700, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              "각 부위별 장비 오버로드 상세 정보",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.shield_outlined,
+                    color: Colors.orange.shade700, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  "각 부위별 장비 오버로드 상세 정보",
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ],
             ),
+            if (localNikke != null)
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/overload-simulator',
+                    arguments: {
+                      'nikke': localNikke,
+                      'charData': modifiableChar,
+                      'assumeCube15': _assumeCube15,
+                    },
+                  );
+                },
+                icon: const Icon(Icons.build_circle_outlined, size: 16),
+                label: const Text("모듈작 시뮬레이션", style: TextStyle(fontSize: 12)),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                ),
+              ),
           ],
         ),
         const SizedBox(height: 12),

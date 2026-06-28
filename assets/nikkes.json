@@ -3200,6 +3200,42 @@
     "squadNum": 0,
     "rank": "SSR",
     "type": "ATK",
+    "isTemporary": false
+  },
+  {
+    "id": "cinderella_crystal_wave",
+    "name": "신데렐라 : 크리스탈 웨이브",
+    "imageUrl": "assets/nikke/cinderella_crystal_wave.png",
+    "burst": "3",
+    "element": "Iron",
+    "weaponType": "MG",
+    "company": "Pilgrim",
+    "ability": [
+      "수렐루"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK",
+    "isTemporary": true
+  },
+  {
+    "id": "marciana_marine_study",
+    "name": "마르차나 : 마린 스터디",
+    "imageUrl": "assets/nikke/marciana_marine_study.png",
+    "burst": "3",
+    "element": "Iron",
+    "weaponType": "AR",
+    "company": "Elysion",
+    "ability": [
+      "수말차",
+      "수세식화장실",
+      "섹스"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK",
     "isTemporary": true
   }
 ]
