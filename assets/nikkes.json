@@ -3205,7 +3205,7 @@
   {
     "id": "cinderella_crystal_wave",
     "name": "신데렐라 : 크리스탈 웨이브",
-    "imageUrl": "assets/nikke/cinderella_crystal_wave.png",
+    "imageUrl": "assets/nikke/cinderella_crystal_wave.webp",
     "burst": "3",
     "element": "Iron",
     "weaponType": "MG",
@@ -3222,7 +3222,7 @@
   {
     "id": "marciana_marine_study",
     "name": "마르차나 : 마린 스터디",
-    "imageUrl": "assets/nikke/marciana_marine_study.png",
+    "imageUrl": "assets/nikke/marciana_marine_study.webp",
     "burst": "3",
     "element": "Iron",
     "weaponType": "AR",
