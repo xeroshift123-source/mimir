@@ -43,7 +43,7 @@ class MimirApp extends StatelessWidget {
           create: (_) => NikkeProvider()..loadNikkes(), // 앱 시작 시 니케 목록 로딩
         ),
         ChangeNotifierProvider(
-          create: (_) => ThemeProvider()..loadTheme(), // 테마 초기화 로드
+          create: (_) => ThemeProvider()..loadTheme(), // 테마 초기화 로f드
         ),
         ChangeNotifierProvider(
           create: (_) => AuthProvider(), // 사용자 인증 정보 상태 관리
@@ -123,7 +123,8 @@ class MimirApp extends StatelessWidget {
               LoginScreen.routeName: (context) => const LoginScreen(),
               SyncScreen.routeName: (context) => const SyncScreen(),
               MyNikkeScreen.routeName: (context) => const MyNikkeScreen(),
-              OverloadSimulatorScreen.routeName: (context) => const OverloadSimulatorScreen(),
+              OverloadSimulatorScreen.routeName: (context) =>
+                  const OverloadSimulatorScreen(),
             },
           );
         },
