@@ -11,18 +11,12 @@ class OverloadSimulatorProvider with ChangeNotifier {
   late List<OverloadEquipment> equipments;
 
   int _modulesSpentOnRolls = 0;
+  int _modulesSpentOnLocking = 0;
   int totalLockKeysUsed = 0;
   double currentCp = 0;
 
   int get totalModulesUsed {
-    int lockCost = 0;
-    for (final eq in equipments) {
-      int initial = eq.initialLockedCount;
-      int module = eq.moduleLockedCount;
-      int total = initial + module;
-      lockCost += _getLockCostFor(total) - _getLockCostFor(initial);
-    }
-    return _modulesSpentOnRolls + lockCost;
+    return _modulesSpentOnRolls + _modulesSpentOnLocking;
   }
 
   int _getLockCostFor(int count) {
@@ -148,6 +142,10 @@ class OverloadSimulatorProvider with ChangeNotifier {
     final bool wasLocked = slot.isModuleLocked;
     
     if (!wasLocked) {
+      int currentLocked = eq.moduleLockedCount + eq.initialLockedCount;
+      int cost = _getLockCostFor(currentLocked + 1) - _getLockCostFor(currentLocked);
+      _modulesSpentOnLocking += cost;
+
       slot.isInitialLocked = false;
       slot.isKeyLocked = false;
     }
@@ -187,6 +185,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
 
   void reset() {
     _modulesSpentOnRolls = 0;
+    _modulesSpentOnLocking = 0;
     totalLockKeysUsed = 0;
     _initializeEquipments();
     _calculateCP();
@@ -208,13 +207,17 @@ class OverloadSimulatorProvider with ChangeNotifier {
     final eq = _getEquipment(part);
 
     // 1. 비용 계산 및 소모
-    int totalLockCount = eq.slots.where((s) => s.isLocked).length;
-    int moduleCost = 1 + totalLockCount;
-    
+    int mLockCount = eq.moduleLockedCount + eq.initialLockedCount;
     int kLockCount = eq.keyLockedCount;
+    int moduleCost = 1 + mLockCount;
+    
     int keyCost = 0;
-    if (kLockCount == 1) keyCost = 20;
-    else if (kLockCount == 2) keyCost = 50;
+    for (int i = 0; i < kLockCount; i++) {
+      int lockPosition = mLockCount + i + 1;
+      if (lockPosition == 1) keyCost += 20;
+      else if (lockPosition == 2) keyCost += 30;
+      else if (lockPosition >= 3) keyCost += 40;
+    }
 
     _modulesSpentOnRolls += moduleCost;
     totalLockKeysUsed += keyCost;
@@ -259,13 +262,17 @@ class OverloadSimulatorProvider with ChangeNotifier {
     final eq = _getEquipment(part);
 
     // 1. 비용 계산 (수치 변경도 효과 변경과 동일한 비용 구조를 가짐)
-    int totalLockCount = eq.slots.where((s) => s.isLocked).length;
-    int moduleCost = 1 + totalLockCount;
-    
+    int mLockCount = eq.moduleLockedCount + eq.initialLockedCount;
     int kLockCount = eq.keyLockedCount;
+    int moduleCost = 1 + mLockCount;
+    
     int keyCost = 0;
-    if (kLockCount == 1) keyCost = 20;
-    else if (kLockCount == 2) keyCost = 50;
+    for (int i = 0; i < kLockCount; i++) {
+      int lockPosition = mLockCount + i + 1;
+      if (lockPosition == 1) keyCost += 20;
+      else if (lockPosition == 2) keyCost += 30;
+      else if (lockPosition >= 3) keyCost += 40;
+    }
 
     _modulesSpentOnRolls += moduleCost;
     totalLockKeysUsed += keyCost;
