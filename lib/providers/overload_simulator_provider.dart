@@ -209,7 +209,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
     // 1. 비용 계산 및 소모
     int mLockCount = eq.moduleLockedCount + eq.initialLockedCount;
     int kLockCount = eq.keyLockedCount;
-    int moduleCost = 1 + mLockCount;
+    int moduleCost = 1 + mLockCount + kLockCount;
     
     int keyCost = 0;
     for (int i = 0; i < kLockCount; i++) {
@@ -264,7 +264,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
     // 1. 비용 계산 (수치 변경도 효과 변경과 동일한 비용 구조를 가짐)
     int mLockCount = eq.moduleLockedCount + eq.initialLockedCount;
     int kLockCount = eq.keyLockedCount;
-    int moduleCost = 1 + mLockCount;
+    int moduleCost = 1 + mLockCount + kLockCount;
     
     int keyCost = 0;
     for (int i = 0; i < kLockCount; i++) {

@@ -46,6 +46,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   bool _isNikkeSheetOpen = false;
   String? _weaknessElement;
   Map<String, dynamic>? _profileData; // 👈 추가
+  bool _allowUnowned = false;
 
   static const Map<String, String> _elementIconMap = {
     '전격': 'assets/icons/elements/icon-elements-Electric.webp',
@@ -910,6 +911,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     if (_weaknessElement != null) {
       await prefs.setString('deck_builder_weakness_element', _weaknessElement!);
     }
+    await prefs.setBool('deck_builder_allow_unowned', _allowUnowned);
   }
 
   Future<void> _loadDeckFromLocal() async {
@@ -948,6 +950,11 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     final savedWeakness = prefs.getString('deck_builder_weakness_element');
     if (savedWeakness != null && _weaknessElement == null) {
       _weaknessElement = savedWeakness;
+    }
+
+    final savedAllowUnowned = prefs.getBool('deck_builder_allow_unowned');
+    if (savedAllowUnowned != null) {
+      _allowUnowned = savedAllowUnowned;
     }
 
     if (raw == null) return;
@@ -1334,6 +1341,13 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                 selectedNikkeId: _selectedNikkeId,
                 assignedSquadMap: assignedSquadMap,
                 syncedCharacters: syncedCharacters,
+                allowUnowned: _allowUnowned,
+                onToggleAllowUnowned: (val) {
+                  setState(() {
+                    _allowUnowned = val;
+                  });
+                  _saveDeckToLocal();
+                },
                 onNikkeTap: _onNikkeTap,
                 searchQuery: _searchQuery,
                 burstFilters: _burstFilters,
@@ -1528,6 +1542,13 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                           selectedNikkeId: _selectedNikkeId,
                           assignedSquadMap: assignedSquadMap,
                           syncedCharacters: syncedCharacters,
+                          allowUnowned: _allowUnowned,
+                          onToggleAllowUnowned: (val) {
+                            setState(() {
+                              _allowUnowned = val;
+                            });
+                            _saveDeckToLocal();
+                          },
                           // 모바일에서는 선택하면 시트 닫고, 선택 유지
                           onNikkeTap: (nikke) {
                             _onNikkeTap(nikke); // 기존 선택 로직 그대로
@@ -1571,6 +1592,8 @@ class NikkeListPanel extends StatefulWidget {
   final String? selectedNikkeId;
   final Map<String, int> assignedSquadMap;
   final Map<String, Map<String, dynamic>> syncedCharacters; // 👈 추가
+  final bool allowUnowned;
+  final ValueChanged<bool>? onToggleAllowUnowned;
   final ValueChanged<Nikke>? onNikkeTap;
   final List<String> squadNames;
 
@@ -1594,6 +1617,8 @@ class NikkeListPanel extends StatefulWidget {
     this.selectedNikkeId,
     this.assignedSquadMap = const {},
     this.syncedCharacters = const {}, // 👈 추가
+    this.allowUnowned = false,
+    this.onToggleAllowUnowned,
     this.onNikkeTap,
     this.searchQuery = '',
     this.burstFilters = const {},
@@ -1797,9 +1822,10 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                 final bool isAssigned = squadIndex != null;
 
                 final bool isSynced = widget.syncedCharacters.isNotEmpty;
-                final bool isNotOwned = isSynced &&
+                final bool isNotOwnedReal = isSynced &&
                     !widget.syncedCharacters.containsKey(nikke.name) &&
                     !nikke.isTemporary;
+                final bool isNotOwned = isNotOwnedReal && !widget.allowUnowned;
 
                 final bool isSelected = !isAssigned &&
                     !isNotOwned &&
@@ -1852,6 +1878,20 @@ class _NikkeListPanelState extends State<NikkeListPanel>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (widget.syncedCharacters.isNotEmpty) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('미보유 니케 포함'),
+              Switch(
+                value: widget.allowUnowned,
+                onChanged: widget.onToggleAllowUnowned,
+                activeColor: Colors.orange,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
         const Text('속성'),
         const SizedBox(height: 4),
         Wrap(

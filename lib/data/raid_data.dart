@@ -60,4 +60,27 @@ final List<RaidInfo> raidHistory = [
     weakness: "풍압",
     keyword: ["코어", "파츠"],
   ),
+  const RaidInfo(
+    type: RaidType.union,
+    seasonName: "26년 7월",
+    period: "7/10(금)",
+    imagePath: "assets/images/dororong.png",
+    unionBosses: {
+      "작열": "리빌드 오벨리스크",
+      "풍압": "크라켄 (★)",
+      "수냉": "두리안",
+      "전격": "알트아이젠 (★)",
+      "철갑": "닥터",
+    },
+  ),
+  const RaidInfo(
+    type: RaidType.solo,
+    seasonName: "SEASON 39",
+    bossName: "아일랜드이터",
+    period: " 7/16(금) 12:00 ~ 7/23(수) 4:59",
+    imagePath: "assets/images/raids/island_eater.png",
+    bossElement: "전격",
+    weakness: "철갑",
+    keyword: [],
+  ),
 ];

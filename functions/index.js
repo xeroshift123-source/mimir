@@ -225,6 +225,13 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
                 mappedList.sort((a, b) => b.combat - a.combat);
                 results.characters = mappedList;
             }
+        } else {
+            // API failed (e.g. privacy settings disabled or account unlinked)
+            const errorMsg = gameInfoRes?.data?.msg || '알 수 없는 오류';
+            return res.status(200).json({
+                success: false, 
+                error: `지휘관 게임 정보를 불러올 수 없습니다. 블라블라링크 설정에서 '내 정보 공개' 및 '캐릭터 정보 공개'가 켜져 있는지 확인해주세요. (API 응답: ${errorMsg})`
+            });
         }
 
         // [Step 5] Firestore DB에 정적 스냅샷 저장
