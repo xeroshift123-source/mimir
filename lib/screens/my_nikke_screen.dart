@@ -47,6 +47,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   bool _profileExpanded = true;
   bool _assumeCube15 = false;
   bool _showNicknameOnLicense = false;
+  bool _sortByLevel40Cp = false;
 
   @override
   void didChangeDependencies() {
@@ -290,6 +291,21 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
       return true;
     }).toList();
+
+    if (_sortByLevel40Cp) {
+      for (var char in filteredChars) {
+        final nameCode = char['name_code'] as int? ?? 0;
+        final String mappedName = BlablaMap.characterNames[nameCode] ?? '';
+        final localNikke = nikkeNameMap[mappedName];
+        final modifiableChar = _getCharWithConsoleLevels(char, localNikke);
+        char['level40Cp'] = CpCalculator.calculateCp(modifiableChar, localNikke, targetLevel: 40, assumeCube15: _assumeCube15).toInt();
+      }
+      filteredChars.sort((a, b) {
+        final cpA = a['level40Cp'] as int? ?? 0;
+        final cpB = b['level40Cp'] as int? ?? 0;
+        return cpB.compareTo(cpA);
+      });
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -735,6 +751,63 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                 });
               },
             ),
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 50,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "정렬",
+                      style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Wrap(
+                    spacing: 4,
+                    runSpacing: 4,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _sortByLevel40Cp = !_sortByLevel40Cp;
+                            _selectedCharIndex = 0;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: _sortByLevel40Cp ? Colors.orange : Colors.grey.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: _sortByLevel40Cp ? Colors.orange : Colors.transparent,
+                            ),
+                          ),
+                          child: Text(
+                            "40레벨 투력",
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: _sortByLevel40Cp ? FontWeight.bold : FontWeight.normal,
+                              color: _sortByLevel40Cp
+                                  ? Colors.white
+                                  : (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.grey.shade300
+                                      : Colors.black87),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
         ],
       ),
@@ -841,7 +914,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         final grade = char['grade'] as int? ?? 0;
         final core = char['core'] as int? ?? 0;
         final level = char['level'] as int? ?? 1;
-        final combat = char['combat'] as int? ?? 0;
+        final combat = _sortByLevel40Cp
+            ? (char['level40Cp'] as int? ?? 0)
+            : (char['combat'] as int? ?? 0);
 
         return GestureDetector(
           onTap: () {
@@ -1254,7 +1329,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   }
 
   Widget _buildPortraitBox(Map<String, dynamic> char, Nikke? localNikke) {
-    final combat = char['combat'] as int? ?? 0;
+    final combat = _sortByLevel40Cp
+        ? (char['level40Cp'] as int? ?? 0)
+        : (char['combat'] as int? ?? 0);
     return Container(
       width: 84,
       height: 112,
