@@ -1084,9 +1084,16 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                               Text(
                                 NumberFormat('#,###').format(combat),
                                 style: const TextStyle(
-                                    color: Colors.orangeAccent,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold),
+                                  color: Colors.orangeAccent,
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    Shadow(offset: Offset(-1, -1), color: Colors.black),
+                                    Shadow(offset: Offset(1, -1), color: Colors.black),
+                                    Shadow(offset: Offset(1, 1), color: Colors.black),
+                                    Shadow(offset: Offset(-1, 1), color: Colors.black),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -1412,8 +1419,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.orangeAccent,
-                    fontSize: 9,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.bold,
+                    shadows: [
+                      Shadow(offset: Offset(-1, -1), color: Colors.black),
+                      Shadow(offset: Offset(1, -1), color: Colors.black),
+                      Shadow(offset: Offset(1, 1), color: Colors.black),
+                      Shadow(offset: Offset(-1, 1), color: Colors.black),
+                    ],
                   ),
                 ),
               ),
