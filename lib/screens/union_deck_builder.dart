@@ -953,12 +953,14 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Row(
             children: [
               Icon(Icons.qr_code_2, color: Colors.orange),
               SizedBox(width: 8),
-              Text("덱 코드 관리", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text("덱 코드 관리",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
           content: ConstrainedBox(
@@ -968,55 +970,64 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ElevatedButton.icon(
-                icon: const Icon(Icons.copy, color: Colors.white, size: 18),
-                label: const Text("현재 덱 코드 복사하기", style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _exportDeckCode();
-                },
-              ),
-              const SizedBox(height: 24),
-              const Text("덱 코드 불러오기", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: importController,
-                decoration: InputDecoration(
-                  hintText: "여기에 덱 코드를 붙여넣으세요",
-                  isDense: true,
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                  icon: const Icon(Icons.copy, color: Colors.white, size: 18),
+                  label: const Text("현재 덱 코드 복사하기",
+                      style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () {
-                  final code = importController.text.trim();
-                  if (code.isNotEmpty) {
+                  onPressed: () {
                     Navigator.pop(context);
-                    _importDeckCode(code);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade600,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    _exportDeckCode();
+                  },
                 ),
-                child: const Text("불러오기 적용"),
-              ),
-            ],
+                const SizedBox(height: 24),
+                const Text("덱 코드 불러오기",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Colors.orange)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: importController,
+                  decoration: InputDecoration(
+                    hintText: "여기에 덱 코드를 붙여넣으세요",
+                    isDense: true,
+                    filled: true,
+                    fillColor:
+                        isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    final code = importController.text.trim();
+                    if (code.isNotEmpty) {
+                      Navigator.pop(context);
+                      _importDeckCode(code);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade600,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text("불러오기 적용"),
+                ),
+              ],
+            ),
           ),
-        ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -1029,8 +1040,10 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
   }
 
   void _exportDeckCode() {
-    final List<List<String?>> squadIds = _squads.map((squad) => squad.map((n) => n?.id).toList()).toList();
-    final code = DeckCodeUtils.encodeDeck(type: 'union', squads: squadIds, elements: _squadNames);
+    final List<List<String?>> squadIds =
+        _squads.map((squad) => squad.map((n) => n?.id).toList()).toList();
+    final code = DeckCodeUtils.encodeDeck(
+        type: 'union', squads: squadIds, elements: _squadNames);
     if (code.isNotEmpty) {
       Clipboard.setData(ClipboardData(text: code));
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1044,24 +1057,25 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
     if (result != null && result.type == 'union') {
       final decodedSquads = result.squads;
       final decodedElements = result.elements;
-      
+
       final nikkeList = context.read<NikkeProvider>().nikkeList;
       final mapById = {for (final n in nikkeList) n.id: n};
 
       setState(() {
-        for (int s = 0; s < 3 && s < decodedSquads.length; s++) { // 유니온 레이드는 3스쿼드
+        for (int s = 0; s < 3 && s < decodedSquads.length; s++) {
+          // 유니온 레이드는 3스쿼드
           for (int i = 0; i < 5; i++) {
             final id = decodedSquads[s][i];
             _squads[s][i] = id != null ? mapById[id] : null;
           }
         }
-        
+
         if (decodedElements != null) {
           for (int i = 0; i < 3 && i < decodedElements.length; i++) {
             _squadNames[i] = decodedElements[i];
           }
         }
-        
+
         _activeSquadIndex = 0; // 첫 번째 스쿼드로 이동
       });
       _saveDeckToLocal();
