@@ -225,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ✅ 카드 본문
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -293,38 +293,89 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 12),
                       if (raid.unionBosses != null)
-                        ...raid.unionBosses!.entries.map((entry) {
+                        ...raid.unionBosses!.map((boss) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: SizedBox(
-                              width: 220,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Image.asset(
-                                    _elementIconMap[entry.key] ??
-                                        "assets/icons/elements/icon-elements-Electric.webp",
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      entry.value,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w700,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
+                            padding: const EdgeInsets.symmetric(vertical: 6.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Image.asset(
+                                  _elementIconMap[boss.element] ??
+                                      "assets/icons/elements/icon-elements-Electric.webp",
+                                  width: 20,
+                                  height: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    boss.name,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                if (boss.keyword != null && boss.keyword!.isNotEmpty)
+                                  Wrap(
+                                    spacing: 4,
+                                    alignment: WrapAlignment.end,
+                                    children: boss.keyword!.map((kw) {
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange,
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        child: Text(
+                                          "#$kw",
+                                          style: const TextStyle(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                              ],
                             ),
                           );
                         }).toList(),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              UnionDeckBuilderScreen.routeName,
+                              arguments: raid,
+                            );
+                          },
+                          icon:
+                              const Icon(Icons.group_work, color: Colors.white),
+                          label: const Text(
+                            "덱 구성하기",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange.shade700,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -372,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // ✅ 카드 본문
               Padding(
                 padding: const EdgeInsets.only(
-                    left: 16, right: 16, top: 16, bottom: 8),
+                    left: 24, right: 24, top: 16, bottom: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -850,8 +901,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "유니온 레이드 덱 구성",
                         icon: Icons.group_work,
                         color: Colors.orange.shade700,
-                        onTap: () => Navigator.pushNamed(
-                            context, UnionDeckBuilderScreen.routeName),
+                        onTap: () {
+                          final currentRaid = raidHistory[_currentRaidPage];
+                          final unionRaid = currentRaid.type == RaidType.union 
+                              ? currentRaid 
+                              : raidHistory.firstWhere((r) => r.type == RaidType.union);
+                          Navigator.pushNamed(
+                            context, 
+                            UnionDeckBuilderScreen.routeName,
+                            arguments: unionRaid,
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       _buildMenuButton(

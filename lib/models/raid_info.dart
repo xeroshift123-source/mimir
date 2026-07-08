@@ -2,6 +2,18 @@
 
 enum RaidType { solo, union }
 
+class UnionBossInfo {
+  final String element;
+  final String name;
+  final List<String>? keyword;
+
+  const UnionBossInfo({
+    required this.element,
+    required this.name,
+    this.keyword,
+  });
+}
+
 class RaidInfo {
   final RaidType type;
   final String seasonName;
@@ -14,7 +26,7 @@ class RaidInfo {
   final String? weakness;
 
   // Union Raid specific
-  final Map<String, String>? unionBosses;
+  final List<UnionBossInfo>? unionBosses;
   final List<String>? keyword;
 
   const RaidInfo({

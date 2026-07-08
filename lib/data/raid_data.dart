@@ -19,13 +19,13 @@ final List<RaidInfo> raidHistory = [
     seasonName: "26년 5월",
     period: "5/15(금)",
     imagePath: "assets/images/dororong.png",
-    unionBosses: {
-      "풍압": "두리안",
-      "수냉": "헤비메탈",
-      "작열": "모더니아 (★)",
-      "철갑": "리빌드 벌컨R",
-      "전격": "알트아이젠 (★)",
-    },
+    unionBosses: [
+      UnionBossInfo(element: "풍압", name: "두리안"),
+      UnionBossInfo(element: "수냉", name: "헤비메탈"),
+      UnionBossInfo(element: "작열", name: "모더니아 (★)"),
+      UnionBossInfo(element: "철갑", name: "리빌드 벌컨R"),
+      UnionBossInfo(element: "전격", name: "알트아이젠 (★)"),
+    ],
   ),
   const RaidInfo(
     type: RaidType.solo,
@@ -42,13 +42,13 @@ final List<RaidInfo> raidHistory = [
     seasonName: "26년 6월",
     period: "6/12(금)",
     imagePath: "assets/images/dororong.png",
-    unionBosses: {
-      "작열": "시니스터",
-      "풍압": "레플리카 레드슈즈",
-      "수냉": "니힐리스타 (★)",
-      "전격": "리빌드 빅 토르소",
-      "철갑": "울트라 (★)",
-    },
+    unionBosses: [
+      UnionBossInfo(element: "작열", name: "시니스터"),
+      UnionBossInfo(element: "풍압", name: "레플리카 레드슈즈"),
+      UnionBossInfo(element: "수냉", name: "니힐리스타 (★)"),
+      UnionBossInfo(element: "전격", name: "리빌드 빅 토르소"),
+      UnionBossInfo(element: "철갑", name: "울트라 (★)"),
+    ],
   ),
   const RaidInfo(
     type: RaidType.solo,
@@ -65,13 +65,13 @@ final List<RaidInfo> raidHistory = [
     seasonName: "26년 7월",
     period: "7/10(금)",
     imagePath: "assets/images/dororong.png",
-    unionBosses: {
-      "작열": "리빌드 오벨리스크",
-      "풍압": "크라켄 (★)",
-      "수냉": "두리안",
-      "전격": "알트아이젠 (★)",
-      "철갑": "닥터",
-    },
+    unionBosses: [
+      UnionBossInfo(element: "작열", name: "리빌드 오벨리스크", keyword: ["파츠"]),
+      UnionBossInfo(element: "풍압", name: "크라켄 (★)", keyword: ["코어", "파츠"]),
+      UnionBossInfo(element: "수냉", name: "두리안", keyword: ["코어", "힐"]),
+      UnionBossInfo(element: "전격", name: "알트아이젠 (★)", keyword: ["파츠"]),
+      UnionBossInfo(element: "철갑", name: "닥터", keyword: ["코어"]),
+    ],
   ),
   const RaidInfo(
     type: RaidType.solo,

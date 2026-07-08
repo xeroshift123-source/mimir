@@ -15,6 +15,7 @@ import 'package:pasteboard/pasteboard.dart';
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/models/nikke.dart';
 import 'package:mimir/models/shared_deck.dart';
+import 'package:mimir/models/raid_info.dart';
 import 'package:mimir/providers/nikke_provider.dart';
 import 'package:mimir/providers/auth_provider.dart';
 import 'package:mimir/repository/mock_deck_repository.dart';
@@ -46,13 +47,6 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
   Map<String, dynamic>? _profileData; // 👈 추가
   bool _allowUnowned = false;
 
-  static const Map<String, String> _elementIconMap = {
-    '전격': 'assets/icons/elements/icon-elements-Electric.webp',
-    '철갑': 'assets/icons/elements/icon-elements-Iron.webp',
-    '작열': 'assets/icons/elements/icon-elements-Fire.webp',
-    '수냉': 'assets/icons/elements/icon-elements-Water.webp',
-    '풍압': 'assets/icons/elements/icon-elements-Wind.webp',
-  };
   List<List<String?>>? _pendingSquadsIds;
   bool _restoredOnce = false;
   bool _isImportedDeck = false;
@@ -62,6 +56,8 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
   bool _hasCandidate = false;
   List<Nikke?> _candidateSquad = [null];
   List<String?>? _pendingCandidateIds;
+
+  RaidInfo? _unionRaid;
 
   void _updateCandidateSquadSlots() {
     final active = _candidateSquad.whereType<Nikke>().toList();
@@ -126,6 +122,8 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
     final routeArgs = ModalRoute.of(context)?.settings.arguments;
     if (routeArgs is String) {
       _weaknessElement = routeArgs;
+    } else if (routeArgs is RaidInfo) {
+      _unionRaid = routeArgs;
     } else if (routeArgs is SharedDeck) {
       _pendingSquadsIds = routeArgs.squadsNikkeIds;
       _isImportedDeck = true;
@@ -595,13 +593,26 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
           ...List.generate(_squads.length, (index) {
             final isLastWithoutCandidate =
                 !_hasCandidate && index == _squads.length - 1;
+            
+            final squadName = _squadNames[index];
+            List<String> bossKeywords = [];
+            if (_unionRaid != null && _unionRaid!.unionBosses != null) {
+              final matchedBoss = _unionRaid!.unionBosses!
+                  .where((b) => b.element == squadName || b.name.contains(squadName))
+                  .firstOrNull;
+              if (matchedBoss != null && matchedBoss.keyword != null) {
+                bossKeywords = matchedBoss.keyword!;
+              }
+            }
+
             return Padding(
               padding: EdgeInsets.only(bottom: isLastWithoutCandidate ? 0 : 8),
               child: _ShareSquadPanel(
-                title: _squadNames[index],
+                title: squadName,
                 isActive: index == _activeSquadIndex,
                 slots: _squads[index],
-                weaknessElement: _squadNames[index],
+                weaknessElement: squadName,
+                raidKeywords: bossKeywords,
               ),
             );
           }),
@@ -614,6 +625,7 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
                 slots: _candidateSquad,
                 weaknessElement: '전격', // 후보 덱은 기본 속성
                 isCandidate: true,
+                raidKeywords: const [],
               ),
             ),
           const SizedBox(height: 10),
@@ -2446,6 +2458,7 @@ class _ShareSquadPanel extends StatelessWidget {
   final List<Nikke?> slots;
   final String weaknessElement;
   final bool isCandidate;
+  final List<String> raidKeywords;
 
   const _ShareSquadPanel({
     required this.title,
@@ -2453,6 +2466,7 @@ class _ShareSquadPanel extends StatelessWidget {
     required this.slots,
     required this.weaknessElement,
     this.isCandidate = false,
+    this.raidKeywords = const [],
   });
 
   Widget _buildBadge({
@@ -2500,6 +2514,42 @@ class _ShareSquadPanel extends StatelessWidget {
     }
   }
 
+  Widget _buildGradientBadge(String text) {
+    return Container(
+      padding: const EdgeInsets.all(1.2), // Border width
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFD4A5FF),
+            Color(0xFF80FFEA),
+            Color(0xFFB185DB),
+            Color(0xFFFF9CEE),
+            Color(0xFF8A2BE2),
+          ],
+          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+        decoration: BoxDecoration(
+          color: const Color(0xFF11141B), // Matches panel background
+          borderRadius: BorderRadius.circular(4.8),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // Changed to white as requested
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDynamicBadge(String text) {
     const goldColor = Color(0xFFFFA000);
     return Container(
@@ -2540,39 +2590,83 @@ class _ShareSquadPanel extends StatelessWidget {
         activeNikkes.any((n) => n.ability.contains("버스트 쿨타임 감소"));
 
     // 2. 동적 키워드 로직
+    final List<String> specialTags = [];
     final List<String> dynamicTags = [];
-    if (activeNikkes.any((n) => n.ability.contains("힐"))) {
-      dynamicTags.add("힐");
+
+    // 코어
+    if (raidKeywords.contains("코어") && activeNikkes.any((n) => n.ability.contains("코어데미지증가"))) {
+      specialTags.add("코어");
     }
-    if (activeNikkes.any((n) => n.name == "토브")) {
-      dynamicTags.add("샷건");
-    }
-    if (activeNikkes.where((n) => n.ability.contains("방어력무시데미지")).length >= 2) {
-      dynamicTags.add("방무뎀");
-    }
-    if (activeNikkes.where((n) => n.ability.contains("관통데미지")).length >= 2) {
-      dynamicTags.add("관통뎀");
-    }
-    if (activeNikkes.where((n) => n.ability.contains("지속데미지")).length >= 2) {
-      dynamicTags.add("지속딜");
-    }
-    if (activeNikkes.where((n) => n.ability.contains("파츠")).length >= 2) {
+
+    // 파츠
+    if (raidKeywords.contains("파츠") && activeNikkes.any((n) => n.ability.contains("파츠"))) {
+      specialTags.add("파츠");
+    } else if (activeNikkes.where((n) => n.ability.contains("파츠")).length >= 2) {
       dynamicTags.add("파츠");
     }
-    if (activeNikkes.where((n) => n.ability.contains("받는데미지증가")).length >= 2) {
+
+    // 힐
+    if (raidKeywords.contains("힐") && activeNikkes.any((n) => n.ability.contains("힐"))) {
+      specialTags.add("힐");
+    } else if (activeNikkes.any((n) => n.ability.contains("힐"))) {
+      dynamicTags.add("힐");
+    }
+
+    // 샷건
+    if (raidKeywords.contains("샷건") && activeNikkes.any((n) => n.name == "토브")) {
+      specialTags.add("샷건");
+    } else if (activeNikkes.any((n) => n.name == "토브")) {
+      dynamicTags.add("샷건");
+    }
+
+    // 방무뎀
+    if ((raidKeywords.contains("방어력무시데미지") || raidKeywords.contains("방무뎀")) && activeNikkes.any((n) => n.ability.contains("방어력무시데미지"))) {
+      specialTags.add("방무뎀");
+    } else if (activeNikkes.where((n) => n.ability.contains("방어력무시데미지")).length >= 2) {
+      dynamicTags.add("방무뎀");
+    }
+
+    // 관통뎀
+    if ((raidKeywords.contains("관통데미지") || raidKeywords.contains("관통뎀")) && activeNikkes.any((n) => n.ability.contains("관통데미지"))) {
+      specialTags.add("관통뎀");
+    } else if (activeNikkes.where((n) => n.ability.contains("관통데미지")).length >= 2) {
+      dynamicTags.add("관통뎀");
+    }
+
+    // 지속딜
+    if ((raidKeywords.contains("지속데미지") || raidKeywords.contains("지속딜")) && activeNikkes.any((n) => n.ability.contains("지속데미지"))) {
+      specialTags.add("지속딜");
+    } else if (activeNikkes.where((n) => n.ability.contains("지속데미지")).length >= 2) {
+      dynamicTags.add("지속딜");
+    }
+
+    // 받뎀증
+    if ((raidKeywords.contains("받는데미지증가") || raidKeywords.contains("받뎀증")) && activeNikkes.any((n) => n.ability.contains("받는데미지증가"))) {
+      specialTags.add("받뎀증");
+    } else if (activeNikkes.where((n) => n.ability.contains("받는데미지증가")).length >= 2) {
       dynamicTags.add("받뎀증");
     }
-    if (activeNikkes.where((n) => n.ability.contains("분배데미지")).length >= 2) {
+
+    // 분배뎀
+    if ((raidKeywords.contains("분배데미지") || raidKeywords.contains("분배뎀")) && activeNikkes.any((n) => n.ability.contains("분배데미지"))) {
+      specialTags.add("분배뎀");
+    } else if (activeNikkes.where((n) => n.ability.contains("분배데미지")).length >= 2) {
       dynamicTags.add("분배뎀");
     }
-    if (activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
+
+    // 재장전
+    if ((raidKeywords.contains("재장전속도증가") || raidKeywords.contains("재장전")) && activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
+      specialTags.add("재장전");
+    } else if (activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
       dynamicTags.add("재장전");
     }
-    final explosionCount =
-        activeNikkes.where((n) => n.ability.contains("폭발데미지")).length;
-    final rlCount =
-        activeNikkes.where((n) => n.weaponType == WeaponType.RL).length;
-    if (explosionCount >= 2 || (explosionCount >= 1 && rlCount >= 1)) {
+
+    // 폭발뎀
+    final explosionCount = activeNikkes.where((n) => n.ability.contains("폭발데미지")).length;
+    final rlCount = activeNikkes.where((n) => n.weaponType == WeaponType.RL).length;
+    if ((raidKeywords.contains("폭발데미지") || raidKeywords.contains("폭발뎀")) && activeNikkes.any((n) => n.ability.contains("폭발데미지"))) {
+      specialTags.add("폭발뎀");
+    } else if (explosionCount >= 2 || (explosionCount >= 1 && rlCount >= 1)) {
       dynamicTags.add("폭발뎀");
     }
 
@@ -2664,19 +2758,21 @@ class _ShareSquadPanel extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 5),
-                  Container(
-                    height: 0.8,
-                    color: Colors.white.withOpacity(0.06),
-                  ),
-                  const SizedBox(height: 5),
-                  if (dynamicTags.isNotEmpty)
+                  if (specialTags.isNotEmpty || dynamicTags.isNotEmpty) ...[
+                    Container(
+                      height: 0.8,
+                      color: Colors.white.withOpacity(0.06),
+                    ),
+                    const SizedBox(height: 5),
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
-                      children: dynamicTags.map((tag) {
-                        return _buildDynamicBadge(tag);
-                      }).toList(),
+                      children: [
+                        ...specialTags.map((tag) => _buildGradientBadge(tag)),
+                        ...dynamicTags.map((tag) => _buildDynamicBadge(tag)),
+                      ],
                     ),
+                  ],
                 ],
               ],
             ),
