@@ -81,6 +81,6 @@ final List<RaidInfo> raidHistory = [
     imagePath: "assets/images/raids/island_eater.png",
     bossElement: "전격",
     weakness: "철갑",
-    keyword: [],
+    keyword: ["코어"],
   ),
 ];

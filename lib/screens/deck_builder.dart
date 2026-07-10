@@ -2744,6 +2744,8 @@ class _ShareSquadPanel extends StatelessWidget {
         activeNikkes.any((n) => n.element == targetEnum);
     final bool hasCooldownReduction =
         activeNikkes.any((n) => n.ability.contains("버스트 쿨타임 감소"));
+    final bool hasFullBurstTimeIncrease =
+        activeNikkes.any((n) => n.ability.contains("풀 버스트 시간 증가"));
 
     // 2. 동적 키워드 로직
     final List<String> specialTags = [];
@@ -2883,9 +2885,13 @@ class _ShareSquadPanel extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: _buildBadge(
-                          text: "버쿨감",
-                          isActive: hasCooldownReduction,
-                          themeColor: const Color(0xFF4CAF50),
+                          text: (!hasCooldownReduction && hasFullBurstTimeIncrease)
+                              ? "풀버연장"
+                              : "버쿨감",
+                          isActive: hasCooldownReduction || hasFullBurstTimeIncrease,
+                          themeColor: (!hasCooldownReduction && hasFullBurstTimeIncrease)
+                              ? Colors.blue
+                              : const Color(0xFF4CAF50),
                           textColor: Colors.white,
                         ),
                       ),
