@@ -48,6 +48,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   bool _assumeCube15 = false;
   bool _showNicknameOnLicense = false;
   bool _sortByLevel40Cp = false;
+  bool _sortByUko = false;
 
   @override
   void didChangeDependencies() {
@@ -304,6 +305,34 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         final cpA = a['level40Cp'] as int? ?? 0;
         final cpB = b['level40Cp'] as int? ?? 0;
         return cpB.compareTo(cpA);
+      });
+    } else if (_sortByUko) {
+      for (var char in filteredChars) {
+        double ukoSum = 0;
+        final equips = char['equipment'] as List<dynamic>? ?? [];
+        for (final eq in equips) {
+          final eqOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+          for (final opt in eqOptions) {
+            final int id = opt as int? ?? 0;
+            if (id == 0) continue;
+            final String stat = BlablaMap.getOptionName(id);
+            if (stat.contains('우월코드') || stat.contains('우월 코드')) {
+              ukoSum += BlablaMap.getOptionPercent(id);
+            }
+          }
+        }
+        char['ukoSum'] = ukoSum;
+      }
+      filteredChars.sort((a, b) {
+        final sumA = a['ukoSum'] as double? ?? 0.0;
+        final sumB = b['ukoSum'] as double? ?? 0.0;
+        // 2차 정렬: 투력
+        if (sumB.compareTo(sumA) == 0) {
+          final cpA = a['combat'] as int? ?? 0;
+          final cpB = b['combat'] as int? ?? 0;
+          return cpB.compareTo(cpA);
+        }
+        return sumB.compareTo(sumA);
       });
     }
 
@@ -777,6 +806,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                         onTap: () {
                           setState(() {
                             _sortByLevel40Cp = !_sortByLevel40Cp;
+                            if (_sortByLevel40Cp) _sortByUko = false;
                             _selectedCharIndex = 0;
                           });
                         },
@@ -798,7 +828,38 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                   ? Colors.white
                                   : (Theme.of(context).brightness == Brightness.dark
                                       ? Colors.grey.shade300
-                                      : Colors.black87),
+                                      : Colors.grey.shade700),
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _sortByUko = !_sortByUko;
+                            if (_sortByUko) _sortByLevel40Cp = false;
+                            _selectedCharIndex = 0;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: _sortByUko ? Colors.orange : Colors.grey.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: _sortByUko ? Colors.orange : Colors.transparent,
+                            ),
+                          ),
+                          child: Text(
+                            "우코",
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: _sortByUko ? FontWeight.bold : FontWeight.normal,
+                              color: _sortByUko
+                                  ? Colors.white
+                                  : (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.grey.shade300
+                                      : Colors.grey.shade700),
                             ),
                           ),
                         ),
@@ -914,9 +975,17 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         final grade = char['grade'] as int? ?? 0;
         final core = char['core'] as int? ?? 0;
         final level = char['level'] as int? ?? 1;
-        final combat = _sortByLevel40Cp
-            ? (char['level40Cp'] as int? ?? 0)
-            : (char['combat'] as int? ?? 0);
+        
+        final String combatDisplay;
+        if (_sortByUko) {
+          final uko = char['ukoSum'] as double? ?? 0.0;
+          combatDisplay = "${uko.toStringAsFixed(2)}%";
+        } else {
+          final combat = _sortByLevel40Cp
+              ? (char['level40Cp'] as int? ?? 0)
+              : (char['combat'] as int? ?? 0);
+          combatDisplay = NumberFormat('#,###').format(combat);
+        }
 
         return GestureDetector(
           onTap: () {
@@ -1082,7 +1151,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                     color: Colors.white70, fontSize: 10),
                               ),
                               Text(
-                                NumberFormat('#,###').format(combat),
+                                combatDisplay,
                                 style: const TextStyle(
                                   color: Colors.orangeAccent,
                                   fontSize: 11.5,
@@ -1336,9 +1405,16 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   }
 
   Widget _buildPortraitBox(Map<String, dynamic> char, Nikke? localNikke) {
-    final combat = _sortByLevel40Cp
-        ? (char['level40Cp'] as int? ?? 0)
-        : (char['combat'] as int? ?? 0);
+    final String combatDisplay;
+    if (_sortByUko) {
+      final uko = char['ukoSum'] as double? ?? 0.0;
+      combatDisplay = "${uko.toStringAsFixed(2)}%";
+    } else {
+      final combat = _sortByLevel40Cp
+          ? (char['level40Cp'] as int? ?? 0)
+          : (char['combat'] as int? ?? 0);
+      combatDisplay = NumberFormat('#,###').format(combat);
+    }
     return Container(
       width: 84,
       height: 112,
@@ -1415,7 +1491,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   ),
                 ),
                 child: Text(
-                  NumberFormat('#,###').format(combat),
+                  combatDisplay,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.orangeAccent,

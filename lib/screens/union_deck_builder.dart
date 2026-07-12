@@ -3004,6 +3004,17 @@ class _NikkeHoverTooltipState extends State<NikkeHoverTooltip> {
   }
 
   OverlayEntry _createOverlayEntry() {
+    RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    bool showOnLeft = false;
+    if (renderBox != null) {
+      final size = renderBox.size;
+      final offset = renderBox.localToGlobal(Offset.zero);
+      final screenWidth = MediaQuery.of(context).size.width;
+      if (offset.dx + size.width + 330 > screenWidth) {
+        showOnLeft = true;
+      }
+    }
+
     return OverlayEntry(
       builder: (context) {
         return Positioned(
@@ -3011,9 +3022,9 @@ class _NikkeHoverTooltipState extends State<NikkeHoverTooltip> {
           child: CompositedTransformFollower(
             link: _layerLink,
             showWhenUnlinked: false,
-            targetAnchor: Alignment.topRight,
-            followerAnchor: Alignment.topLeft,
-            offset: const Offset(10, 0),
+            targetAnchor: showOnLeft ? Alignment.topLeft : Alignment.topRight,
+            followerAnchor: showOnLeft ? Alignment.topRight : Alignment.topLeft,
+            offset: Offset(showOnLeft ? -10 : 10, 0),
             child: IgnorePointer(
               child: Material(
                 elevation: 8,

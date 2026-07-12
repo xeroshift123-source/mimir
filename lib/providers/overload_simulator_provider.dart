@@ -15,6 +15,13 @@ class OverloadSimulatorProvider with ChangeNotifier {
   int totalLockKeysUsed = 0;
   double currentCp = 0;
 
+  late int simGrade;
+  late int simCore;
+  late int simBondLevel;
+  late int simSkill1;
+  late int simSkill2;
+  late int simBurst;
+
   int get totalModulesUsed {
     return _modulesSpentOnRolls + _modulesSpentOnLocking;
   }
@@ -30,7 +37,42 @@ class OverloadSimulatorProvider with ChangeNotifier {
   final Random _random = Random();
 
   OverloadSimulatorProvider(this.nikke, {this.charData, this.assumeCube15 = false}) {
+    _initializeStats();
     _initializeEquipments();
+    _calculateCP();
+  }
+
+  void _initializeStats() {
+    simGrade = charData?['grade'] as int? ?? 0;
+    simCore = charData?['core'] as int? ?? 0;
+    simBondLevel = charData?['bondLevel'] as int? ?? 1;
+    final skills = charData?['skills'] as Map<String, dynamic>? ?? {};
+    simSkill1 = skills['skill1'] as int? ?? 1;
+    simSkill2 = skills['skill2'] as int? ?? 1;
+    simBurst = skills['burst'] as int? ?? 1;
+  }
+
+  void updateLimitBreakCore(int grade, int core) {
+    simGrade = grade;
+    simCore = core;
+    _calculateCP();
+  }
+
+  void updateBondLevel(int level) {
+    simBondLevel = level;
+    _calculateCP();
+  }
+
+  void updateSkill(int skillIndex, int level) {
+    if (skillIndex == 1) simSkill1 = level;
+    else if (skillIndex == 2) simSkill2 = level;
+    else if (skillIndex == 3) simBurst = level;
+    _calculateCP();
+  }
+
+  void updateEquipmentLevel(EquipmentPart part, int level) {
+    final eq = _getEquipment(part);
+    eq.level = level;
     _calculateCP();
   }
 
@@ -47,6 +89,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
       for (final eq in equips) {
         final slotName = eq['slot'] as String? ?? '';
         final options = eq['overloadOptions'] as List<dynamic>? ?? [];
+        final level = eq['level'] as int? ?? 0;
         
         EquipmentPart? part;
         if (slotName == 'head') part = EquipmentPart.head;
@@ -56,6 +99,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
         
         if (part != null) {
           final targetEq = _getEquipment(part);
+          targetEq.level = level;
           for (int i = 0; i < options.length && i < 3; i++) {
             final int id = options[i] as int? ?? 0;
             if (id == 0) continue;
@@ -83,6 +127,14 @@ class OverloadSimulatorProvider with ChangeNotifier {
   void _calculateCP() {
     // char map for CpCalculator. Use existing charData to preserve skills, console, etc.
     final charMap = Map<String, dynamic>.from(charData ?? {});
+    charMap['grade'] = simGrade;
+    charMap['core'] = simCore;
+    charMap['bondLevel'] = simBondLevel;
+    charMap['skills'] = {
+      'skill1': simSkill1,
+      'skill2': simSkill2,
+      'burst': simBurst,
+    };
 
     charMap['equipment'] = equipments.map((eq) {
       // Find original equipment
@@ -103,12 +155,13 @@ class OverloadSimulatorProvider with ChangeNotifier {
       if (originalEq != null) {
         final newEq = Map<String, dynamic>.from(originalEq);
         newEq['overloadOptions'] = overloadOptions;
+        newEq['level'] = eq.level;
         return newEq;
       } else {
         return {
           'tier': 10, // Default if not found
           'slot': eq.part.name,
-          'level': 0, 
+          'level': eq.level, 
           'overloadOptions': overloadOptions,
         };
       }
@@ -187,6 +240,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
     _modulesSpentOnRolls = 0;
     _modulesSpentOnLocking = 0;
     totalLockKeysUsed = 0;
+    _initializeStats();
     _initializeEquipments();
     _calculateCP();
   }

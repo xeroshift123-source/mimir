@@ -45,10 +45,12 @@ class OverloadSlot {
 class OverloadEquipment {
   final EquipmentPart part;
   final List<OverloadSlot> slots;
+  int level;
 
   OverloadEquipment({
     required this.part,
     List<OverloadSlot>? slots,
+    this.level = 0,
   }) : slots = slots ?? List.generate(3, (_) => OverloadSlot());
 
   int get moduleLockedCount => slots.where((s) => s.isModuleLocked).length;

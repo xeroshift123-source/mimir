@@ -58,6 +58,8 @@ class _OverloadSimulatorView extends StatelessWidget {
                           children: [
                             _buildTotalOverloadStats(provider, isDark),
                             const SizedBox(height: 16),
+                            _buildSimulatedStatsPanel(context, provider, isDark),
+                            const SizedBox(height: 16),
                             _buildEquipmentSection(context, provider, EquipmentPart.head, '머리', isDark),
                             const SizedBox(height: 16),
                             _buildEquipmentSection(context, provider, EquipmentPart.torso, '몸통', isDark),
@@ -74,7 +76,14 @@ class _OverloadSimulatorView extends StatelessWidget {
                             // 왼쪽: 옵션 총합 패널
                             Expanded(
                               flex: 1,
-                              child: _buildTotalOverloadStats(provider, isDark),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _buildTotalOverloadStats(provider, isDark),
+                                  const SizedBox(height: 16),
+                                  _buildSimulatedStatsPanel(context, provider, isDark),
+                                ],
+                              ),
                             ),
                             const SizedBox(width: 24),
                             // 오른쪽: 2x2 그리드
@@ -113,6 +122,177 @@ class _OverloadSimulatorView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSimulatedStatsPanel(BuildContext context, OverloadSimulatorProvider provider, bool isDark) {
+    int lbSliderValue = provider.simGrade;
+    if (provider.simGrade == 3) {
+      lbSliderValue = 3 + provider.simCore;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E1F28) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.tune, color: Colors.orange.shade700, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                "스탯 시뮬레이션",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // 돌파
+          _buildStatRow(
+            title: "돌파",
+            icon: Icons.star_border,
+            isDark: isDark,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Slider(
+                    value: lbSliderValue.toDouble(),
+                    min: 0,
+                    max: 10,
+                    divisions: 10,
+                    activeColor: Colors.orange,
+                    inactiveColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                    onChanged: (val) {
+                      int v = val.toInt();
+                      int g = v <= 3 ? v : 3;
+                      int c = v <= 3 ? 0 : v - 3;
+                      provider.updateLimitBreakCore(g, c);
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: 50,
+                  child: Text(
+                    lbSliderValue <= 3 ? (lbSliderValue == 0 ? '명함' : '$lbSliderValue돌') : '+${lbSliderValue - 3}코어',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          // 호감도
+          _buildStatRow(
+            title: "호감도",
+            icon: Icons.favorite_border,
+            isDark: isDark,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove_circle_outline),
+                  color: Colors.orange,
+                  onPressed: provider.simBondLevel > 1 ? () => provider.updateBondLevel(provider.simBondLevel - 1) : null,
+                ),
+                SizedBox(
+                  width: 60,
+                  child: Text(
+                    '${provider.simBondLevel} / 40',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  color: Colors.orange,
+                  onPressed: provider.simBondLevel < 40 ? () => provider.updateBondLevel(provider.simBondLevel + 1) : null,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          // 스킬
+          _buildStatRow(
+            title: "스킬",
+            icon: Icons.auto_awesome,
+            isDark: isDark,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildSkillStepper(1, provider.simSkill1, provider, isDark),
+                const Text("/", style: TextStyle(color: Colors.grey, fontSize: 18)),
+                _buildSkillStepper(2, provider.simSkill2, provider, isDark),
+                const Text("/", style: TextStyle(color: Colors.grey, fontSize: 18)),
+                _buildSkillStepper(3, provider.simBurst, provider, isDark),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatRow({required String title, required IconData icon, required Widget child, required bool isDark}) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 70,
+          child: Row(
+            children: [
+              Icon(icon, size: 16, color: Colors.grey),
+              const SizedBox(width: 4),
+              Text(title, style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700, fontSize: 13, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+        Expanded(child: child),
+      ],
+    );
+  }
+
+  Widget _buildSkillStepper(int skillIndex, int level, OverloadSimulatorProvider provider, bool isDark) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: level > 1 ? () => provider.updateSkill(skillIndex, level - 1) : null,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+            child: Icon(Icons.remove, size: 18, color: level > 1 ? Colors.orange : Colors.grey.shade400),
+          ),
+        ),
+        SizedBox(
+          width: 24,
+          child: Text(
+            '$level',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+          ),
+        ),
+        InkWell(
+          onTap: level < 10 ? () => provider.updateSkill(skillIndex, level + 1) : null,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+            child: Icon(Icons.add, size: 18, color: level < 10 ? Colors.orange : Colors.grey.shade400),
+          ),
+        ),
+      ],
     );
   }
 
@@ -328,7 +508,13 @@ class _OverloadSimulatorView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Row(
+            children: [
+              Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(width: 12),
+              _buildEquipmentLevelStepper(context, provider, part, eq.level, isDark),
+            ],
+          ),
           const SizedBox(height: 12),
           // 3개의 옵션 슬롯
           for (int i = 0; i < 3; i++) ...[
@@ -364,6 +550,36 @@ class _OverloadSimulatorView extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildEquipmentLevelStepper(BuildContext context, OverloadSimulatorProvider provider, EquipmentPart part, int level, bool isDark) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: level > 0 ? () => provider.updateEquipmentLevel(part, level - 1) : null,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Icon(Icons.remove_circle_outline, size: 20, color: level > 0 ? (isDark ? Colors.white : Colors.black87) : Colors.grey.shade400),
+          ),
+        ),
+        SizedBox(
+          width: 28,
+          child: Text(
+            '+$level',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+          ),
+        ),
+        InkWell(
+          onTap: level < 5 ? () => provider.updateEquipmentLevel(part, level + 1) : null,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Icon(Icons.add_circle_outline, size: 20, color: level < 5 ? (isDark ? Colors.white : Colors.black87) : Colors.grey.shade400),
+          ),
+        ),
+      ],
     );
   }
 
