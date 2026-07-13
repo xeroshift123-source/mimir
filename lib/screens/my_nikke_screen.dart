@@ -1991,7 +1991,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                optName,
+                '$optName (${info['count']})',
                 style: TextStyle(
                   color: labelColor,
                   fontSize: 13,

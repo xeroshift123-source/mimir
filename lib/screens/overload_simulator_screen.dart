@@ -387,7 +387,7 @@ class _OverloadSimulatorView extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(info['name'], style: TextStyle(color: labelColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                      Text('${info['name']} (${info['count']})', style: TextStyle(color: labelColor, fontSize: 13, fontWeight: FontWeight.bold)),
                       Text('+${(info['sumPercent'] as double).toStringAsFixed(2)}%', style: TextStyle(color: valueColor, fontSize: 13, fontWeight: FontWeight.bold)),
                     ],
                   ),

@@ -12,39 +12,28 @@ import 'package:mimir/utils/skill_data.dart';
 import 'package:mimir/models/nikke.dart';
 import 'package:mimir/widgets/cube_level_dialog.dart';
 
-class NayutaHelmCalculatorForm extends StatefulWidget {
-  const NayutaHelmCalculatorForm({super.key});
+class MatchaGakseolCalculatorForm extends StatefulWidget {
+  const MatchaGakseolCalculatorForm({super.key});
 
   @override
-  State<NayutaHelmCalculatorForm> createState() =>
-      _NayutaHelmCalculatorFormState();
+  State<MatchaGakseolCalculatorForm> createState() =>
+      _MatchaGakseolCalculatorFormState();
 }
 
-class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
+class _MatchaGakseolCalculatorFormState
+    extends State<MatchaGakseolCalculatorForm> {
   // 기본값 복구
-  final _nayutaAtkController = TextEditingController(text: "85,000");
-  final _nayutaOverController = TextEditingController(text: "0");
-  final _helmAtkController = TextEditingController(text: "80,000");
-  final _helmOverController = TextEditingController(text: "0");
+  final _matchaAtkController = TextEditingController(text: "85,000");
+  final _matchaOverController = TextEditingController(text: "0");
+  final _gakseolAtkController = TextEditingController(text: "80,000");
+  final _gakseolOverController = TextEditingController(text: "0");
 
-  String? _extraNikkeType;
-  final _extraAtkController = TextEditingController(text: "80,000");
-  final _extraOverController = TextEditingController(text: "0");
-  int _cludBurstLevel = 10;
   int _mirandaBurstLevel = 10;
-  int _nayutaS2Level = 10;
+  int _matchaS2Level = 10;
+  int _gakseolS2Level = 10;
 
-  double targetNayuta = 0;
-  double targetHelm = 0;
-  double targetExtra = 0;
-  List<String> bufferedNikkes = [];
-
-  double resNayutaFinal = 0;
-  double resHelmFinal = 0;
-  double resExtraFinal = 0;
-  bool nayutaHasMiranda = false;
-  bool helmHasMiranda = false;
-  bool extraHasMiranda = false;
+  double resMatchaFinal = 0;
+  double resGakseolFinal = 0;
 
   String resultMessage = "수치를 입력하고 계산하기를 눌러주세요.";
   String needOverloadMessage = "";
@@ -61,7 +50,8 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       if (openId == null || openId.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('동기화된 프로필이 없습니다. 블라블라링크 동기화를 먼저 진행해주세요.')),
+            const SnackBar(
+                content: Text('동기화된 프로필이 없습니다. 블라블라링크 동기화를 먼저 진행해주세요.')),
           );
         }
         return;
@@ -89,7 +79,8 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         for (final n in localNikkes) n.name: n
       };
 
-      Map<String, dynamic> injectConsoleLevels(Map<String, dynamic> c, Nikke? n) {
+      Map<String, dynamic> injectConsoleLevels(
+          Map<String, dynamic> c, Nikke? n) {
         int common = 0, classConsole = 0, companyConsole = 0;
         for (final item in recycleRoom) {
           if (item is Map) {
@@ -116,42 +107,42 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         return mod;
       }
 
-      Map<String, dynamic>? nayutaChar;
-      Map<String, dynamic>? helmChar;
-      Map<String, dynamic>? cludChar;
-      Map<String, dynamic>? cdieselChar;
+      Map<String, dynamic>? matchaChar;
+      Map<String, dynamic>? gakseolChar;
       Map<String, dynamic>? mirandaChar;
-      
+
       for (final char in characters) {
         final nameCode = char['name_code'] as int? ?? 0;
         final mappedName = BlablaMap.characterNames[nameCode] ?? '';
-        if (mappedName == '나유타') nayutaChar = char;
-        if (mappedName == '헬름') helmChar = char;
-        if (mappedName == '루드밀라 : 윈터 오너') cludChar = char;
-        if (mappedName == '디젤 : 윈터 스위츠') cdieselChar = char;
+        if (mappedName == '마르차나 : 마린 스터디') matchaChar = char;
+        if (mappedName == '스노우 화이트 : 헤비암즈') gakseolChar = char;
         if (mappedName == '미란다') mirandaChar = char;
       }
 
-      if (nayutaChar == null && helmChar == null) {
+      if (matchaChar == null && gakseolChar == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('동기화된 데이터에서 나유타와 헬름을 찾을 수 없습니다.')),
+            const SnackBar(
+                content: Text('동기화된 데이터에서 마르차나와 스노우화이트을 찾을 수 없습니다.')),
           );
         }
         return;
       }
 
       final List<Map<String, dynamic>> dialogNikkes = [];
-      if (nayutaChar != null) {
-        dialogNikkes.add({'name': '나유타', 'char': nayutaChar, 'image': 'assets/nikke/nayuta.webp'});
+      if (matchaChar != null) {
+        dialogNikkes.add({
+          'name': '마르차나 : 마린 스터디',
+          'char': matchaChar,
+          'image': 'assets/nikke/marciana_marine_study.webp'
+        });
       }
-      if (helmChar != null) {
-        dialogNikkes.add({'name': '헬름', 'char': helmChar, 'image': 'assets/nikke/helm.webp'});
-      }
-      if (_extraNikkeType == 'clud' && cludChar != null) {
-        dialogNikkes.add({'name': '루드밀라 : 윈터 오너', 'char': cludChar, 'image': 'assets/nikke/ludmilla_winter_owner.webp'});
-      } else if (_extraNikkeType == 'cdiesel' && cdieselChar != null) {
-        dialogNikkes.add({'name': '디젤 : 윈터 스위츠', 'char': cdieselChar, 'image': 'assets/nikke/diesel_winter_sweets.webp'});
+      if (gakseolChar != null) {
+        dialogNikkes.add({
+          'name': '스노우 화이트 : 헤비암즈',
+          'char': gakseolChar,
+          'image': 'assets/nikke/snow_white_heavy_arms.webp'
+        });
       }
 
       if (!mounted) return;
@@ -169,35 +160,43 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         await CpCalculator.init();
       }
 
-      void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController overCtrl) {
+      void applyCharStats(Map<String, dynamic> char, String name,
+          TextEditingController atkCtrl, TextEditingController overCtrl) {
         final localNikke = nikkeNameMap[name];
         final modChar = injectConsoleLevels(char, localNikke);
         final customCube = selectedCubeLevels[name] ?? 0;
-        
+
         double atk400 = 0;
         double overAtk = 0;
-        
+
         if (CpCalculator.isInitialized) {
-          final cp = CpCalculator.calculateCp(modChar, localNikke, targetLevel: 400, assumeCube15: false, customCubeLevel: customCube);
+          final cp = CpCalculator.calculateCp(modChar, localNikke,
+              targetLevel: 400,
+              assumeCube15: false,
+              customCubeLevel: customCube);
           if (cp != -1.0) {
-            final stats = CpCalculator.calculateTargetStats(modChar, localNikke, targetLevel: 400, assumeCube15: false, customCubeLevel: customCube);
+            final stats = CpCalculator.calculateTargetStats(modChar, localNikke,
+                targetLevel: 400,
+                assumeCube15: false,
+                customCubeLevel: customCube);
             atk400 = stats['atk'] ?? 0;
           } else {
             atk400 = 0;
           }
         }
-        
+
         final equips = modChar['equipment'] as List<dynamic>? ?? [];
         for (final eq in equips) {
           final options = eq['overloadOptions'] as List<dynamic>? ?? [];
           for (final opt in options) {
             final int id = opt as int? ?? 0;
-            if (id >= 7000801 && id <= 7000815) { // 공격력 옵션
+            if (id >= 7000801 && id <= 7000815) {
+              // 공격력 옵션
               overAtk += BlablaMap.getOptionPercent(id);
             }
           }
         }
-        
+
         atkCtrl.text = atk400 > 0 ? _formatter.format(atk400.round()) : "0";
         overCtrl.text = overAtk.toStringAsFixed(2);
       }
@@ -206,20 +205,15 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         final skills = mirandaChar['skills'] as Map<String, dynamic>? ?? {};
         _mirandaBurstLevel = skills['burst'] ?? 10;
       }
-      if (nayutaChar != null) {
-        applyCharStats(nayutaChar, '나유타', _nayutaAtkController, _nayutaOverController);
-        final skills = nayutaChar['skills'] as Map<String, dynamic>? ?? {};
-        _nayutaS2Level = skills['skill2'] ?? 10;
+      if (matchaChar != null) {
+        applyCharStats(matchaChar, '마르차나 : 마린 스터디', _matchaAtkController, _matchaOverController);
+        final skills = matchaChar['skills'] as Map<String, dynamic>? ?? {};
+        _matchaS2Level = skills['skill2'] ?? 10;
       }
-      if (helmChar != null) {
-        applyCharStats(helmChar, '헬름', _helmAtkController, _helmOverController);
-      }
-      if (_extraNikkeType == 'clud' && cludChar != null) {
-        applyCharStats(cludChar, '루드밀라 : 윈터 오너', _extraAtkController, _extraOverController);
-        final skills = cludChar['skills'] as Map<String, dynamic>? ?? {};
-        _cludBurstLevel = skills['burst'] ?? 10;
-      } else if (_extraNikkeType == 'cdiesel' && cdieselChar != null) {
-        applyCharStats(cdieselChar, '디젤 : 윈터 스위츠', _extraAtkController, _extraOverController);
+      if (gakseolChar != null) {
+        applyCharStats(gakseolChar, '스노우 화이트 : 헤비암즈', _gakseolAtkController, _gakseolOverController);
+        final skills = gakseolChar['skills'] as Map<String, dynamic>? ?? {};
+        _gakseolS2Level = skills['skill2'] ?? 10;
       }
 
       if (mounted) {
@@ -242,12 +236,10 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
 
   @override
   void dispose() {
-    _nayutaAtkController.dispose();
-    _nayutaOverController.dispose();
-    _helmAtkController.dispose();
-    _helmOverController.dispose();
-    _extraAtkController.dispose();
-    _extraOverController.dispose();
+    _matchaAtkController.dispose();
+    _matchaOverController.dispose();
+    _gakseolAtkController.dispose();
+    _gakseolOverController.dispose();
     super.dispose();
   }
 
@@ -257,92 +249,46 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
   void _calculate() {
     setState(() {
       double mirandaVal = SkillData.mirandaBurst[_mirandaBurstLevel];
-      double nayutaSkill2 = SkillData.nayutaS2[_nayutaS2Level];
+      double matchaSkill2 = SkillData.matchaS2[_matchaS2Level];
 
-      double nBase = _parse(_nayutaAtkController.text);
-      double nOver = _parse(_nayutaOverController.text) / 100;
-      double nPre = nBase * (1 + nOver + nayutaSkill2);
+      double nBase = _parse(_matchaAtkController.text);
+      double nOver = _parse(_matchaOverController.text) / 100;
 
-      double hBase = _parse(_helmAtkController.text);
-      double hOver = _parse(_helmOverController.text) / 100;
-      double hPre = hBase * (1 + hOver);
+      double hBase = _parse(_gakseolAtkController.text);
+      double hOver = _parse(_gakseolOverController.text) / 100;
+      double gakseolSkill2 = SkillData.gakseolS2[_gakseolS2Level];
 
-      double eBase = _parse(_extraAtkController.text);
-      double eOver = _parse(_extraOverController.text) / 100;
-      double ePre = (_extraNikkeType != null) ? (eBase * (1 + eOver)) : -1.0;
+      resMatchaFinal = nBase * (1 + nOver + matchaSkill2 + mirandaVal);
+      resGakseolFinal = hBase * (1 + hOver + gakseolSkill2 + mirandaVal);
 
-      targetNayuta = nPre;
-      targetHelm = hPre;
-      targetExtra = _extraNikkeType != null ? ePre : 0;
-
-      List<Map<String, dynamic>> comparisonList = [
-        {'id': 'nayuta', 'name': '나유타', 'val': nPre},
-        {'id': 'helm', 'name': '헬름', 'val': hPre}
-      ];
-      if (_extraNikkeType != null) {
-        String eName = _extraNikkeType == 'clud' ? '클루드' : (_extraNikkeType == 'cdiesel' ? '클디젤' : '일반3버');
-        comparisonList.add({'id': 'extra', 'name': eName, 'val': ePre});
-      }
-      comparisonList.sort((a, b) => b['val'].compareTo(a['val']));
-      Set<String> top2 = {comparisonList[0]['id'], comparisonList[1]['id']};
-      bufferedNikkes = [comparisonList[0]['name'] as String, comparisonList[1]['name'] as String];
-
-      nayutaHasMiranda = top2.contains('nayuta');
-      helmHasMiranda = top2.contains('helm');
-      extraHasMiranda = top2.contains('extra');
-
-      resNayutaFinal = nBase *
-          (1 + nOver + nayutaSkill2 + (nayutaHasMiranda ? mirandaVal : 0));
-      resHelmFinal = hBase * (1 + hOver + (helmHasMiranda ? mirandaVal : 0));
-
-      if (_extraNikkeType != null) {
-        double cludBurstVal = _extraNikkeType == 'clud' ? SkillData.cludBurst[_cludBurstLevel] : 0;
-        resExtraFinal = eBase *
-            (1 + eOver + cludBurstVal + (extraHasMiranda ? mirandaVal : 0));
-      }
-
-      double maxAtk = resNayutaFinal;
+      double maxAtk = resMatchaFinal;
       String rival = "";
-      if (resHelmFinal > maxAtk) {
-        maxAtk = resHelmFinal;
-        rival = "헬름";
-      }
-      if (_extraNikkeType != null && resExtraFinal > maxAtk) {
-        maxAtk = resExtraFinal;
-        rival = (_extraNikkeType == 'clud') ? "클루드" : ((_extraNikkeType == 'cdiesel') ? "클디젤" : "일반 니케");
+      if (resGakseolFinal > maxAtk) {
+        maxAtk = resGakseolFinal;
+        rival = "스노우화이트";
       }
 
-      if (_extraNikkeType != null && !nayutaHasMiranda) {
+      if (maxAtk != resMatchaFinal) {
         isError = true;
-        resultMessage = "❌ 경고: 나유타가 미란다 버프 타겟에서 밀려났습니다!";
-        double targetDiff = min(targetHelm, targetExtra) - targetNayuta;
-        double neededIncrease = (targetDiff / nBase) * 100;
-        needOverloadMessage = "나유타가 미란다 버프를 받으려면 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.";
-      } else if (maxAtk != resNayutaFinal) {
-        isError = true;
-        double currentTotalBuff = nOver + nayutaSkill2 + (nayutaHasMiranda ? mirandaVal : 0);
+        double currentTotalBuff =
+            nOver + matchaSkill2 + mirandaVal;
         double neededOver = ((maxAtk / nBase) - 1 - currentTotalBuff) * 100;
-        resultMessage = "❌ 경고: $rival이 나유타보다 최종 공격력이 높습니다!";
-        needOverloadMessage = "나유타의 오버공증이 최소 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
+        resultMessage = "❌ 경고: $rival이 마르차나보다 최종 공격력이 높습니다!";
+        needOverloadMessage =
+            "마르차나의 오버공증이 최소 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
       } else {
         isError = false;
-        double secondMaxAtk = resHelmFinal;
-        String secondRival = "헬름";
+        double secondMaxAtk = resGakseolFinal;
+        String secondRival = "스노우화이트";
         double secondRivalBase = hBase;
 
-        if (_extraNikkeType != null && resExtraFinal > resHelmFinal) {
-          secondMaxAtk = resExtraFinal;
-          secondRival = (_extraNikkeType == 'clud') ? "클루드" : ((_extraNikkeType == 'cdiesel') ? "클디젤" : "일반 니케");
-          secondRivalBase = eBase;
-        }
-
-        double margin = resNayutaFinal - secondMaxAtk;
-        double nayutaAllowedDecrease = (margin / nBase) * 100;
+        double margin = resMatchaFinal - secondMaxAtk;
+        double matchaAllowedDecrease = (margin / nBase) * 100;
         double rivalAllowedIncrease = (margin / secondRivalBase) * 100;
 
-        resultMessage = "✅ 정상: 나유타의 최종 공격력이 가장 높습니다.";
+        resultMessage = "✅ 정상: 마르차나의 최종 공격력이 가장 높습니다.";
         needOverloadMessage = "💡 현재 상태 기준 여유 수치\n"
-            "• 나유타 오버공증: ${nayutaAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
+            "• 마르차나 오버공증: ${matchaAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
             "• $secondRival 오버공증: ${rivalAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
       }
     });
@@ -353,12 +299,12 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
         _buildSliderField("미란다 버스트", _mirandaBurstLevel, (v) => setDialogState(() => _mirandaBurstLevel = v))
       ]);
 
-  void _showBurstDialog() => _showSettingDialog("클루드 스킬 설정", (setDialogState) => [
-        _buildSliderField("버스트", _cludBurstLevel, (v) => setDialogState(() => _cludBurstLevel = v))
+  void _showMatchaSkillDialog() => _showSettingDialog("마르차나 스킬 설정", (setDialogState) => [
+        _buildSliderField("2스킬", _matchaS2Level, (v) => setDialogState(() => _matchaS2Level = v))
       ]);
 
-  void _showNayutaSkillDialog() => _showSettingDialog("나유타 스킬 설정", (setDialogState) => [
-        _buildSliderField("2스킬", _nayutaS2Level, (v) => setDialogState(() => _nayutaS2Level = v))
+  void _showGakseolSkillDialog() => _showSettingDialog("스노우화이트 스킬 설정", (setDialogState) => [
+        _buildSliderField("2스킬", _gakseolS2Level, (v) => setDialogState(() => _gakseolS2Level = v))
       ]);
 
   void _showSettingDialog(String title, List<Widget> Function(void Function(void Function())) builder) {
@@ -427,32 +373,21 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       children: [
         const Divider(height: 24),
         _buildCharacterInputRow(
-            label: "나유타",
-            imagePath: "assets/nikke/nayuta.webp",
+            label: "마르차나",
+            imagePath: "assets/nikke/marciana_marine_study.webp",
             color: Colors.purple,
-            atkCtrl: _nayutaAtkController,
-            overCtrl: _nayutaOverController,
-            onImageTap: _showNayutaSkillDialog),
+            atkCtrl: _matchaAtkController,
+            overCtrl: _matchaOverController,
+            onImageTap: _showMatchaSkillDialog),
         const SizedBox(height: 16),
         _buildCharacterInputRow(
-            label: "헬름",
-            imagePath: "assets/nikke/helm.webp",
+            label: "스노우화이트",
+            imagePath: "assets/nikke/snow_white_heavy_arms.webp",
             color: Colors.blue,
-            atkCtrl: _helmAtkController,
-            overCtrl: _helmOverController),
-        if (_extraNikkeType != null) ...[
-          const SizedBox(height: 16),
-          _buildCharacterInputRow(
-            label: _extraNikkeType == 'clud' ? "루드밀라:윈터오너" : (_extraNikkeType == 'cdiesel' ? "디젤:윈터스위츠" : "일반3버"),
-            imagePath: _extraNikkeType == 'clud'
-                ? "assets/nikke/ludmilla_winter_owner.webp"
-                : (_extraNikkeType == 'cdiesel' ? "assets/nikke/diesel_winter_sweets.webp" : "assets/nikke/soldiereg.webp"),
-            color: Colors.cyan,
-            atkCtrl: _extraAtkController,
-            overCtrl: _extraOverController,
-            onImageTap: _extraNikkeType == 'clud' ? _showBurstDialog : null,
-          ),
-        ],
+            atkCtrl: _gakseolAtkController,
+            overCtrl: _gakseolOverController,
+            onImageTap: _showGakseolSkillDialog),
+
         const SizedBox(height: 24),
         // 동기화 자동 입력 버튼
         SizedBox(
@@ -460,9 +395,13 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
           height: 48,
           child: ElevatedButton.icon(
             onPressed: _isSyncing ? null : _handleAutoSync,
-            icon: _isSyncing 
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-              : const Icon(Icons.sync, color: Colors.white),
+            icon: _isSyncing
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2))
+                : const Icon(Icons.sync, color: Colors.white),
             label: Text(
               _isSyncing ? "동기화 정보 불러오는 중..." : "동기화 스탯 자동 입력",
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
@@ -471,35 +410,21 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
               backgroundColor: Colors.teal.shade500,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)
-              ),
+                  borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ),
         const SizedBox(height: 12),
-
         _buildActionButtons(),
         const SizedBox(height: 20),
-        if (_extraNikkeType != null) ...[
-          _buildTargetingCheckCard(),
-          const SizedBox(height: 12),
-        ],
         _buildResultCard(
-          "미란다 버프 우선순위 및 최종 결과",
-          resNayutaFinal,
-          resHelmFinal,
+          "미란다 버프 포함 최종 결과",
+          resMatchaFinal,
+          resGakseolFinal,
           [
-            "나유타: 오버 + 2스(Lv.$_nayutaS2Level)${nayutaHasMiranda ? ' + 미란다(Lv.$_mirandaBurstLevel)' : ''}",
-            "헬름: 오버${helmHasMiranda ? ' + 미란다(Lv.$_mirandaBurstLevel)' : ''}",
-            if (_extraNikkeType == 'clud')
-              "클루드: 오버 + 자버프(Lv.$_cludBurstLevel)${extraHasMiranda ? ' + 미란다(Lv.$_mirandaBurstLevel)' : ''}",
-            if (_extraNikkeType == 'cdiesel')
-              "클디젤: 오버${extraHasMiranda ? ' + 미란다(Lv.$_mirandaBurstLevel)' : ''}",
-            if (_extraNikkeType == 'general')
-              "일반3버: 오버${extraHasMiranda ? ' + 미란다(Lv.$_mirandaBurstLevel)' : ''}",
+            "마르차나: 오버 + 2스(Lv.$_matchaS2Level, ${(SkillData.matchaS2[_matchaS2Level]*100).toStringAsFixed(2)}%) + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)",
+            "스노우화이트: 오버 + 2스(Lv.$_gakseolS2Level, ${(SkillData.gakseolS2[_gakseolS2Level]*100).toStringAsFixed(2)}%) + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)",
           ],
-          extraVal: _extraNikkeType != null ? resExtraFinal : null,
-          extraName: _extraNikkeType == 'clud' ? "클루드" : (_extraNikkeType == 'cdiesel' ? "클디젤" : "일반3버"),
           onSettingsTap: _showMirandaSettingsDialog,
         ),
         const SizedBox(height: 16),
@@ -523,85 +448,7 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
                           borderRadius: BorderRadius.circular(12))),
                   child: const Text("최종 결과 계산",
                       style: TextStyle(fontWeight: FontWeight.bold))))),
-      const SizedBox(width: 8),
-      Expanded(
-          flex: 1,
-          child: SizedBox(
-              height: 50,
-              child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.orange),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12))),
-                  child: PopupMenuButton<String>(
-                      onSelected: (val) => setState(() =>
-                          _extraNikkeType = (val == 'remove' ? null : val)),
-                      itemBuilder: (context) => [
-                            const PopupMenuItem(
-                                value: 'clud', child: Text("클루드")),
-                            const PopupMenuItem(
-                                value: 'cdiesel', child: Text("클디젤")),
-                            const PopupMenuItem(
-                                value: 'general', child: Text("일반 니케")),
-                            const PopupMenuItem(
-                                value: 'remove',
-                                child: Text("제거",
-                                    style: TextStyle(color: Colors.red)))
-                          ],
-                      child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("3버 추가",
-                                style: TextStyle(
-                                    color: Colors.orange,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13)),
-                            Icon(Icons.arrow_drop_down, color: Colors.orange)
-                          ]))))),
     ]);
-  }
-
-  Widget _buildTargetingCheckCard() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? Colors.purple.shade800 : Colors.purple.shade200,
-          width: 1.5,
-        ),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [
-          Icon(Icons.gps_fixed, size: 16, color: Colors.purple),
-          SizedBox(width: 6),
-          Text("미란다 버프 타겟팅 판정 (버스트 전)",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: Colors.purple)),
-        ]),
-        const SizedBox(height: 12),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          _targetUnitColumn("나유타", targetNayuta, nayutaHasMiranda),
-          _targetUnitColumn("헬름", targetHelm, helmHasMiranda),
-          if (_extraNikkeType != null)
-            _targetUnitColumn(
-                _extraNikkeType == 'clud' ? "클루드" : (_extraNikkeType == 'cdiesel' ? "클디젤" : "일반3버"),
-                targetExtra,
-                extraHasMiranda),
-        ]),
-        const Divider(height: 20),
-        Text("• 미란다 버프 수혜자: ${bufferedNikkes.join(', ')}",
-            style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87)),
-      ]),
-    );
   }
 
   Widget _targetUnitColumn(String name, double val, bool isBuffered) {
@@ -706,12 +553,11 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
   }
 
   Widget _buildResultCard(
-      String title, double nayutaVal, double helmVal, List<String> notes,
-      {double? extraVal, String? extraName, VoidCallback? onSettingsTap}) {
+      String title, double matchaVal, double gakseolVal, List<String> notes,
+      {VoidCallback? onSettingsTap}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    double max = nayutaVal;
-    if (helmVal > max) max = helmVal;
-    if (extraVal != null && extraVal > max) max = extraVal;
+    double max = matchaVal;
+    if (gakseolVal > max) max = gakseolVal;
     return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -733,16 +579,11 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
                     color: isDark ? Colors.grey.shade400 : Colors.grey))
           ]),
           const SizedBox(height: 10),
-          _resRow("나유타", _formatter.format(nayutaVal.toInt()), nayutaVal == max,
-              Colors.purple),
+          _resRow("마르차나", _formatter.format(matchaVal.toInt()),
+              matchaVal == max, Colors.purple),
           const SizedBox(height: 4),
-          _resRow("헬름", _formatter.format(helmVal.toInt()), helmVal == max,
-              Colors.blue),
-          if (extraVal != null) ...[
-            const SizedBox(height: 4),
-            _resRow(extraName!, _formatter.format(extraVal.toInt()),
-                extraVal == max, Colors.cyan)
-          ],
+          _resRow("스노우화이트", _formatter.format(gakseolVal.toInt()),
+              gakseolVal == max, Colors.blue),
           const Divider(height: 20),
           ...notes.map((n) => Padding(
               padding: const EdgeInsets.only(bottom: 2),

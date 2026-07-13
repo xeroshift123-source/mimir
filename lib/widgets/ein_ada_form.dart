@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mimir/providers/nikke_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:mimir/utils/blabla_map.dart';
+import 'package:mimir/utils/skill_data.dart';
 import 'package:mimir/models/nikke.dart';
 import 'package:mimir/widgets/cube_level_dialog.dart';
 
@@ -29,12 +30,12 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
   bool _useTakina = false;
   final _takinaAtkController = TextEditingController(text: "70,000");
   final _takinaOverController = TextEditingController(text: "0");
-  final _takinaS1Controller = TextEditingController(text: "47.29");
+  int _takinaS1Level = 1;
 
-  final _mirandaAtkController = TextEditingController(text: "40.4");
-  final _adaS1Controller = TextEditingController(text: "60.0");
-  final _adaBurstController = TextEditingController(text: "40.0");
-  final _einS1Controller = TextEditingController(text: "70.12");
+  int _mirandaBurstLevel = 10;
+  int _adaS1Level = 10;
+  int _adaBurstLevel = 10;
+  int _einS1Level = 10;
 
   // --- 결과 데이터 변수 ---
   double targetAda = 0, targetEin = 0, targetTakina = 0;
@@ -115,6 +116,7 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
       Map<String, dynamic>? einChar;
       Map<String, dynamic>? adaChar;
       Map<String, dynamic>? takinaChar;
+      Map<String, dynamic>? mirandaChar;
       
       for (final char in characters) {
         final nameCode = char['name_code'] as int? ?? 0;
@@ -122,6 +124,7 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
         if (mappedName == '아인') einChar = char;
         if (mappedName == '에이다') adaChar = char;
         if (mappedName == '타키나') takinaChar = char;
+        if (mappedName == '미란다') mirandaChar = char;
       }
 
       if (einChar == null && adaChar == null) {
@@ -192,10 +195,25 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
         overCtrl.text = overAtk.toStringAsFixed(2);
       }
 
-      if (einChar != null) applyCharStats(einChar, '아인', _einAtkController, _einOverController);
-      if (adaChar != null) applyCharStats(adaChar, '에이다', _adaAtkController, _adaOverController);
+      if (mirandaChar != null) {
+        final skills = mirandaChar['skills'] as Map<String, dynamic>? ?? {};
+        _mirandaBurstLevel = skills['burst'] ?? 10;
+      }
+      if (einChar != null) {
+        applyCharStats(einChar, '아인', _einAtkController, _einOverController);
+        final skills = einChar['skills'] as Map<String, dynamic>? ?? {};
+        _einS1Level = skills['skill1'] ?? 10;
+      }
+      if (adaChar != null) {
+        applyCharStats(adaChar, '에이다', _adaAtkController, _adaOverController);
+        final skills = adaChar['skills'] as Map<String, dynamic>? ?? {};
+        _adaS1Level = skills['skill1'] ?? 10;
+        _adaBurstLevel = skills['burst'] ?? 10;
+      }
       if (_useTakina && takinaChar != null) {
         applyCharStats(takinaChar, '타키나', _takinaAtkController, _takinaOverController);
+        final skills = takinaChar['skills'] as Map<String, dynamic>? ?? {};
+        _takinaS1Level = skills['skill1'] ?? 1;
       }
 
       if (mounted) {
@@ -224,11 +242,6 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
     _einOverController.dispose();
     _takinaAtkController.dispose();
     _takinaOverController.dispose();
-    _takinaS1Controller.dispose();
-    _mirandaAtkController.dispose();
-    _adaS1Controller.dispose();
-    _adaBurstController.dispose();
-    _einS1Controller.dispose();
     super.dispose();
   }
 
@@ -242,12 +255,12 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
       double eOver = _parse(_einOverController.text) / 100;
       double tAtk = _parse(_takinaAtkController.text);
       double tOver = _parse(_takinaOverController.text) / 100;
-      double tS1 = _parse(_takinaS1Controller.text) / 100;
+      double tS1 = SkillData.takinaS1[_takinaS1Level];
 
-      double miranda = _parse(_mirandaAtkController.text) / 100;
-      double aS1 = _parse(_adaS1Controller.text) / 100;
-      double aB = _parse(_adaBurstController.text) / 100;
-      double eS1 = _parse(_einS1Controller.text) / 100;
+      double miranda = SkillData.mirandaBurst[_mirandaBurstLevel];
+      double aS1 = SkillData.adaS1[_adaS1Level];
+      double aB = SkillData.adaBurst[_adaBurstLevel];
+      double eS1 = SkillData.einS1[_einS1Level];
 
       // 1. 미란다 타겟팅 수치 판정 (사령관님 공식 반영)
       // 아인, 에이다: 400렙공 * (1 + 오버공증)
@@ -415,16 +428,16 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
 
         // 2. 에이다 버스트 시 카드 (원본 유지)
         _buildResultCard("<에이다 버스트 시>", resAdaOnAdaB, resEinOnAdaB, [
-          "에이다: ${bufferedNikkes.contains('에이다') ? '미란다(${_mirandaAtkController.text}%) + ' : ''}1스(${_adaS1Controller.text}%) + 버스트(${_adaBurstController.text}%) + 오버",
-          "아인: ${bufferedNikkes.contains('아인') ? '미란다(${_mirandaAtkController.text}%) + ' : ''}1스(${_einS1Controller.text}%) + 오버"
+          "에이다: ${bufferedNikkes.contains('에이다') ? '미란다(Lv.$_mirandaBurstLevel) + ' : ''}1스(Lv.$_adaS1Level) + 버스트(Lv.$_adaBurstLevel) + 오버",
+          "아인: ${bufferedNikkes.contains('아인') ? '미란다(Lv.$_mirandaBurstLevel) + ' : ''}1스(Lv.$_einS1Level) + 오버"
         ]),
 
         const SizedBox(height: 12),
 
         // 3. 아인 버스트 시 카드 (원본 유지)
         _buildResultCard("<아인 버스트 시>", resAdaOnEinB, resEinOnEinB, [
-          "에이다: ${bufferedNikkes.contains('에이다') ? '미란다(${_mirandaAtkController.text}%) + ' : ''}오버",
-          "아인: ${bufferedNikkes.contains('아인') ? '미란다(${_mirandaAtkController.text}%) + ' : ''}1스(${_einS1Controller.text}%) + 오버"
+          "에이다: ${bufferedNikkes.contains('에이다') ? '미란다(Lv.$_mirandaBurstLevel) + ' : ''}오버",
+          "아인: ${bufferedNikkes.contains('아인') ? '미란다(Lv.$_mirandaBurstLevel) + ' : ''}1스(Lv.$_einS1Level) + 오버"
         ]),
 
         const SizedBox(height: 16),
@@ -724,62 +737,77 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
   }
 
   // --- 다이얼로그 함수부 ---
-  void _showMirandaDialog() => _showSettingDialog(
-      "미란다 설정", [_buildPopupField("미란다 버스트 공증 (%)", _mirandaAtkController)]);
-  void _showAdaSkillDialog() => _showSettingDialog("에이다 스킬 설정", [
-        _buildPopupField("1스킬 공증 (%)", _adaS1Controller),
-        _buildPopupField("버스트 자공증 (%)", _adaBurstController)
+  void _showMirandaDialog() => _showSettingDialog("미란다 설정", (setDialogState) => [
+        _buildSliderField("미란다 버스트", _mirandaBurstLevel, (v) => setDialogState(() => _mirandaBurstLevel = v))
       ]);
-  void _showEinSkillDialog() => _showSettingDialog(
-      "아인 스킬 설정", [_buildPopupField("1스킬 공증 (%)", _einS1Controller)]);
-  void _showTakinaSkillDialog() => _showSettingDialog(
-      "타키나 스킬 설정", [_buildPopupField("1스킬 자공증 (%)", _takinaS1Controller)]);
+  void _showAdaSkillDialog() => _showSettingDialog("에이다 스킬 설정", (setDialogState) => [
+        _buildSliderField("1스킬", _adaS1Level, (v) => setDialogState(() => _adaS1Level = v)),
+        _buildSliderField("버스트", _adaBurstLevel, (v) => setDialogState(() => _adaBurstLevel = v))
+      ]);
+  void _showEinSkillDialog() => _showSettingDialog("아인 스킬 설정", (setDialogState) => [
+        _buildSliderField("1스킬", _einS1Level, (v) => setDialogState(() => _einS1Level = v))
+      ]);
+  void _showTakinaSkillDialog() => _showSettingDialog("타키나 스킬 설정", (setDialogState) => [
+        _buildSliderField("1스킬", _takinaS1Level, (v) => setDialogState(() => _takinaS1Level = v))
+      ]);
 
-  void _showSettingDialog(String title, List<Widget> fields) {
+  void _showSettingDialog(String title, List<Widget> Function(void Function(void Function())) builder) {
     showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-                title: Text(title,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold)),
-                content:
-                    Column(mainAxisSize: MainAxisSize.min, children: fields),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("취소")),
-                  ElevatedButton(
-                      onPressed: () {
-                        setState(() {});
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange),
-                      child: const Text("확인",
-                          style: TextStyle(color: Colors.white)))
-                ]));
+        builder: (context) => StatefulBuilder(
+              builder: (context, setDialogState) => AlertDialog(
+                  title: Text(title,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: builder(setDialogState)),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("취소")),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange),
+                        child: const Text("확인",
+                            style: TextStyle(color: Colors.white)))
+                  ]),
+            ));
   }
 
-  Widget _buildPopupField(String label, TextEditingController controller) {
+  Widget _buildSliderField(String label, int currentLevel, ValueChanged<int> onChanged) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: TextField(
-            controller: controller,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
-            decoration: InputDecoration(
-                labelText: label,
-                labelStyle: TextStyle(
-                    color:
-                        isDark ? Colors.grey.shade400 : Colors.grey.shade700),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                        color: isDark
-                            ? Colors.grey.shade800
-                            : Colors.grey.shade300)),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10)))));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white : Colors.black87)),
+            Text("Lv.$currentLevel",
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange)),
+          ],
+        ),
+        Slider(
+          value: currentLevel.toDouble(),
+          min: 1,
+          max: 10,
+          divisions: 9,
+          activeColor: Colors.orange,
+          onChanged: (val) => onChanged(val.toInt()),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
   }
 }

@@ -5,6 +5,7 @@ import 'package:mimir/screens/login.dart';
 import 'package:mimir/widgets/ein_ada_form.dart';
 import 'package:mimir/widgets/nayuta_helm_form.dart';
 import 'package:mimir/widgets/scarlet_lib_form.dart';
+import 'package:mimir/widgets/matcha_gakseol_form.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 
 class CalculateListScreen extends StatefulWidget {
@@ -37,6 +38,12 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
       "subtitle": "리버렐리오 1스킬 차속 버프 시뮬레이션",
       "icon": "assets/icons/elements/icon-elements-Wind.webp",
       "content": const ScarletLibCalculatorForm(),
+    },
+    {
+      "title": "말차-각설 계산기",
+      "subtitle": "애장품 미란다 버프 시뮬레이션",
+      "icon": "assets/icons/elements/icon-elements-Iron.webp",
+      "content": const MatchaGakseolCalculatorForm(),
     },
   ];
 
