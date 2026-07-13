@@ -155,7 +155,7 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       }
 
       if (!mounted) return;
-      final selectedCubeLevels = await showDialog<Map<String, int>>(
+      final selectedCubeLevels = await showDialog<Map<String, SyncOptions>>(
         context: context,
         builder: (context) => CubeLevelDialog(nikkes: dialogNikkes),
       );
@@ -172,7 +172,31 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController overCtrl) {
         final localNikke = nikkeNameMap[name];
         final modChar = injectConsoleLevels(char, localNikke);
-        final customCube = selectedCubeLevels[name] ?? 0;
+        
+        final customOptions = selectedCubeLevels[name] ?? SyncOptions();
+        final customCube = customOptions.cubeLevel;
+        
+        if (customOptions.limitBreak <= 3) {
+           modChar['grade'] = customOptions.limitBreak;
+           modChar['core'] = 0;
+        } else {
+           modChar['grade'] = 3;
+           modChar['core'] = customOptions.limitBreak - 3;
+        }
+        modChar['bondLevel'] = customOptions.affection;
+
+        
+        final equips = List<dynamic>.from(modChar['equipment'] as List<dynamic>? ?? []);
+        for(int i=0; i<equips.length; i++) {
+           if (equips[i] == null) continue;
+           final eq = Map<String, dynamic>.from(equips[i]);
+           if(eq['slot'] == 'head') eq['level'] = customOptions.headLevel;
+           if(eq['slot'] == 'torso') eq['level'] = customOptions.torsoLevel;
+           if(eq['slot'] == 'arm') eq['level'] = customOptions.armLevel;
+           if(eq['slot'] == 'leg') eq['level'] = customOptions.legLevel;
+           equips[i] = eq;
+        }
+        modChar['equipment'] = equips;
         
         double atk400 = 0;
         double overAtk = 0;
@@ -187,8 +211,8 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
           }
         }
         
-        final equips = modChar['equipment'] as List<dynamic>? ?? [];
-        for (final eq in equips) {
+        final overloadEquips = modChar['equipment'] as List<dynamic>? ?? [];
+        for (final eq in overloadEquips) {
           final options = eq['overloadOptions'] as List<dynamic>? ?? [];
           for (final opt in options) {
             final int id = opt as int? ?? 0;

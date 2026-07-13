@@ -138,7 +138,7 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
       }
 
       if (!mounted) return;
-      final selectedCubeLevels = await showDialog<Map<String, int>>(
+      final selectedCubeLevels = await showDialog<Map<String, SyncOptions>>(
         context: context,
         builder: (context) => CubeLevelDialog(nikkes: dialogNikkes),
       );
@@ -155,7 +155,21 @@ class _ScarletLibCalculatorFormState extends State<ScarletLibCalculatorForm> {
       void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController? overCtrl) {
         final localNikke = nikkeNameMap[name];
         final modChar = injectConsoleLevels(char, localNikke);
-        final customCube = selectedCubeLevels[name] ?? 0;
+        
+        final customOptions = selectedCubeLevels[name] ?? SyncOptions();
+        final customCube = customOptions.cubeLevel;
+        
+        final equips = List<dynamic>.from(modChar['equipment'] as List<dynamic>? ?? []);
+        for(int i=0; i<equips.length; i++) {
+           if (equips[i] == null) continue;
+           final eq = Map<String, dynamic>.from(equips[i]);
+           if(eq['slot'] == 'head') eq['level'] = customOptions.headLevel;
+           if(eq['slot'] == 'torso') eq['level'] = customOptions.torsoLevel;
+           if(eq['slot'] == 'arm') eq['level'] = customOptions.armLevel;
+           if(eq['slot'] == 'leg') eq['level'] = customOptions.legLevel;
+           equips[i] = eq;
+        }
+        modChar['equipment'] = equips;
         
         double atk400 = 0;
         double overAtk = 0;
