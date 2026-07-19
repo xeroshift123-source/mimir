@@ -64,7 +64,7 @@ final List<RaidInfo> raidHistory = [
     type: RaidType.union,
     seasonName: "26년 7월",
     period: "7/10(금)",
-    imagePath: "assets/images/dororong.png",
+    imagePath: "assets/images/union_raid.webp",
     unionBosses: [
       UnionBossInfo(element: "작열", name: "리빌드 오벨리스크", keyword: ["파츠"]),
       UnionBossInfo(element: "풍압", name: "크라켄 (★)", keyword: ["코어", "파츠"]),
@@ -78,9 +78,9 @@ final List<RaidInfo> raidHistory = [
     seasonName: "SEASON 39",
     bossName: "아일랜드이터",
     period: " 7/16(금) 12:00 ~ 7/23(수) 4:59",
-    imagePath: "assets/images/raids/island_eater.png",
+    imagePath: "assets/images/raids/island_eater2.png",
     bossElement: "전격",
     weakness: "철갑",
-    keyword: ["코어"],
+    keyword: ["코어", "힐"],
   ),
 ];

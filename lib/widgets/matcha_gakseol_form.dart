@@ -31,6 +31,7 @@ class _MatchaGakseolCalculatorFormState
   int _mirandaBurstLevel = 10;
   int _matchaS2Level = 10;
   int _gakseolS2Level = 10;
+  bool isHelm = false;
 
   double resMatchaFinal = 0;
   double resGakseolFinal = 0;
@@ -115,15 +116,18 @@ class _MatchaGakseolCalculatorFormState
         final nameCode = char['name_code'] as int? ?? 0;
         final mappedName = BlablaMap.characterNames[nameCode] ?? '';
         if (mappedName == '마르차나 : 마린 스터디') matchaChar = char;
-        if (mappedName == '스노우 화이트 : 헤비암즈') gakseolChar = char;
+        if (!isHelm && mappedName == '스노우 화이트 : 헤비암즈') gakseolChar = char;
+        if (isHelm && mappedName == '헬름') gakseolChar = char;
         if (mappedName == '미란다') mirandaChar = char;
       }
 
       if (matchaChar == null && gakseolChar == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('동기화된 데이터에서 마르차나와 스노우화이트을 찾을 수 없습니다.')),
+            SnackBar(
+                content: Text(isHelm
+                    ? '동기화된 데이터에서 마르차나와 헬름을 찾을 수 없습니다.'
+                    : '동기화된 데이터에서 마르차나와 스노우화이트을 찾을 수 없습니다.')),
           );
         }
         return;
@@ -139,9 +143,9 @@ class _MatchaGakseolCalculatorFormState
       }
       if (gakseolChar != null) {
         dialogNikkes.add({
-          'name': '스노우 화이트 : 헤비암즈',
+          'name': isHelm ? '헬름' : '스노우 화이트 : 헤비암즈',
           'char': gakseolChar,
-          'image': 'assets/nikke/snow_white_heavy_arms.webp'
+          'image': isHelm ? 'assets/nikke/helm.webp' : 'assets/nikke/snow_white_heavy_arms.webp'
         });
       }
 
@@ -233,7 +237,7 @@ class _MatchaGakseolCalculatorFormState
         _matchaS2Level = skills['skill2'] ?? 10;
       }
       if (gakseolChar != null) {
-        applyCharStats(gakseolChar, '스노우 화이트 : 헤비암즈', _gakseolAtkController, _gakseolOverController);
+        applyCharStats(gakseolChar, isHelm ? '헬름' : '스노우 화이트 : 헤비암즈', _gakseolAtkController, _gakseolOverController);
         final skills = gakseolChar['skills'] as Map<String, dynamic>? ?? {};
         _gakseolS2Level = skills['skill2'] ?? 10;
       }
@@ -278,16 +282,16 @@ class _MatchaGakseolCalculatorFormState
 
       double hBase = _parse(_gakseolAtkController.text);
       double hOver = _parse(_gakseolOverController.text) / 100;
-      double gakseolSkill2 = SkillData.gakseolS2[_gakseolS2Level];
+      double gakseolSkill2 = isHelm ? 0.0 : SkillData.gakseolS2[_gakseolS2Level];
 
       resMatchaFinal = nBase * (1 + nOver + matchaSkill2 + mirandaVal);
       resGakseolFinal = hBase * (1 + hOver + gakseolSkill2 + mirandaVal);
 
       double maxAtk = resMatchaFinal;
-      String rival = "";
+      String rivalName = isHelm ? "헬름" : "스노우화이트";
+      
       if (resGakseolFinal > maxAtk) {
         maxAtk = resGakseolFinal;
-        rival = "스노우화이트";
       }
 
       if (maxAtk != resMatchaFinal) {
@@ -295,13 +299,12 @@ class _MatchaGakseolCalculatorFormState
         double currentTotalBuff =
             nOver + matchaSkill2 + mirandaVal;
         double neededOver = ((maxAtk / nBase) - 1 - currentTotalBuff) * 100;
-        resultMessage = "❌ 경고: $rival이 마르차나보다 최종 공격력이 높습니다!";
+        resultMessage = "❌ 경고: $rivalName이 마르차나보다 최종 공격력이 높습니다!";
         needOverloadMessage =
             "마르차나의 오버공증이 최소 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
       } else {
         isError = false;
         double secondMaxAtk = resGakseolFinal;
-        String secondRival = "스노우화이트";
         double secondRivalBase = hBase;
 
         double margin = resMatchaFinal - secondMaxAtk;
@@ -311,7 +314,7 @@ class _MatchaGakseolCalculatorFormState
         resultMessage = "✅ 정상: 마르차나의 최종 공격력이 가장 높습니다.";
         needOverloadMessage = "💡 현재 상태 기준 여유 수치\n"
             "• 마르차나 오버공증: ${matchaAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
-            "• $secondRival 오버공증: ${rivalAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
+            "• $rivalName 오버공증: ${rivalAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
       }
     });
   }
@@ -403,12 +406,12 @@ class _MatchaGakseolCalculatorFormState
             onImageTap: _showMatchaSkillDialog),
         const SizedBox(height: 16),
         _buildCharacterInputRow(
-            label: "스노우화이트",
-            imagePath: "assets/nikke/snow_white_heavy_arms.webp",
+            label: isHelm ? "헬름" : "스노우화이트",
+            imagePath: isHelm ? "assets/nikke/helm.webp" : "assets/nikke/snow_white_heavy_arms.webp",
             color: Colors.blue,
             atkCtrl: _gakseolAtkController,
             overCtrl: _gakseolOverController,
-            onImageTap: _showGakseolSkillDialog),
+            onImageTap: isHelm ? null : _showGakseolSkillDialog),
 
         const SizedBox(height: 24),
         // 동기화 자동 입력 버튼
@@ -445,9 +448,12 @@ class _MatchaGakseolCalculatorFormState
           resGakseolFinal,
           [
             "마르차나: 오버 + 2스(Lv.$_matchaS2Level, ${(SkillData.matchaS2[_matchaS2Level]*100).toStringAsFixed(2)}%) + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)",
-            "스노우화이트: 오버 + 2스(Lv.$_gakseolS2Level, ${(SkillData.gakseolS2[_gakseolS2Level]*100).toStringAsFixed(2)}%) + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)",
+            isHelm 
+                ? "헬름: 오버 + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)"
+                : "스노우화이트: 오버 + 2스(Lv.$_gakseolS2Level, ${(SkillData.gakseolS2[_gakseolS2Level]*100).toStringAsFixed(2)}%) + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)",
           ],
           onSettingsTap: _showMirandaSettingsDialog,
+          rivalName: isHelm ? "헬름" : "스노우화이트",
         ),
         const SizedBox(height: 16),
         _buildStatusBox(),
@@ -457,6 +463,26 @@ class _MatchaGakseolCalculatorFormState
 
   Widget _buildActionButtons() {
     return Row(children: [
+      Expanded(
+          flex: 1,
+          child: SizedBox(
+              height: 50,
+              child: ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      isHelm = !isHelm;
+                    });
+                    _calculate();
+                  },
+                  icon: const Icon(Icons.swap_horiz, color: Colors.white),
+                  label: const Text("3버 교체",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueGrey,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)))))),
+      const SizedBox(width: 8),
       Expanded(
           flex: 2,
           child: SizedBox(
@@ -552,7 +578,7 @@ class _MatchaGakseolCalculatorFormState
 
   Widget _buildResultCard(
       String title, double matchaVal, double gakseolVal, List<String> notes,
-      {VoidCallback? onSettingsTap}) {
+      {VoidCallback? onSettingsTap, String rivalName = "스노우화이트"}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     double max = matchaVal;
     if (gakseolVal > max) max = gakseolVal;
@@ -580,7 +606,7 @@ class _MatchaGakseolCalculatorFormState
           _resRow("마르차나", _formatter.format(matchaVal.toInt()),
               matchaVal == max, Colors.purple),
           const SizedBox(height: 4),
-          _resRow("스노우화이트", _formatter.format(gakseolVal.toInt()),
+          _resRow(rivalName, _formatter.format(gakseolVal.toInt()),
               gakseolVal == max, Colors.blue),
           const Divider(height: 20),
           ...notes.map((n) => Padding(
