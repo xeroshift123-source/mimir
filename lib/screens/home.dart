@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/deck_builder.dart';
 import 'package:mimir/screens/union_deck_builder.dart';
-import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/screens/login.dart';
 import 'package:mimir/screens/sync_screen.dart';
 import 'package:mimir/screens/my_nikke_screen.dart';
@@ -12,6 +11,7 @@ import 'package:mimir/providers/auth_provider.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/app_footer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/raid_info.dart';
 import '../data/raid_data.dart';
@@ -916,11 +916,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 12),
                       _buildMenuButton(
                         context,
-                        title: "공유 덱 라이브러리 바로가기",
-                        icon: Icons.auto_awesome_motion,
+                        title: "솔레 금서고 바로가기",
+                        icon: Icons.history,
                         color: Colors.deepOrange,
-                        onTap: () => Navigator.pushNamed(
-                            context, DeckLibraryScreen.routeName),
+                        onTap: () async {
+                          final Uri url = Uri.parse('https://soloraidhistory.vercel.app/');
+                          if (!await launchUrl(url)) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('링크를 열 수 없습니다.'),
+                                    backgroundColor: Colors.orange),
+                              );
+                            }
+                          }
+                        },
                       ),
                       const SizedBox(height: 12),
                       _buildMenuButton(

@@ -8,7 +8,8 @@
     "weaponType": "AR",
     "company": "Abnormal",
     "ability": [
-      "분배데미지"
+      "분배데미지",
+      "최대체력"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -426,7 +427,8 @@
     "weaponType": "RL",
     "company": "Pilgrim",
     "ability": [
-      "렐루"
+      "렐루",
+      "최대체력"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -1369,7 +1371,8 @@
     "ability": [
       "클이든",
       "시전자 기준 공격력",
-      "시공증"
+      "시공증",
+      "최대체력"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -2350,7 +2353,8 @@
       "버쿨감",
       "시전자 기준 공격력",
       "시공증",
-      "힐"
+      "힐",
+      "최대체력증가"
     ],
     "coolTime": 20,
     "squadNum": 0,
@@ -3233,7 +3237,7 @@
     "squadNum": 0,
     "rank": "SSR",
     "type": "ATK",
-    "isTemporary": true
+    "isTemporary": false
   },
   {
     "id": "marciana_marine_study",
@@ -3249,6 +3253,44 @@
       "섹스"
     ],
     "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK",
+    "isTemporary": false
+  },
+  {
+    "id": "laplace_ultimate_hero",
+    "name": "라플라스 : 얼티밋 히어로",
+    "imageUrl": "assets/nikke/laplace_ultimate_hero.webp",
+    "burst": "3",
+    "element": "Wind",
+    "weaponType": "RL",
+    "company": "Missilis",
+    "ability": [
+      "최대체력"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK",
+    "isTemporary": true
+  },
+  {
+    "id": "maxwell_ordinary_mechanic",
+    "name": "맥스웰 : 오디너리 미케닉",
+    "imageUrl": "assets/nikke/maxwell_ordinary_mechanic.webp",
+    "burst": "2",
+    "element": "Wind",
+    "weaponType": "SR",
+    "company": "Missilis",
+    "ability": [
+      "버스트 충전",
+      "관통데미지",
+      "관통뎀",
+      "힐",
+      "최대체력증가"
+    ],
+    "coolTime": 20,
     "squadNum": 0,
     "rank": "SSR",
     "type": "ATK",
