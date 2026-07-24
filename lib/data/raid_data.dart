@@ -83,4 +83,18 @@ final List<RaidInfo> raidHistory = [
     weakness: "철갑",
     keyword: ["코어", "힐"],
   ),
+  const RaidInfo(
+    type: RaidType.union,
+    seasonName: "26년 8월",
+    period: "7/31(금)",
+    imagePath: "assets/images/union_raid.webp",
+    unionBosses: [
+      UnionBossInfo(element: "작열", name: "플레이트", keyword: ["코어", "타수"]),
+      UnionBossInfo(element: "풍압", name: "리빌드 핑거즈", keyword: ["코어"]),
+      UnionBossInfo(
+          element: "수냉", name: "토커티브 (★)", keyword: ["코어", "파츠", "즉사"]),
+      UnionBossInfo(element: "전격", name: "선바스", keyword: ["파츠"]),
+      UnionBossInfo(element: "철갑", name: "마테리얼H (★)", keyword: ["코어", "파츠"]),
+    ],
+  ),
 ];
