@@ -93,7 +93,7 @@ final List<RaidInfo> raidHistory = [
       UnionBossInfo(element: "풍압", name: "리빌드 핑거즈", keyword: ["코어"]),
       UnionBossInfo(
           element: "수냉", name: "토커티브 (★)", keyword: ["코어", "파츠", "즉사"]),
-      UnionBossInfo(element: "전격", name: "선바스", keyword: ["파츠"]),
+      UnionBossInfo(element: "전격", name: "선바스", keyword: ["코어"]),
       UnionBossInfo(element: "철갑", name: "마테리얼H (★)", keyword: ["코어", "파츠"]),
     ],
   ),
