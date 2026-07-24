@@ -3124,7 +3124,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              "(Driver's License)",
+                              is80k ? "(AZX Operator)" : "(Driver's License)",
                               style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
