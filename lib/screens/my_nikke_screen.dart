@@ -49,6 +49,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   bool _showNicknameOnLicense = false;
   bool _sortByLevel40Cp = false;
   bool _sortByUko = false;
+  bool _sortByAtk = false;
+  bool _sortByUkoAtk = false;
+  bool _hideStats = false;
 
   @override
   void didChangeDependencies() {
@@ -328,6 +331,64 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       filteredChars.sort((a, b) {
         final sumA = a['ukoSum'] as double? ?? 0.0;
         final sumB = b['ukoSum'] as double? ?? 0.0;
+        // 2차 정렬: 투력
+        if (sumB.compareTo(sumA) == 0) {
+          final cpA = a['combat'] as int? ?? 0;
+          final cpB = b['combat'] as int? ?? 0;
+          return cpB.compareTo(cpA);
+        }
+        return sumB.compareTo(sumA);
+      });
+    } else if (_sortByAtk) {
+      for (var char in filteredChars) {
+        double atkSum = 0;
+        final equips = char['equipment'] as List<dynamic>? ?? [];
+        for (final eq in equips) {
+          final eqOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+          for (final opt in eqOptions) {
+            final int id = opt as int? ?? 0;
+            if (id == 0) continue;
+            final String stat = BlablaMap.getOptionName(id);
+            if (stat.contains('공격력')) {
+              atkSum += BlablaMap.getOptionPercent(id);
+            }
+          }
+        }
+        char['atkSum'] = atkSum;
+      }
+      filteredChars.sort((a, b) {
+        final sumA = a['atkSum'] as double? ?? 0.0;
+        final sumB = b['atkSum'] as double? ?? 0.0;
+        // 2차 정렬: 투력
+        if (sumB.compareTo(sumA) == 0) {
+          final cpA = a['combat'] as int? ?? 0;
+          final cpB = b['combat'] as int? ?? 0;
+          return cpB.compareTo(cpA);
+        }
+        return sumB.compareTo(sumA);
+      });
+    } else if (_sortByUkoAtk) {
+      for (var char in filteredChars) {
+        double ukoAtkSum = 0;
+        final equips = char['equipment'] as List<dynamic>? ?? [];
+        for (final eq in equips) {
+          final eqOptions = eq['overloadOptions'] as List<dynamic>? ?? [];
+          for (final opt in eqOptions) {
+            final int id = opt as int? ?? 0;
+            if (id == 0) continue;
+            final String stat = BlablaMap.getOptionName(id);
+            if (stat.contains('우월코드') ||
+                stat.contains('우월 코드') ||
+                stat.contains('공격력')) {
+              ukoAtkSum += BlablaMap.getOptionPercent(id);
+            }
+          }
+        }
+        char['ukoAtkSum'] = ukoAtkSum;
+      }
+      filteredChars.sort((a, b) {
+        final sumA = a['ukoAtkSum'] as double? ?? 0.0;
+        final sumB = b['ukoAtkSum'] as double? ?? 0.0;
         // 2차 정렬: 투력
         if (sumB.compareTo(sumA) == 0) {
           final cpA = a['combat'] as int? ?? 0;
@@ -807,91 +868,121 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     spacing: 4,
                     runSpacing: 4,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _sortByLevel40Cp = !_sortByLevel40Cp;
-                            if (_sortByLevel40Cp) _sortByUko = false;
-                            _selectedCharIndex = 0;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: _sortByLevel40Cp
-                                ? Colors.orange
-                                : Colors.grey.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: _sortByLevel40Cp
-                                  ? Colors.orange
-                                  : Colors.transparent,
-                            ),
-                          ),
-                          child: Text(
-                            "40레벨 투력",
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: _sortByLevel40Cp
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: _sortByLevel40Cp
-                                  ? Colors.white
-                                  : (Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.grey.shade300
-                                      : Colors.grey.shade700),
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _sortByUko = !_sortByUko;
-                            if (_sortByUko) _sortByLevel40Cp = false;
-                            _selectedCharIndex = 0;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: _sortByUko
-                                ? Colors.orange
-                                : Colors.grey.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: _sortByUko
-                                  ? Colors.orange
-                                  : Colors.transparent,
-                            ),
-                          ),
-                          child: Text(
-                            "우코",
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: _sortByUko
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: _sortByUko
-                                  ? Colors.white
-                                  : (Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.grey.shade300
-                                      : Colors.grey.shade700),
-                            ),
-                          ),
-                        ),
-                      ),
+                      _buildSortChip("40레벨 투력", _sortByLevel40Cp, () {
+                        setState(() {
+                          final next = !_sortByLevel40Cp;
+                          _sortByLevel40Cp = next;
+                          _sortByUko = false;
+                          _sortByAtk = false;
+                          _sortByUkoAtk = false;
+                          _selectedCharIndex = 0;
+                        });
+                      }),
+                      _buildSortChip("우코", _sortByUko, () {
+                        setState(() {
+                          final next = !_sortByUko;
+                          _sortByUko = next;
+                          _sortByLevel40Cp = false;
+                          _sortByAtk = false;
+                          _sortByUkoAtk = false;
+                          _selectedCharIndex = 0;
+                        });
+                      }),
+                      _buildSortChip("공격력", _sortByAtk, () {
+                        setState(() {
+                          final next = !_sortByAtk;
+                          _sortByAtk = next;
+                          _sortByLevel40Cp = false;
+                          _sortByUko = false;
+                          _sortByUkoAtk = false;
+                          _selectedCharIndex = 0;
+                        });
+                      }),
+                      _buildSortChip("우공", _sortByUkoAtk, () {
+                        setState(() {
+                          final next = !_sortByUkoAtk;
+                          _sortByUkoAtk = next;
+                          _sortByLevel40Cp = false;
+                          _sortByUko = false;
+                          _sortByAtk = false;
+                          _selectedCharIndex = 0;
+                        });
+                      }),
                     ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 50,
+                  child: Text(
+                    "표시",
+                    style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange),
+                  ),
+                ),
+                Text(
+                  "수치 가리기",
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 28,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Switch(
+                      value: _hideStats,
+                      activeColor: Colors.orange,
+                      onChanged: (val) {
+                        setState(() {
+                          _hideStats = val;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ],
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildSortChip(String label, bool isSel, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSel ? Colors.orange : Colors.grey.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: isSel ? Colors.orange : Colors.transparent,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+            color: isSel
+                ? Colors.white
+                : (Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade300
+                    : Colors.grey.shade700),
+          ),
+        ),
       ),
     );
   }
@@ -1001,6 +1092,12 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         if (_sortByUko) {
           final uko = char['ukoSum'] as double? ?? 0.0;
           combatDisplay = "${uko.toStringAsFixed(2)}%";
+        } else if (_sortByAtk) {
+          final atk = char['atkSum'] as double? ?? 0.0;
+          combatDisplay = "${atk.toStringAsFixed(2)}%";
+        } else if (_sortByUkoAtk) {
+          final ukoAtk = char['ukoAtkSum'] as double? ?? 0.0;
+          combatDisplay = "${ukoAtk.toStringAsFixed(2)}%";
         } else {
           final combat = _sortByLevel40Cp
               ? (char['level40Cp'] as int? ?? 0)
@@ -1171,28 +1268,29 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                 style: const TextStyle(
                                     color: Colors.white70, fontSize: 10),
                               ),
-                              Text(
-                                combatDisplay,
-                                style: const TextStyle(
-                                  color: Colors.orangeAccent,
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: [
-                                    Shadow(
-                                        offset: Offset(-1, -1),
-                                        color: Colors.black),
-                                    Shadow(
-                                        offset: Offset(1, -1),
-                                        color: Colors.black),
-                                    Shadow(
-                                        offset: Offset(1, 1),
-                                        color: Colors.black),
-                                    Shadow(
-                                        offset: Offset(-1, 1),
-                                        color: Colors.black),
-                                  ],
+                              if (!_hideStats)
+                                Text(
+                                  combatDisplay,
+                                  style: const TextStyle(
+                                    color: Colors.orangeAccent,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      Shadow(
+                                          offset: Offset(-1, -1),
+                                          color: Colors.black),
+                                      Shadow(
+                                          offset: Offset(1, -1),
+                                          color: Colors.black),
+                                      Shadow(
+                                          offset: Offset(1, 1),
+                                          color: Colors.black),
+                                      Shadow(
+                                          offset: Offset(-1, 1),
+                                          color: Colors.black),
+                                    ],
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ],
@@ -1439,6 +1537,12 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     if (_sortByUko) {
       final uko = char['ukoSum'] as double? ?? 0.0;
       combatDisplay = "${uko.toStringAsFixed(2)}%";
+    } else if (_sortByAtk) {
+      final atk = char['atkSum'] as double? ?? 0.0;
+      combatDisplay = "${atk.toStringAsFixed(2)}%";
+    } else if (_sortByUkoAtk) {
+      final ukoAtk = char['ukoAtkSum'] as double? ?? 0.0;
+      combatDisplay = "${ukoAtk.toStringAsFixed(2)}%";
     } else {
       final combat = _sortByLevel40Cp
           ? (char['level40Cp'] as int? ?? 0)
@@ -1507,36 +1611,37 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   ),
                 ),
               ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [Colors.black87, Colors.transparent],
+            if (!_hideStats)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Colors.black87, Colors.transparent],
+                    ),
                   ),
-                ),
-                child: Text(
-                  combatDisplay,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.orangeAccent,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.bold,
-                    shadows: [
-                      Shadow(offset: Offset(-1, -1), color: Colors.black),
-                      Shadow(offset: Offset(1, -1), color: Colors.black),
-                      Shadow(offset: Offset(1, 1), color: Colors.black),
-                      Shadow(offset: Offset(-1, 1), color: Colors.black),
-                    ],
+                  child: Text(
+                    combatDisplay,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.orangeAccent,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(offset: Offset(-1, -1), color: Colors.black),
+                        Shadow(offset: Offset(1, -1), color: Colors.black),
+                        Shadow(offset: Offset(1, 1), color: Colors.black),
+                        Shadow(offset: Offset(-1, 1), color: Colors.black),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),

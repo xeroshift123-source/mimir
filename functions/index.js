@@ -74,20 +74,46 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             'Cookie': botCookie
         };
 
+        // 💡 헬퍼: 자동 재시도(Auto-retry) Axios POST
+        async function postWithRetry(endpoint, payload, maxRetries = 2, delayMs = 300) {
+            for (let i = 0; i <= maxRetries; i++) {
+                try {
+                    const res = await axios.post(endpoint, payload, { headers: customHeaders, timeout: 6000 });
+                    if (res && res.data && res.data.code === 0) {
+                        return res;
+                    }
+                    if (i < maxRetries) {
+                        await new Promise(r => setTimeout(r, delayMs));
+                    } else {
+                        return res;
+                    }
+                } catch (err) {
+                    if (i < maxRetries) {
+                        await new Promise(r => setTimeout(r, delayMs));
+                    } else {
+                        console.error(`POST ${endpoint} error:`, err.message);
+                        return null;
+                    }
+                }
+            }
+            return null;
+        }
+
         const results = { profile: null, gameInfo: null, characters: [] };
 
-        // [Step 1] Profile & GamePlayerInfo 조회
-        const profileRes = await axios.post(
+        // [Step 1] Profile & GamePlayerInfo 조회 (자동 재시도)
+        const profileRes = await postWithRetry(
             'https://api.blablalink.com/api/ugc/direct/standalonesite/User/GetUserProfile',
-            { intl_openid: openId },
-            { headers: customHeaders }
-        ).catch(err => {
-            console.error('GetUserProfile error:', err.message);
-            return null;
-        });
+            { intl_openid: openId }
+        );
 
         if (profileRes && profileRes.data && profileRes.data.code === 0) {
             results.profile = profileRes.data.data;
+        } else if (!profileRes) {
+            return res.status(200).json({
+                success: false,
+                error: "블라블라링크 서버 통신 지연: 프로필 정보를 가져올 수 없습니다. 잠시 후 다시 시도해 주세요."
+            });
         }
 
         // 💡 [소유권 검증]: 상태메세지(소개글)가 '미미르만만세' 인지 검증
@@ -99,14 +125,10 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             });
         }
 
-        const gameInfoRes = await axios.post(
+        const gameInfoRes = await postWithRetry(
             'https://api.blablalink.com/api/ugc/direct/standalonesite/User/GetUserGamePlayerInfo',
-            { intl_openid: openId },
-            { headers: customHeaders }
-        ).catch(err => {
-            console.error('GetUserGamePlayerInfo error:', err.message);
-            return null;
-        });
+            { intl_openid: openId }
+        );
 
         if (gameInfoRes && gameInfoRes.data && gameInfoRes.data.code === 0 && gameInfoRes.data.data) {
             results.gameInfo = gameInfoRes.data.data;
@@ -115,20 +137,18 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             const proxyPayload = { intl_open_id: rawOpenId, nikke_area_id: areaId };
 
             // [Step 2] 인게임 Basic & Outpost 지표 조회
-            const basicRes = await axios.post(
+            const basicRes = await postWithRetry(
                 'https://api.blablalink.com/api/game/proxy/Game/GetUserProfileBasicInfo',
-                proxyPayload,
-                { headers: customHeaders }
-            ).catch(() => null);
+                proxyPayload
+            );
             if (basicRes && basicRes.data && basicRes.data.code === 0 && basicRes.data.data) {
                 Object.assign(results.gameInfo, basicRes.data.data.basic_info || basicRes.data.data);
             }
 
-            const outpostRes = await axios.post(
+            const outpostRes = await postWithRetry(
                 'https://api.blablalink.com/api/game/proxy/Game/GetUserProfileOutpostInfo',
-                proxyPayload,
-                { headers: customHeaders }
-            ).catch(() => null);
+                proxyPayload
+            );
             if (outpostRes && outpostRes.data && outpostRes.data.code === 0 && outpostRes.data.data) {
                 Object.assign(results.gameInfo, outpostRes.data.data.outpost_info || outpostRes.data.data);
             }
@@ -136,11 +156,10 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             // [Step 3] 타 유저 대응 길드 디테일 연동
             const gsn = results.gameInfo.gsn || (results.gameInfo.basic_info ? results.gameInfo.basic_info.gsn : null);
             if (gsn && gsn !== "0" && gsn !== 0) {
-                const guildRes = await axios.post(
+                const guildRes = await postWithRetry(
                     'https://api.blablalink.com/api/game/proxy/Game/GetGuildDetail',
-                    { ...proxyPayload, guild_id: gsn.toString() },
-                    { headers: customHeaders }
-                ).catch(() => null);
+                    { ...proxyPayload, guild_id: gsn.toString() }
+                );
                 if (guildRes && guildRes.data && guildRes.data.code === 0 && guildRes.data.data) {
                     const detail = guildRes.data.data.guild_detail || {};
                     results.gameInfo.guild_name = detail.guild_name;
@@ -153,11 +172,10 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             }
 
             // [Step 4] 보유 니케 및 초정밀 상세 스펙 조회
-            const charRes = await axios.post(
+            const charRes = await postWithRetry(
                 'https://api.blablalink.com/api/game/proxy/Game/GetUserCharacters',
-                proxyPayload,
-                { headers: customHeaders }
-            ).catch(() => null);
+                proxyPayload
+            );
 
             if (charRes && charRes.data && charRes.data.code === 0 && charRes.data.data) {
                 const rawList = charRes.data.data.characters || [];
@@ -165,11 +183,10 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
 
                 let detailsMap = {};
                 if (nameCodes.length > 0) {
-                    const detailsRes = await axios.post(
+                    const detailsRes = await postWithRetry(
                         'https://api.blablalink.com/api/game/proxy/Game/GetUserCharacterDetails',
-                        { ...proxyPayload, name_codes: nameCodes },
-                        { headers: customHeaders }
-                    ).catch(() => null);
+                        { ...proxyPayload, name_codes: nameCodes }
+                    );
 
                     if (detailsRes && detailsRes.data && detailsRes.data.code === 0 && detailsRes.data.data) {
                         const detailsList = detailsRes.data.data.character_details || [];
