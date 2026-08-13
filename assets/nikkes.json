@@ -3314,12 +3314,17 @@
   {
     "id": "makoto",
     "name": "퀸(니지마 마코토)",
-    "imageUrl": "assets/nikke/makoto.png",
-    "burst": "0",
+    "imageUrl": "assets/nikke/makoto.webp",
+    "burst": "3",
     "element": "Fire",
     "weaponType": "SG",
     "company": "Abnormal",
-    "ability": [],
+    "ability": [
+      "분배데미지",
+      "분배뎀",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR",
@@ -3329,12 +3334,18 @@
   {
     "id": "yukiko",
     "name": "아마기 유키코",
-    "imageUrl": "assets/nikke/yukiko.png",
-    "burst": "0",
+    "imageUrl": "assets/nikke/yukiko.webp",
+    "burst": "3",
     "element": "Fire",
     "weaponType": "MG",
     "company": "Abnormal",
-    "ability": [],
+    "ability": [
+      "분배데미지",
+      "분배뎀",
+      "힐",
+      "시전자 기준 공격력",
+      "시공증"
+    ],
     "coolTime": 40,
     "squadNum": 0,
     "rank": "SSR",
@@ -3344,8 +3355,8 @@
   {
     "id": "aegis",
     "name": "아이기스",
-    "imageUrl": "assets/nikke/aegis.png",
-    "burst": "0",
+    "imageUrl": "assets/nikke/aegis.webp",
+    "burst": "2",
     "element": "Iron",
     "weaponType": "SMG",
     "company": "Abnormal",

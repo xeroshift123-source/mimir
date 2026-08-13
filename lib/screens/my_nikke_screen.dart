@@ -52,6 +52,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   bool _sortByAtk = false;
   bool _sortByUkoAtk = false;
   bool _hideStats = false;
+  bool _isGridViewInWideMode = false;
 
   @override
   void didChangeDependencies() {
@@ -401,7 +402,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWideScreen = constraints.maxWidth >= 900;
+        final isWideScreen = constraints.maxWidth >= 1200;
 
         if (isWideScreen) {
           return Center(
@@ -427,10 +428,13 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                       child: Column(
                         children: [
                           _buildProfileSummaryBar(isDark),
-                          _buildSearchAndFilters(isDark),
+                          _buildSearchAndFilters(isDark, true),
                           Expanded(
-                            child: _buildNikkeList(
-                                filteredChars, nikkeNameMap, isDark),
+                            child: _isGridViewInWideMode
+                                ? _buildNikkeGrid(
+                                    filteredChars, nikkeNameMap, isDark, false)
+                                : _buildNikkeList(
+                                    filteredChars, nikkeNameMap, isDark),
                           ),
                         ],
                       ),
@@ -456,7 +460,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           return Column(
             children: [
               _buildProfileSummaryBar(isDark),
-              _buildSearchAndFilters(isDark),
+              _buildSearchAndFilters(isDark, false),
               Expanded(
                 child:
                     _buildNikkeGrid(filteredChars, nikkeNameMap, isDark, true),
@@ -703,7 +707,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     );
   }
 
-  Widget _buildSearchAndFilters(bool isDark) {
+  Widget _buildSearchAndFilters(bool isDark, bool isWide) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: isDark ? const Color(0xFF1A1A24) : Colors.grey.shade50,
@@ -775,6 +779,21 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   });
                 },
               ),
+              if (isWide) ...[
+                const SizedBox(width: 4),
+                IconButton(
+                  tooltip: _isGridViewInWideMode ? "리스트 뷰로 전환" : "그리드 뷰로 전환",
+                  icon: Icon(
+                    _isGridViewInWideMode ? Icons.view_list : Icons.grid_view,
+                    color: _isGridViewInWideMode ? Colors.orange : Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isGridViewInWideMode = !_isGridViewInWideMode;
+                    });
+                  },
+                ),
+              ],
             ],
           ),
           if (_filterExpanded) ...[
@@ -1406,7 +1425,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   child: Row(
                     children: [
                       Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1468,7 +1487,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Expanded(
                         flex: 3,
                         child: Column(
@@ -1480,7 +1499,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                               maxLines: 1,
                               softWrap: false,
                               style: TextStyle(
-                                fontSize: 16.5,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 color: isDark ? Colors.white : Colors.black87,
                               ),
@@ -1489,7 +1508,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                             Text(
                               "스킬 레벨",
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 12.5,
                                 color: isDark
                                     ? Colors.grey.shade500
                                     : Colors.grey.shade600,
@@ -1498,7 +1517,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Expanded(
                         flex: 3,
                         child: Column(
@@ -1511,14 +1530,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: _buildEquipmentStatusSummary(equips, isDark),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Expanded(
-                        flex: 5,
+                        flex: 6,
                         child: _buildOverloadStatsSummary(equips, isDark),
                       ),
                     ],
@@ -1736,7 +1755,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       if (eq == null) {
         return Text(
           "$label -",
-          style: const TextStyle(color: Colors.grey, fontSize: 12),
+          style: const TextStyle(color: Colors.grey, fontSize: 11.5),
         );
       }
       final int tier = eq['tier'] as int? ?? 0;
@@ -1751,7 +1770,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         "$label +$level",
         style: TextStyle(
           color: textColor,
-          fontSize: 12,
+          fontSize: 11.5,
           fontWeight: FontWeight.bold,
         ),
       );
@@ -1761,24 +1780,30 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            buildSlotText('head', '머리'),
-            const Text(" / ",
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            buildSlotText('torso', '몸통'),
-          ],
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              buildSlotText('head', '머리'),
+              const Text(" / ",
+                  style: TextStyle(color: Colors.grey, fontSize: 11.5)),
+              buildSlotText('torso', '몸통'),
+            ],
+          ),
         ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            buildSlotText('arm', '장갑'),
-            const Text(" / ",
-                style: TextStyle(color: Colors.grey, fontSize: 12)),
-            buildSlotText('leg', '신발'),
-          ],
+        const SizedBox(height: 4),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              buildSlotText('arm', '장갑'),
+              const Text(" / ",
+                  style: TextStyle(color: Colors.grey, fontSize: 11.5)),
+              buildSlotText('leg', '신발'),
+            ],
+          ),
         ),
       ],
     );
@@ -1856,9 +1881,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
             : const Color(0xFF7F8C8D); // 일반 옵션 수치 색상 (회색)
 
         return Container(
-          width: 150,
           margin: const EdgeInsets.symmetric(vertical: 2.0),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
           decoration: BoxDecoration(
             color: boxBgColor,
             borderRadius: BorderRadius.circular(4),
@@ -1866,19 +1890,24 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                name,
-                style: TextStyle(
-                  color: labelColor,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.bold,
+              Flexible(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: labelColor,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              const SizedBox(width: 2),
               Text(
                 "+${sumPercent.toStringAsFixed(2)}%",
                 style: TextStyle(
                   color: valueColor,
-                  fontSize: 10.5,
+                  fontSize: 9.5,
                   fontWeight: FontWeight.bold,
                 ),
               ),

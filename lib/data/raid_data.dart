@@ -97,4 +97,14 @@ final List<RaidInfo> raidHistory = [
       UnionBossInfo(element: "철갑", name: "마테리얼H (★)", keyword: ["코어", "파츠"]),
     ],
   ),
+  const RaidInfo(
+    type: RaidType.solo,
+    seasonName: "SEASON 40",
+    bossName: "사치스러운 거미",
+    period: " 8/20(목) 12:00 ~ 8/27(목) 4:59",
+    imagePath: "assets/images/raids/luxury_spider.png",
+    bossElement: "풍압",
+    weakness: "작열",
+    keyword: ["잡몹"],
+  ),
 ];
