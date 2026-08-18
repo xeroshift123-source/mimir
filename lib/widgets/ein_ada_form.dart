@@ -77,9 +77,11 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
 
       final characters = profile['characters'] as List<dynamic>? ?? [];
       final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
+      if (!mounted) return;
       var localNikkes = context.read<NikkeProvider>().nikkeList;
       if (localNikkes.isEmpty) {
         await context.read<NikkeProvider>().loadNikkes();
+        if (!mounted) return;
         localNikkes = context.read<NikkeProvider>().nikkeList;
       }
       final Map<String, Nikke> nikkeNameMap = {
@@ -308,13 +310,15 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
       double mValA = adaGetsM ? miranda : 0;
       double mValE = einGetsM ? miranda : 0;
 
+      double adaBuffAmount = aAtk * aS1;
+
       // <에이다 버스트 시>
       resAdaOnAdaB = aAtk * (1 + mValA + aS1 + aB + aOver);
       resEinOnAdaB = eAtk * (1 + mValE + eS1 + eOver);
 
       // <아인 버스트 시>
       resAdaOnEinB = aAtk * (1 + mValA + aOver);
-      resEinOnEinB = eAtk * (1 + mValE + eS1 + eOver);
+      resEinOnEinB = eAtk * (1 + mValE + eS1 + eOver) + adaBuffAmount;
 
       // 3. 상태 메시지 및 에러 판정
       if (_useTakina && bufferedNikkes.contains('타키나')) {
@@ -458,10 +462,10 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
 
         const SizedBox(height: 12),
 
-        // 3. 아인 버스트 시 카드 (원본 유지)
+        // 3. 아인 버스트 시 카드
         _buildResultCard("<아인 버스트 시>", resAdaOnEinB, resEinOnEinB, [
           "에이다: ${bufferedNikkes.contains('에이다') ? '미란다(Lv.$_mirandaBurstLevel) + ' : ''}오버",
-          "아인: ${bufferedNikkes.contains('아인') ? '미란다(Lv.$_mirandaBurstLevel) + ' : ''}1스(Lv.$_einS1Level) + 오버"
+          "아인: (${bufferedNikkes.contains('아인') ? '미란다(Lv.$_mirandaBurstLevel) + ' : ''}1스(Lv.$_einS1Level) + 오버) + 에이다1스(Lv.$_adaS1Level: ${_formatter.format((_parse(_adaAtkController.text) * SkillData.adaS1[_adaS1Level]).round())})"
         ]),
 
         const SizedBox(height: 16),
