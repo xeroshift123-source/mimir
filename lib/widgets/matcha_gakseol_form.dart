@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/utils/skill_data.dart';
 import 'package:mimir/models/nikke.dart';
+import 'package:mimir/models/enums.dart';
 import 'package:mimir/widgets/cube_level_dialog.dart';
 
 class MatchaGakseolCalculatorForm extends StatefulWidget {
@@ -22,28 +23,75 @@ class MatchaGakseolCalculatorForm extends StatefulWidget {
 
 class _MatchaGakseolCalculatorFormState
     extends State<MatchaGakseolCalculatorForm> {
-  // 기본값 복구
-  final _matchaAtkController = TextEditingController(text: "85,000");
-  final _matchaOverController = TextEditingController(text: "0");
-  final _gakseolAtkController = TextEditingController(text: "80,000");
-  final _gakseolOverController = TextEditingController(text: "0");
+  final _nikke1AtkController = TextEditingController(text: "80,000");
+  final _nikke1OverController = TextEditingController(text: "0");
+
+  final _nikke2AtkController = TextEditingController(text: "80,000");
+  final _nikke2OverController = TextEditingController(text: "0");
+
+  Nikke? _nikke1;
+  Nikke? _nikke2;
 
   int _mirandaBurstLevel = 10;
-  int _matchaS2Level = 10;
-  int _gakseolS2Level = 10;
-  bool isHelm = false;
 
-  double resMatchaFinal = 0;
-  double resGakseolFinal = 0;
+  // 슬롯 1 개별 스킬 레벨
+  int _nikke1MatchaS2Level = 10;
+  int _nikke1GakseolS2Level = 10;
+  int _nikke1AdaS1Level = 10;
+  int _nikke1AdaBurstLevel = 10;
 
-  String resultMessage = "수치를 입력하고 계산하기를 눌러주세요.";
+  // 슬롯 2 개별 스킬 레벨
+  int _nikke2MatchaS2Level = 10;
+  int _nikke2GakseolS2Level = 10;
+  int _nikke2AdaS1Level = 10;
+  int _nikke2AdaBurstLevel = 10;
+
+  double resNikke1FinalOnAdaB = 0;
+  double resNikke1FinalOnOtherB = 0;
+  double resNikke2FinalOnAdaB = 0;
+  double resNikke2FinalOnOtherB = 0;
+
+  List<String> bufferedNikkes = [];
+
+  String resultMessage = "니케 1과 니케 2를 선택하고 계산하기를 눌러주세요.";
   String needOverloadMessage = "";
   bool isError = false;
   final NumberFormat _formatter = NumberFormat('#,###');
 
   bool _isSyncing = false;
 
+  final Set<String> allowed7NikkeNames = {
+    '마르차나 : 마린 스터디',
+    '스노우 화이트 : 헤비암즈',
+    '미하라 : 본딩 체인',
+    '헬름',
+    '에이다',
+    '디젤 : 윈터 스위츠',
+    '프리바티',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final provider = context.read<NikkeProvider>();
+      if (provider.nikkeList.isEmpty) {
+        await provider.loadNikkes();
+      }
+    });
+  }
+
   Future<void> _handleAutoSync() async {
+    if (_nikke1 == null && _nikke2 == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('동기화를 진행할 니케를 먼저 선택해주세요.')),
+        );
+      }
+      return;
+    }
+
     setState(() => _isSyncing = true);
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -71,9 +119,11 @@ class _MatchaGakseolCalculatorFormState
 
       final characters = profile['characters'] as List<dynamic>? ?? [];
       final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
+      if (!mounted) return;
       var localNikkes = context.read<NikkeProvider>().nikkeList;
       if (localNikkes.isEmpty) {
         await context.read<NikkeProvider>().loadNikkes();
+        if (!mounted) return;
         localNikkes = context.read<NikkeProvider>().nikkeList;
       }
       final Map<String, Nikke> nikkeNameMap = {
@@ -108,44 +158,43 @@ class _MatchaGakseolCalculatorFormState
         return mod;
       }
 
-      Map<String, dynamic>? matchaChar;
-      Map<String, dynamic>? gakseolChar;
+      Map<String, dynamic>? nikke1Char;
+      Map<String, dynamic>? nikke2Char;
       Map<String, dynamic>? mirandaChar;
+
+      final n1Name = _nikke1?.name ?? '';
+      final n2Name = _nikke2?.name ?? '';
 
       for (final char in characters) {
         final nameCode = char['name_code'] as int? ?? 0;
         final mappedName = BlablaMap.characterNames[nameCode] ?? '';
-        if (mappedName == '마르차나 : 마린 스터디') matchaChar = char;
-        if (!isHelm && mappedName == '스노우 화이트 : 헤비암즈') gakseolChar = char;
-        if (isHelm && mappedName == '헬름') gakseolChar = char;
+        if (n1Name.isNotEmpty && (mappedName == n1Name || (n1Name == '에이다' && mappedName == '에이다'))) nikke1Char = char;
+        if (n2Name.isNotEmpty && (mappedName == n2Name || (n2Name == '에이다' && mappedName == '에이다'))) nikke2Char = char;
         if (mappedName == '미란다') mirandaChar = char;
       }
 
-      if (matchaChar == null && gakseolChar == null) {
+      if (nikke1Char == null && nikke2Char == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(isHelm
-                    ? '동기화된 데이터에서 마르차나와 헬름을 찾을 수 없습니다.'
-                    : '동기화된 데이터에서 마르차나와 스노우화이트을 찾을 수 없습니다.')),
+            const SnackBar(content: Text('동기화된 데이터에서 선택한 니케 정보를 찾을 수 없습니다.')),
           );
         }
         return;
       }
 
       final List<Map<String, dynamic>> dialogNikkes = [];
-      if (matchaChar != null) {
+      if (nikke1Char != null && _nikke1 != null) {
         dialogNikkes.add({
-          'name': '마르차나 : 마린 스터디',
-          'char': matchaChar,
-          'image': 'assets/nikke/marciana_marine_study.webp'
+          'name': _nikke1!.name,
+          'char': nikke1Char,
+          'image': _nikke1!.imageUrl,
         });
       }
-      if (gakseolChar != null) {
+      if (nikke2Char != null && _nikke2 != null && _nikke2!.name != _nikke1?.name) {
         dialogNikkes.add({
-          'name': isHelm ? '헬름' : '스노우 화이트 : 헤비암즈',
-          'char': gakseolChar,
-          'image': isHelm ? 'assets/nikke/helm.webp' : 'assets/nikke/snow_white_heavy_arms.webp'
+          'name': _nikke2!.name,
+          'char': nikke2Char,
+          'image': _nikke2!.imageUrl,
         });
       }
 
@@ -217,7 +266,6 @@ class _MatchaGakseolCalculatorFormState
           for (final opt in options) {
             final int id = opt as int? ?? 0;
             if (id >= 7000801 && id <= 7000815) {
-              // 공격력 옵션
               overAtk += BlablaMap.getOptionPercent(id);
             }
           }
@@ -231,18 +279,34 @@ class _MatchaGakseolCalculatorFormState
         final skills = mirandaChar['skills'] as Map<String, dynamic>? ?? {};
         _mirandaBurstLevel = skills['burst'] ?? 10;
       }
-      if (matchaChar != null) {
-        applyCharStats(matchaChar, '마르차나 : 마린 스터디', _matchaAtkController, _matchaOverController);
-        final skills = matchaChar['skills'] as Map<String, dynamic>? ?? {};
-        _matchaS2Level = skills['skill2'] ?? 10;
+
+      if (nikke1Char != null && _nikke1 != null) {
+        applyCharStats(nikke1Char, _nikke1!.name, _nikke1AtkController, _nikke1OverController);
+        final skills = nikke1Char['skills'] as Map<String, dynamic>? ?? {};
+        if (_nikke1!.name == '마르차나 : 마린 스터디') {
+          _nikke1MatchaS2Level = skills['skill2'] ?? 10;
+        } else if (_nikke1!.name == '스노우 화이트 : 헤비암즈') {
+          _nikke1GakseolS2Level = skills['skill2'] ?? 10;
+        } else if (_nikke1!.name == '에이다') {
+          _nikke1AdaS1Level = skills['skill1'] ?? 10;
+          _nikke1AdaBurstLevel = skills['burst'] ?? 10;
+        }
       }
-      if (gakseolChar != null) {
-        applyCharStats(gakseolChar, isHelm ? '헬름' : '스노우 화이트 : 헤비암즈', _gakseolAtkController, _gakseolOverController);
-        final skills = gakseolChar['skills'] as Map<String, dynamic>? ?? {};
-        _gakseolS2Level = skills['skill2'] ?? 10;
+      if (nikke2Char != null && _nikke2 != null) {
+        applyCharStats(nikke2Char, _nikke2!.name, _nikke2AtkController, _nikke2OverController);
+        final skills = nikke2Char['skills'] as Map<String, dynamic>? ?? {};
+        if (_nikke2!.name == '마르차나 : 마린 스터디') {
+          _nikke2MatchaS2Level = skills['skill2'] ?? 10;
+        } else if (_nikke2!.name == '스노우 화이트 : 헤비암즈') {
+          _nikke2GakseolS2Level = skills['skill2'] ?? 10;
+        } else if (_nikke2!.name == '에이다') {
+          _nikke2AdaS1Level = skills['skill1'] ?? 10;
+          _nikke2AdaBurstLevel = skills['burst'] ?? 10;
+        }
       }
 
       if (mounted) {
+        _calculate();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('동기화된 스탯 정보를 성공적으로 불러왔습니다! 🚀')),
         );
@@ -262,75 +326,369 @@ class _MatchaGakseolCalculatorFormState
 
   @override
   void dispose() {
-    _matchaAtkController.dispose();
-    _matchaOverController.dispose();
-    _gakseolAtkController.dispose();
-    _gakseolOverController.dispose();
+    _nikke1AtkController.dispose();
+    _nikke1OverController.dispose();
+    _nikke2AtkController.dispose();
+    _nikke2OverController.dispose();
     super.dispose();
   }
 
-  // 콤마 제거 후 파싱하는 헬퍼 함수
   double _parse(String text) => double.tryParse(text.replaceAll(',', '')) ?? 0;
 
   void _calculate() {
+    if (_nikke1 == null || _nikke2 == null) {
+      setState(() {
+        isError = false;
+        resultMessage = "니케 1과 니케 2를 모두 선택해 주세요.";
+        needOverloadMessage = "";
+        bufferedNikkes = [];
+        resNikke1FinalOnAdaB = 0;
+        resNikke1FinalOnOtherB = 0;
+        resNikke2FinalOnAdaB = 0;
+        resNikke2FinalOnOtherB = 0;
+      });
+      return;
+    }
+
     setState(() {
       double mirandaVal = SkillData.mirandaBurst[_mirandaBurstLevel];
-      double matchaSkill2 = SkillData.matchaS2[_matchaS2Level];
 
-      double nBase = _parse(_matchaAtkController.text);
-      double nOver = _parse(_matchaOverController.text) / 100;
+      // 슬롯 1 스탯 & 스킬
+      double n1Base = _parse(_nikke1AtkController.text);
+      double n1Over = _parse(_nikke1OverController.text) / 100;
+      String n1Name = _nikke1!.name;
+      double n1TargetSkill = 0.0;
+      double n1BattleSkillAdaB = 0.0;
+      double n1BattleSkillOtherB = 0.0;
 
-      double hBase = _parse(_gakseolAtkController.text);
-      double hOver = _parse(_gakseolOverController.text) / 100;
-      double gakseolSkill2 = isHelm ? 0.0 : SkillData.gakseolS2[_gakseolS2Level];
-
-      resMatchaFinal = nBase * (1 + nOver + matchaSkill2 + mirandaVal);
-      resGakseolFinal = hBase * (1 + hOver + gakseolSkill2 + mirandaVal);
-
-      double maxAtk = resMatchaFinal;
-      String rivalName = isHelm ? "헬름" : "스노우화이트";
-      
-      if (resGakseolFinal > maxAtk) {
-        maxAtk = resGakseolFinal;
+      if (n1Name == '마르차나 : 마린 스터디') {
+        n1TargetSkill = SkillData.matchaS2[_nikke1MatchaS2Level];
+        n1BattleSkillAdaB = n1TargetSkill;
+        n1BattleSkillOtherB = n1TargetSkill;
+      } else if (n1Name == '스노우 화이트 : 헤비암즈') {
+        n1TargetSkill = SkillData.gakseolS2[_nikke1GakseolS2Level];
+        n1BattleSkillAdaB = n1TargetSkill;
+        n1BattleSkillOtherB = n1TargetSkill;
+      } else if (n1Name == '에이다') {
+        double s1 = SkillData.adaS1[_nikke1AdaS1Level];
+        double b = SkillData.adaBurst[_nikke1AdaBurstLevel];
+        n1TargetSkill = 0.0; // 사전 타겟팅: 1스, 버스트 미반영
+        n1BattleSkillAdaB = s1 + b;
+        n1BattleSkillOtherB = s1;
       }
 
-      if (maxAtk != resMatchaFinal) {
-        isError = true;
-        double currentTotalBuff =
-            nOver + matchaSkill2 + mirandaVal;
-        double neededOver = ((maxAtk / nBase) - 1 - currentTotalBuff) * 100;
-        resultMessage = "❌ 경고: $rivalName이 마르차나보다 최종 공격력이 높습니다!";
-        needOverloadMessage =
-            "마르차나의 오버공증이 최소 ${neededOver.toStringAsFixed(2)}% 더 필요합니다.";
+      double n1Target = n1Base * (1 + n1Over + n1TargetSkill);
+
+      // 슬롯 2 스탯 & 스킬
+      double n2Base = _parse(_nikke2AtkController.text);
+      double n2Over = _parse(_nikke2OverController.text) / 100;
+      String n2Name = _nikke2!.name;
+      double n2TargetSkill = 0.0;
+      double n2BattleSkillAdaB = 0.0;
+      double n2BattleSkillOtherB = 0.0;
+
+      if (n2Name == '마르차나 : 마린 스터디') {
+        n2TargetSkill = SkillData.matchaS2[_nikke2MatchaS2Level];
+        n2BattleSkillAdaB = n2TargetSkill;
+        n2BattleSkillOtherB = n2TargetSkill;
+      } else if (n2Name == '스노우 화이트 : 헤비암즈') {
+        n2TargetSkill = SkillData.gakseolS2[_nikke2GakseolS2Level];
+        n2BattleSkillAdaB = n2TargetSkill;
+        n2BattleSkillOtherB = n2TargetSkill;
+      } else if (n2Name == '에이다') {
+        double s1 = SkillData.adaS1[_nikke2AdaS1Level];
+        double b = SkillData.adaBurst[_nikke2AdaBurstLevel];
+        n2TargetSkill = 0.0;
+        n2BattleSkillAdaB = s1 + b;
+        n2BattleSkillOtherB = s1;
+      }
+
+      double n2Target = n2Base * (1 + n2Over + n2TargetSkill);
+
+      // 미란다 사전 타겟팅 추출 (사전 공격력이 높은 니케가 미란다 버프 수혜)
+      bool n1HasMiranda = false;
+      bool n2HasMiranda = false;
+
+      if (n1Target > n2Target) {
+        n1HasMiranda = true;
+        bufferedNikkes = [n1Name];
+      } else if (n2Target > n1Target) {
+        n2HasMiranda = true;
+        bufferedNikkes = [n2Name];
       } else {
-        isError = false;
-        double secondMaxAtk = resGakseolFinal;
-        double secondRivalBase = hBase;
+        n1HasMiranda = true;
+        n2HasMiranda = true;
+        bufferedNikkes = [n1Name, n2Name];
+      }
 
-        double margin = resMatchaFinal - secondMaxAtk;
-        double matchaAllowedDecrease = (margin / nBase) * 100;
-        double rivalAllowedIncrease = (margin / secondRivalBase) * 100;
+      resNikke1FinalOnAdaB = n1Base * (1 + n1Over + n1BattleSkillAdaB + (n1HasMiranda ? mirandaVal : 0));
+      resNikke1FinalOnOtherB = n1Base * (1 + n1Over + n1BattleSkillOtherB + (n1HasMiranda ? mirandaVal : 0));
 
-        resultMessage = "✅ 정상: 마르차나의 최종 공격력이 가장 높습니다.";
-        needOverloadMessage = "💡 현재 상태 기준 여유 수치\n"
-            "• 마르차나 오버공증: ${matchaAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
-            "• $rivalName 오버공증: ${rivalAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
+      resNikke2FinalOnAdaB = n2Base * (1 + n2Over + n2BattleSkillAdaB + (n2HasMiranda ? mirandaVal : 0));
+      resNikke2FinalOnOtherB = n2Base * (1 + n2Over + n2BattleSkillOtherB + (n2HasMiranda ? mirandaVal : 0));
+
+      // 에이다 포함 시 상태 및 경고 판정
+      bool isN1Ada = (n1Name == '에이다');
+      bool isN2Ada = (n2Name == '에이다');
+
+      if (isN1Ada || isN2Ada) {
+        String otherName = isN1Ada ? n2Name : n1Name;
+        bool otherHasMiranda = isN1Ada ? n2HasMiranda : n1HasMiranda;
+        double otherFinalOnOtherB = isN1Ada ? resNikke2FinalOnOtherB : resNikke1FinalOnOtherB;
+        double adaFinalOnOtherB = isN1Ada ? resNikke1FinalOnOtherB : resNikke2FinalOnOtherB;
+        double otherBase = isN1Ada ? n2Base : n1Base;
+        double adaBase = isN1Ada ? n1Base : n2Base;
+
+        if (!otherHasMiranda) {
+          isError = true;
+          resultMessage = "❌ 경고: 에이다가 $otherName의 미란다 버프를 탈취 중입니다!";
+          double targetDiff = (isN1Ada ? n1Target : n2Target) - (isN1Ada ? n2Target : n1Target);
+          double neededIncrease = (otherBase > 0) ? (targetDiff / otherBase) * 100 : 0;
+          double neededDecrease = (adaBase > 0) ? (targetDiff / adaBase) * 100 : 0;
+          needOverloadMessage = "• $otherName이(가) 미란다 버프를 받으려면 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.\n"
+              "• 또는 에이다의 오버공증을 ${neededDecrease.toStringAsFixed(2)}% 낮춰야 합니다.";
+        } else if (adaFinalOnOtherB > otherFinalOnOtherB) {
+          isError = true;
+          resultMessage = "❌ 경고: $otherName 버스트 시 에이다의 공격력이 $otherName보다 높습니다!";
+          double margin = adaFinalOnOtherB - otherFinalOnOtherB;
+          double neededIncrease = (otherBase > 0) ? (margin / otherBase) * 100 : 0;
+          double neededDecrease = (adaBase > 0) ? (margin / adaBase) * 100 : 0;
+          needOverloadMessage = "• $otherName이(가) $otherName 버스트 시 에이다보다 공격력이 높으려면 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.\n"
+              "• 또는 에이다의 오버공증을 ${neededDecrease.toStringAsFixed(2)}% 낮춰야 합니다.";
+        } else {
+          isError = false;
+          resultMessage = "✅ 정상: $otherName 버스트 시 $otherName이(가) 미란다 버프를 받고 최종 공격력이 가장 높습니다.";
+          double marginOtherB = otherFinalOnOtherB - adaFinalOnOtherB;
+          double otherAllowedDecrease = (otherBase > 0) ? (marginOtherB / otherBase) * 100 : 0;
+          double adaAllowedIncrease = (adaBase > 0) ? (marginOtherB / adaBase) * 100 : 0;
+          needOverloadMessage = "💡 현재 상태 기준 여유 수치\n"
+              "• $otherName 오버공증: ${otherAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
+              "• 에이다 오버공증: ${adaAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.";
+        }
+      } else {
+        // 에이다 미포함 일반 조합
+        if (n1Target != n2Target) {
+          isError = false;
+          String winnerName = n1HasMiranda ? n1Name : n2Name;
+          String loserName = n1HasMiranda ? n2Name : n1Name;
+          double winnerTarget = n1HasMiranda ? n1Target : n2Target;
+          double loserTarget = n1HasMiranda ? n2Target : n1Target;
+          double winnerBase = n1HasMiranda ? n1Base : n2Base;
+          double loserBase = n1HasMiranda ? n2Base : n1Base;
+
+          double margin = winnerTarget - loserTarget;
+          double winnerAllowedDecrease = (winnerBase > 0) ? (margin / winnerBase) * 100 : 0;
+          double loserNeededIncrease = (loserBase > 0) ? (margin / loserBase) * 100 : 0;
+
+          resultMessage = "✅ 정상: $winnerName이(가) 미란다 버프를 받습니다.";
+          needOverloadMessage = "💡 현재 상태 기준 여유 수치\n"
+              "• $winnerName 오버공증: ${winnerAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.\n"
+              "• $loserName 오버공증: ${loserNeededIncrease.toStringAsFixed(2)}% 더 높아도 버프를 탈취할 수 있습니다.";
+        } else {
+          isError = false;
+          resultMessage = "✅ 두 니케의 사전 공격력이 동일하여 모두 미란다 버프를 적용받습니다.";
+          needOverloadMessage = "";
+        }
       }
     });
   }
 
-  // ... (Dialog 및 UI Helper 함수들은 이전과 동일하며 _parse 로직 적용됨) ...
   void _showMirandaSettingsDialog() => _showSettingDialog("미란다 설정", (setDialogState) => [
         _buildSliderField("미란다 버스트", _mirandaBurstLevel, (v) => setDialogState(() => _mirandaBurstLevel = v))
       ]);
 
-  void _showMatchaSkillDialog() => _showSettingDialog("마르차나 스킬 설정", (setDialogState) => [
-        _buildSliderField("2스킬", _matchaS2Level, (v) => setDialogState(() => _matchaS2Level = v))
-      ]);
+  void _showNikkeSkillDialog(int slotIndex) {
+    final nikke = slotIndex == 1 ? _nikke1 : _nikke2;
+    final name = nikke?.name ?? '니케';
 
-  void _showGakseolSkillDialog() => _showSettingDialog("스노우화이트 스킬 설정", (setDialogState) => [
-        _buildSliderField("2스킬", _gakseolS2Level, (v) => setDialogState(() => _gakseolS2Level = v))
+    if (name == '마르차나 : 마린 스터디') {
+      _showSettingDialog("$name 스킬 설정", (setDialogState) => [
+        _buildSliderField("2스킬", slotIndex == 1 ? _nikke1MatchaS2Level : _nikke2MatchaS2Level, (v) {
+          setDialogState(() {
+            if (slotIndex == 1) {
+              _nikke1MatchaS2Level = v;
+            } else {
+              _nikke2MatchaS2Level = v;
+            }
+          });
+        })
       ]);
+    } else if (name == '스노우 화이트 : 헤비암즈') {
+      _showSettingDialog("$name 스킬 설정", (setDialogState) => [
+        _buildSliderField("2스킬", slotIndex == 1 ? _nikke1GakseolS2Level : _nikke2GakseolS2Level, (v) {
+          setDialogState(() {
+            if (slotIndex == 1) {
+              _nikke1GakseolS2Level = v;
+            } else {
+              _nikke2GakseolS2Level = v;
+            }
+          });
+        })
+      ]);
+    } else if (name == '에이다') {
+      _showSettingDialog("$name 스킬 설정", (setDialogState) => [
+        _buildSliderField("1스킬 (자공증)", slotIndex == 1 ? _nikke1AdaS1Level : _nikke2AdaS1Level, (v) {
+          setDialogState(() {
+            if (slotIndex == 1) {
+              _nikke1AdaS1Level = v;
+            } else {
+              _nikke2AdaS1Level = v;
+            }
+          });
+        }),
+        _buildSliderField("버스트 (자공증)", slotIndex == 1 ? _nikke1AdaBurstLevel : _nikke2AdaBurstLevel, (v) {
+          setDialogState(() {
+            if (slotIndex == 1) {
+              _nikke1AdaBurstLevel = v;
+            } else {
+              _nikke2AdaBurstLevel = v;
+            }
+          });
+        }),
+      ]);
+    }
+  }
+
+  void _showNikkeSelectorModal(int slotIndex) {
+    var rawNikkes = List<Nikke>.from(context.read<NikkeProvider>().nikkeList);
+
+    // 디젤 : 윈터 스위츠가 nikkeList에 없는 경우를 위해 픽스처 추가
+    if (!rawNikkes.any((n) => n.name == '디젤 : 윈터 스위츠')) {
+      rawNikkes.add(Nikke(
+        id: 'diesel_winter_sweets',
+        name: '디젤 : 윈터 스위츠',
+        imageUrl: 'assets/nikke/diesel_winter_sweets.webp',
+        burst: BurstType.burst3,
+        element: ElementType.Fire,
+        weaponType: WeaponType.MG,
+        company: Company.Elysion,
+        coolTime: 40,
+        type: 'ATK',
+        ability: [],
+        rank: Rank.SSR,
+      ));
+    }
+
+    final filtered7Nikkes = rawNikkes
+        .where((n) => allowed7NikkeNames.contains(n.name))
+        .toList();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.55,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Text(
+                    "니케 선택 (슬롯 $slotIndex)",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.8,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
+                      itemCount: filtered7Nikkes.length,
+                      itemBuilder: (context, idx) {
+                        final n = filtered7Nikkes[idx];
+                        final isSelected = (slotIndex == 1 && n.name == _nikke1?.name) ||
+                            (slotIndex == 2 && n.name == _nikke2?.name);
+
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (slotIndex == 1) {
+                                _nikke1 = n;
+                              } else {
+                                _nikke2 = n;
+                              }
+                            });
+                            Navigator.pop(context);
+                            _calculate();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected ? Colors.orange : (isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+                                width: isSelected ? 2 : 1,
+                              ),
+                              color: isDark ? const Color(0xFF242424) : Colors.grey.shade50,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(6.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.asset(
+                                        n.imageUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => const Icon(Icons.person, size: 30),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                                  child: Text(
+                                    n.name,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      color: isSelected ? Colors.orange : (isDark ? Colors.white : Colors.black87),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   void _showSettingDialog(String title, List<Widget> Function(void Function(void Function())) builder) {
     showDialog(
@@ -350,6 +708,7 @@ class _MatchaGakseolCalculatorFormState
                     ElevatedButton(
                         onPressed: () {
                           setState(() {});
+                          _calculate();
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
@@ -394,27 +753,31 @@ class _MatchaGakseolCalculatorFormState
 
   @override
   Widget build(BuildContext context) {
+    bool hasSkillSettings1 = _nikke1?.name == '마르차나 : 마린 스터디' || _nikke1?.name == '스노우 화이트 : 헤비암즈' || _nikke1?.name == '에이다';
+    bool hasSkillSettings2 = _nikke2?.name == '마르차나 : 마린 스터디' || _nikke2?.name == '스노우 화이트 : 헤비암즈' || _nikke2?.name == '에이다';
+
     return Column(
       children: [
         const Divider(height: 24),
         _buildCharacterInputRow(
-            label: "마르차나",
-            imagePath: "assets/nikke/marciana_marine_study.webp",
+            label: _nikke1?.name ?? "니케 1 선택",
+            imagePath: _nikke1?.imageUrl,
             color: Colors.purple,
-            atkCtrl: _matchaAtkController,
-            overCtrl: _matchaOverController,
-            onImageTap: _showMatchaSkillDialog),
+            atkCtrl: _nikke1AtkController,
+            overCtrl: _nikke1OverController,
+            onImageTap: () => _showNikkeSelectorModal(1),
+            onSettingsTap: hasSkillSettings1 ? () => _showNikkeSkillDialog(1) : null),
         const SizedBox(height: 16),
         _buildCharacterInputRow(
-            label: isHelm ? "헬름" : "스노우화이트",
-            imagePath: isHelm ? "assets/nikke/helm.webp" : "assets/nikke/snow_white_heavy_arms.webp",
+            label: _nikke2?.name ?? "니케 2 선택",
+            imagePath: _nikke2?.imageUrl,
             color: Colors.blue,
-            atkCtrl: _gakseolAtkController,
-            overCtrl: _gakseolOverController,
-            onImageTap: isHelm ? null : _showGakseolSkillDialog),
+            atkCtrl: _nikke2AtkController,
+            overCtrl: _nikke2OverController,
+            onImageTap: () => _showNikkeSelectorModal(2),
+            onSettingsTap: hasSkillSettings2 ? () => _showNikkeSkillDialog(2) : null),
 
         const SizedBox(height: 24),
-        // 동기화 자동 입력 버튼
         SizedBox(
           width: double.infinity,
           height: 48,
@@ -442,19 +805,7 @@ class _MatchaGakseolCalculatorFormState
         const SizedBox(height: 12),
         _buildActionButtons(),
         const SizedBox(height: 20),
-        _buildResultCard(
-          "미란다 버프 포함 최종 결과",
-          resMatchaFinal,
-          resGakseolFinal,
-          [
-            "마르차나: 오버 + 2스(Lv.$_matchaS2Level, ${(SkillData.matchaS2[_matchaS2Level]*100).toStringAsFixed(2)}%) + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)",
-            isHelm 
-                ? "헬름: 오버 + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)"
-                : "스노우화이트: 오버 + 2스(Lv.$_gakseolS2Level, ${(SkillData.gakseolS2[_gakseolS2Level]*100).toStringAsFixed(2)}%) + 미란다(Lv.$_mirandaBurstLevel, ${(SkillData.mirandaBurst[_mirandaBurstLevel]*100).toStringAsFixed(2)}%)",
-          ],
-          onSettingsTap: _showMirandaSettingsDialog,
-          rivalName: isHelm ? "헬름" : "스노우화이트",
-        ),
+        _buildResultArea(),
         const SizedBox(height: 16),
         _buildStatusBox(),
       ],
@@ -462,52 +813,31 @@ class _MatchaGakseolCalculatorFormState
   }
 
   Widget _buildActionButtons() {
-    return Row(children: [
-      Expanded(
-          flex: 1,
-          child: SizedBox(
-              height: 50,
-              child: ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      isHelm = !isHelm;
-                    });
-                    _calculate();
-                  },
-                  icon: const Icon(Icons.swap_horiz, color: Colors.white),
-                  label: const Text("3버 교체",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueGrey,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)))))),
-      const SizedBox(width: 8),
-      Expanded(
-          flex: 2,
-          child: SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                  onPressed: _calculate,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12))),
-                  child: const Text("최종 결과 계산",
-                      style: TextStyle(fontWeight: FontWeight.bold))))),
-    ]);
+    return SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: ElevatedButton(
+            onPressed: _calculate,
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12))),
+            child: const Text("최종 결과 계산",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))));
   }
-
-
 
   Widget _buildCharacterInputRow(
       {required String label,
-      required String imagePath,
+      required String? imagePath,
       required Color color,
       required TextEditingController atkCtrl,
       required TextEditingController overCtrl,
-      VoidCallback? onImageTap}) {
+      VoidCallback? onImageTap,
+      VoidCallback? onSettingsTap}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasImage = imagePath != null && imagePath.isNotEmpty;
+
     return Row(children: [
       GestureDetector(
         onTap: onImageTap,
@@ -518,27 +848,75 @@ class _MatchaGakseolCalculatorFormState
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: color, width: 2),
-                  image: DecorationImage(
-                      image: AssetImage(imagePath), fit: BoxFit.cover))),
-          if (onImageTap != null)
+                  color: isDark ? const Color(0xFF242424) : Colors.grey.shade100,
+                  image: hasImage
+                      ? DecorationImage(
+                          image: AssetImage(imagePath),
+                          fit: BoxFit.cover,
+                          onError: (_, __) {})
+                      : null),
+              child: !hasImage
+                  ? Center(
+                      child: Icon(Icons.person_add_rounded,
+                          color: color, size: 28),
+                    )
+                  : null),
+          Positioned(
+            bottom: 2,
+            right: 2,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: const BoxDecoration(
+                  color: Colors.orange, shape: BoxShape.circle),
+              child: const Icon(Icons.swap_horiz,
+                  size: 12, color: Colors.white),
+            ),
+          ),
+          if (onSettingsTap != null)
             Positioned(
-                bottom: 2,
-                right: 2,
+              top: 2,
+              right: 2,
+              child: GestureDetector(
+                onTap: onSettingsTap,
                 child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                        color: Colors.orange, shape: BoxShape.circle),
-                    child: const Icon(Icons.settings,
-                        size: 12, color: Colors.white)))
+                  padding: const EdgeInsets.all(2),
+                  decoration: const BoxDecoration(
+                      color: Colors.blueAccent, shape: BoxShape.circle),
+                  child: const Icon(Icons.settings,
+                      size: 12, color: Colors.white),
+                ),
+              ),
+            ),
         ]),
       ),
       const SizedBox(width: 12),
       Expanded(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label,
-            style: TextStyle(
-                color: color, fontWeight: FontWeight.bold, fontSize: 14)),
+        Row(
+          children: [
+            Expanded(
+              child: Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: hasImage ? color : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14)),
+            ),
+            if (onImageTap != null)
+              InkWell(
+                onTap: onImageTap,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    hasImage ? "니케 변경" : "니케 선택",
+                    style: TextStyle(fontSize: 11, color: Colors.orange.shade700, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+          ],
+        ),
         const SizedBox(height: 6),
         Row(children: [
           Expanded(child: _buildCompactField("400렙 공", atkCtrl)),
@@ -576,12 +954,112 @@ class _MatchaGakseolCalculatorFormState
                         : Colors.grey.shade300))));
   }
 
-  Widget _buildResultCard(
-      String title, double matchaVal, double gakseolVal, List<String> notes,
-      {VoidCallback? onSettingsTap, String rivalName = "스노우화이트"}) {
+  String _buildNikkeNote(String name, {required int slotIndex, required bool isAdaBurst}) {
+    int matchaS2Lv = slotIndex == 1 ? _nikke1MatchaS2Level : _nikke2MatchaS2Level;
+    int gakseolS2Lv = slotIndex == 1 ? _nikke1GakseolS2Level : _nikke2GakseolS2Level;
+    int adaS1Lv = slotIndex == 1 ? _nikke1AdaS1Level : _nikke2AdaS1Level;
+    int adaBurstLv = slotIndex == 1 ? _nikke1AdaBurstLevel : _nikke2AdaBurstLevel;
+
+    List<String> parts = [];
+    if (bufferedNikkes.contains(name)) {
+      parts.add("미란다(Lv.$_mirandaBurstLevel)");
+    }
+
+    if (name == '마르차나 : 마린 스터디') {
+      parts.add("2스(Lv.$matchaS2Lv)");
+    } else if (name == '스노우 화이트 : 헤비암즈') {
+      parts.add("2스(Lv.$gakseolS2Lv)");
+    } else if (name == '에이다') {
+      parts.add("1스(Lv.$adaS1Lv)");
+      if (isAdaBurst) {
+        parts.add("버스트(Lv.$adaBurstLv)");
+      }
+    }
+
+    parts.add("오버");
+    return "$name: ${parts.join(' + ')}";
+  }
+
+  Widget _buildResultArea() {
+    if (_nikke1 == null || _nikke2 == null) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+        ),
+        child: Center(
+          child: Text(
+            "니케 1과 니케 2를 클릭하여 선택 후 수치를 입력하세요.",
+            style: TextStyle(
+                fontSize: 13,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+          ),
+        ),
+      );
+    }
+
+    final n1Name = _nikke1!.name;
+    final n2Name = _nikke2!.name;
+    bool isN1Ada = (n1Name == '에이다');
+    bool isN2Ada = (n2Name == '에이다');
+
+    if (isN1Ada || isN2Ada) {
+      String otherName = isN1Ada ? n2Name : n1Name;
+
+      return Column(
+        children: [
+          _buildSingleResultCard(
+            "<에이다 버스트 시>",
+            resNikke1FinalOnAdaB,
+            resNikke2FinalOnAdaB,
+            [
+              _buildNikkeNote(n1Name, slotIndex: 1, isAdaBurst: true),
+              _buildNikkeNote(n2Name, slotIndex: 2, isAdaBurst: true),
+            ],
+            winColor1: isN1Ada ? Colors.orange : Colors.purple,
+            winColor2: isN2Ada ? Colors.orange : Colors.blue,
+          ),
+          const SizedBox(height: 12),
+          _buildSingleResultCard(
+            "<$otherName 버스트 시>",
+            resNikke1FinalOnOtherB,
+            resNikke2FinalOnOtherB,
+            [
+              _buildNikkeNote(n1Name, slotIndex: 1, isAdaBurst: false),
+              _buildNikkeNote(n2Name, slotIndex: 2, isAdaBurst: false),
+            ],
+            winColor1: isN1Ada ? Colors.purple : Colors.orange,
+            winColor2: isN2Ada ? Colors.blue : Colors.orange,
+          ),
+        ],
+      );
+    } else {
+      return _buildSingleResultCard(
+        "미란다 버프 포함 최종 결과",
+        resNikke1FinalOnOtherB,
+        resNikke2FinalOnOtherB,
+        [
+          _buildNikkeNote(n1Name, slotIndex: 1, isAdaBurst: false),
+          _buildNikkeNote(n2Name, slotIndex: 2, isAdaBurst: false),
+        ],
+        winColor1: Colors.purple,
+        winColor2: Colors.blue,
+      );
+    }
+  }
+
+  Widget _buildSingleResultCard(
+      String title, double val1, double val2, List<String> notes,
+      {Color winColor1 = Colors.purple, Color winColor2 = Colors.blue}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    double max = matchaVal;
-    if (gakseolVal > max) max = gakseolVal;
+    final n1Name = _nikke1?.name ?? '니케 1';
+    final n2Name = _nikke2?.name ?? '니케 2';
+    double maxVal = max(val1, val2);
+
     return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -597,17 +1075,15 @@ class _MatchaGakseolCalculatorFormState
                     fontSize: 13,
                     color: isDark ? Colors.white : Colors.black)),
             GestureDetector(
-                onTap: onSettingsTap,
+                onTap: _showMirandaSettingsDialog,
                 child: Icon(Icons.settings_outlined,
                     size: 18,
                     color: isDark ? Colors.grey.shade400 : Colors.grey))
           ]),
           const SizedBox(height: 10),
-          _resRow("마르차나", _formatter.format(matchaVal.toInt()),
-              matchaVal == max, Colors.purple),
+          _resRow(n1Name, _formatter.format(val1.toInt()), val1 == maxVal, winColor1, bufferedNikkes.contains(n1Name)),
           const SizedBox(height: 4),
-          _resRow(rivalName, _formatter.format(gakseolVal.toInt()),
-              gakseolVal == max, Colors.blue),
+          _resRow(n2Name, _formatter.format(val2.toInt()), val2 == maxVal, winColor2, bufferedNikkes.contains(n2Name)),
           const Divider(height: 20),
           ...notes.map((n) => Padding(
               padding: const EdgeInsets.only(bottom: 2),
@@ -618,15 +1094,35 @@ class _MatchaGakseolCalculatorFormState
         ]));
   }
 
-  Widget _resRow(String name, String val, bool win, Color winColor) {
+  Widget _resRow(String name, String val, bool win, Color winColor, bool hasMiranda) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(name,
-          style: TextStyle(
-              fontSize: 12,
-              color: win
-                  ? (isDark ? Colors.white : Colors.black)
-                  : (isDark ? Colors.grey.shade400 : Colors.grey.shade600))),
+      Row(
+        children: [
+          Text(name,
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: win ? FontWeight.bold : FontWeight.normal,
+                  color: win
+                      ? (isDark ? Colors.white : Colors.black)
+                      : (isDark ? Colors.grey.shade400 : Colors.grey.shade600))),
+          if (hasMiranda) ...[
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.orange, width: 0.8),
+              ),
+              child: const Text(
+                "미란다",
+                style: TextStyle(fontSize: 9, color: Colors.orange, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ]
+        ],
+      ),
       Text(val,
           style: TextStyle(
               fontSize: 13,

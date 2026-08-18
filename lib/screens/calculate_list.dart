@@ -40,9 +40,9 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
       "content": const ScarletLibCalculatorForm(),
     },
     {
-      "title": "말차-각설 계산기",
-      "subtitle": "애장품 미란다 버프 시뮬레이션",
-      "icon": "assets/icons/elements/icon-elements-Iron.webp",
+      "title": "미란다 애장품 통합 시뮬레이터",
+      "subtitle": "애장품 미란다 버프 타겟팅 시뮬레이션 (2명 선택)",
+      "icon": "assets/nikke/miranda.webp",
       "content": const MatchaGakseolCalculatorForm(),
     },
   ];
@@ -180,10 +180,14 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
                                         : Colors.grey.shade100),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Image.asset(
-                                item['icon'],
-                                width: 40,
-                                height: 40,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.asset(
+                                  item['icon'],
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 16),
