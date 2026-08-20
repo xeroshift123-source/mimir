@@ -59,7 +59,8 @@ class _MatchaGakseolCalculatorFormState
 
   bool nayutaHasMiranda = false;
 
-  List<String> bufferedNikkes = [];
+  List<String> bufferedNikkes = []; // 파워업(버스트) 수혜자 (상위 2기)
+  String wakeupS2RecipientName = ''; // 웨이크업(S2) 크리확 수혜자 (최종공 1위)
 
   String resultMessage = "니케 1과 니케 2를 선택하고 계산하기를 눌러주세요.";
   String needOverloadMessage = "";
@@ -366,6 +367,7 @@ class _MatchaGakseolCalculatorFormState
         resultMessage = "니케 1과 니케 2를 모두 선택해 주세요.";
         needOverloadMessage = "";
         bufferedNikkes = [];
+        wakeupS2RecipientName = '';
         resNikke1FinalOnAdaB = 0;
         resNikke1FinalOnOtherB = 0;
         resNikke2FinalOnAdaB = 0;
@@ -425,7 +427,8 @@ class _MatchaGakseolCalculatorFormState
       double nayutaSkill2 = SkillData.nayutaS2[_nayutaS2Level];
       double nayutaTarget = nayutaBase * (1 + nayutaOver + nayutaSkill2);
 
-      // 미란다 사전 타겟팅 추출 (상위 2명이 미란다 버프 수혜)
+      // ── STEP 1: 파워업(버스트) 타겟팅 ──
+      // 사전 공격력 상위 2기에게 공격력 +40.4% / 크리뎀 +56.23% 적용
       List<Map<String, dynamic>> targetUnits = [
         {'id': 'n1', 'name': n1Name, 'val': n1Target},
         {'id': 'n2', 'name': n2Name, 'val': n2Target},
@@ -436,6 +439,7 @@ class _MatchaGakseolCalculatorFormState
 
       targetUnits.sort((a, b) => (b['val'] as double).compareTo(a['val'] as double));
 
+      // 상위 2기가 파워업 수혜 (동점 포함)
       Set<String> mirandaBuffedIds = {};
       if (targetUnits.isNotEmpty) mirandaBuffedIds.add(targetUnits[0]['id'] as String);
       if (targetUnits.length > 1) mirandaBuffedIds.add(targetUnits[1]['id'] as String);
@@ -494,89 +498,59 @@ class _MatchaGakseolCalculatorFormState
 
       resNayutaFinal = nayutaBase * (1 + nayutaOver + nayutaSkill2 + (nayutaHasMiranda ? mirandaVal : 0));
 
-      // 판정 메시지 및 오류 판정 (1번 니케 미란다 버프 수령이 최우선 목적)
-      if (!n1HasMiranda) {
-        // 1번 니케가 미란다 버프를 받지 못한 경우 (목표 실패)
+      // ── STEP 2: 웨이크업(S2) 타겟팅 ──
+      // 파워업 적용 이후의 최종 공격력 기준 1위 1기에게 크리확 85.42% 1발
+      List<Map<String, dynamic>> s2Ranking = [
+        {'name': n1Name, 'val': resNikke1FinalOnOtherB, 'base': n1Base},
+        {'name': n2Name, 'val': resNikke2FinalOnOtherB, 'base': n2Base},
+      ];
+      if (_useNayuta) {
+        s2Ranking.add({'name': '나유타', 'val': resNayutaFinal, 'base': nayutaBase});
+      }
+      s2Ranking.sort((a, b) => (b['val'] as double).compareTo(a['val'] as double));
+
+      wakeupS2RecipientName = s2Ranking[0]['name'] as String;
+      // 동점 처리: 1위와 동점이면 n1도 수혜
+      bool n1HasWakeup = (wakeupS2RecipientName == n1Name) ||
+          (s2Ranking.length > 1 &&
+              s2Ranking[0]['val'] == s2Ranking[1]['val'] &&
+              s2Ranking[1]['name'] == n1Name);
+
+      // S2 2위 정보 (여유 수치 계산)
+      String s2SecondName = s2Ranking.length > 1 ? (s2Ranking[1]['name'] as String) : '';
+      double s2SecondVal = s2Ranking.length > 1 ? (s2Ranking[1]['val'] as double) : 0;
+      double s2SecondBase = s2Ranking.length > 1 ? (s2Ranking[1]['base'] as double) : 0;
+
+      // ── 판정 메시지: S2 웨이크업 기준 ──
+      if (!n1HasWakeup) {
         isError = true;
-        resultMessage = "❌ 경고: 1번 니케($n1Name)가 미란다 버프를 적용받지 못하고 있습니다!";
-        double targetCutoff = (targetUnits.length > 1) ? (targetUnits[1]['val'] as double) : 0;
-        double margin = targetCutoff - n1Target;
+        resultMessage = "❌ 경고: $n1Name이(가) 최종공 1위가 아닙니다! ($wakeupS2RecipientName이(가) 크리확 버프 수령 중)";
+        double s2FirstVal = s2Ranking[0]['val'] as double;
+        double s2FirstBase = s2Ranking[0]['base'] as double;
+        double margin = s2FirstVal - resNikke1FinalOnOtherB;
         double neededIncrease = (n1Base > 0) ? (margin / n1Base) * 100 : 0;
-        needOverloadMessage = "• $n1Name이(가) 미란다 버프를 받으려면 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.";
+        double winnerAllowedDecrease = (s2FirstBase > 0) ? (margin / s2FirstBase) * 100 : 0;
+        needOverloadMessage =
+            "• $n1Name 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 있어야 크리확 버프를 받습니다.\n"
+            "• 또는 $wakeupS2RecipientName 오버공증이 ${winnerAllowedDecrease.toStringAsFixed(2)}% 낮아지면 역전됩니다.";
       } else {
-        // 1번 니케가 미란다 버프를 정상적으로 받은 경우 (목표 성공 -> 초록색)
-        if (isN1Ada || isN2Ada) {
-          String otherName = isN1Ada ? n2Name : n1Name;
-          double otherFinalOnOtherB = isN1Ada ? resNikke2FinalOnOtherB : resNikke1FinalOnOtherB;
-          double adaFinalOnOtherB = isN1Ada ? resNikke1FinalOnOtherB : resNikke2FinalOnOtherB;
-          double otherBase = isN1Ada ? n2Base : n1Base;
-          double adaBase = isN1Ada ? n1Base : n2Base;
+        isError = false;
+        resultMessage = "✅ 정상: $n1Name이(가) 최종공 1위로 크리확 85.42% 버프를 수령합니다!";
+        List<String> details = [];
 
-          if (adaFinalOnOtherB > otherFinalOnOtherB) {
-            isError = true;
-            resultMessage = "❌ 경고: $otherName 버스트 시 에이다의 공격력이 $otherName보다 높습니다!";
-            double margin = adaFinalOnOtherB - otherFinalOnOtherB;
-            double neededIncrease = (otherBase > 0) ? (margin / otherBase) * 100 : 0;
-            double neededDecrease = (adaBase > 0) ? (margin / adaBase) * 100 : 0;
-            needOverloadMessage = "• $otherName이(가) $otherName 버스트 시 에이다보다 공격력이 높으려면 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.\n"
-                "• 또는 에이다의 오버공증을 ${neededDecrease.toStringAsFixed(2)}% 낮춰야 합니다.";
-          } else {
-            isError = false;
-            resultMessage = "✅ 정상: $n1Name이(가) 미란다 버프를 정상 적용받습니다.";
-            List<String> details = [];
-
-            if (_useNayuta && nayutaHasMiranda && !n2HasMiranda) {
-              double margin = nayutaTarget - n2Target;
-              double neededIncrease = (n2Base > 0) ? (margin / n2Base) * 100 : 0;
-              double neededNayutaDecrease = (nayutaBase > 0) ? (margin / nayutaBase) * 100 : 0;
-              details.add("💡 참고: 나유타가 $n2Name 대신 2번째 미란다 버프를 수령 중입니다.");
-              details.add("• $n2Name이(가) 나유타로부터 미란다 버프를 되찾으려면 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.");
-              details.add("• 또는 나유타의 오버공증을 ${neededNayutaDecrease.toStringAsFixed(2)}% 낮춰야 합니다.");
-            } else {
-              double marginOtherB = otherFinalOnOtherB - adaFinalOnOtherB;
-              double otherAllowedDecrease = (otherBase > 0) ? (marginOtherB / otherBase) * 100 : 0;
-              double adaAllowedIncrease = (adaBase > 0) ? (marginOtherB / adaBase) * 100 : 0;
-              details.add("💡 현재 상태 기준 여유 수치");
-              details.add("• $otherName 오버공증: ${otherAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.");
-              details.add("• 에이다 오버공증: ${adaAllowedIncrease.toStringAsFixed(2)}% 더 높아도 안전합니다.");
-            }
-            needOverloadMessage = details.join("\n");
-          }
+        if (resNikke1FinalOnOtherB == s2SecondVal) {
+          resultMessage = "✅ $n1Name과(와) $s2SecondName의 최종 공격력이 동일합니다. (동점 처리)";
         } else {
-          // 에이다 미포함 일반 조합
-          isError = false;
-          resultMessage = "✅ 정상: $n1Name이(가) 미란다 버프를 정상 적용받습니다.";
-          List<String> details = [];
+          double margin = resNikke1FinalOnOtherB - s2SecondVal;
+          double n1AllowedDecrease = (n1Base > 0) ? (margin / n1Base) * 100 : 0;
+          double s2SecondNeededIncrease = (s2SecondBase > 0) ? (margin / s2SecondBase) * 100 : 0;
 
-          if (_useNayuta && nayutaHasMiranda && !n2HasMiranda) {
-            double margin = nayutaTarget - n2Target;
-            double neededIncrease = (n2Base > 0) ? (margin / n2Base) * 100 : 0;
-            double neededNayutaDecrease = (nayutaBase > 0) ? (margin / nayutaBase) * 100 : 0;
-            details.add("💡 참고: 나유타가 $n2Name 대신 2번째 미란다 버프를 수령 중입니다.");
-            details.add("• $n2Name이(가) 나유타로부터 미란다 버프를 되찾으려면 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 필요합니다.");
-            details.add("• 또는 나유타의 오버공증을 ${neededNayutaDecrease.toStringAsFixed(2)}% 낮춰야 합니다.");
-          } else {
-            if (n1Target != n2Target) {
-              String winnerName = n1HasMiranda ? n1Name : n2Name;
-              String loserName = n1HasMiranda ? n2Name : n1Name;
-              double winnerTarget = n1HasMiranda ? n1Target : n2Target;
-              double loserTarget = n1HasMiranda ? n2Target : n1Target;
-              double winnerBase = n1HasMiranda ? n1Base : n2Base;
-              double loserBase = n1HasMiranda ? n2Base : n1Base;
-
-              double margin = winnerTarget - loserTarget;
-              double winnerAllowedDecrease = (winnerBase > 0) ? (margin / winnerBase) * 100 : 0;
-              double loserNeededIncrease = (loserBase > 0) ? (margin / loserBase) * 100 : 0;
-
-              details.add("💡 현재 상태 기준 여유 수치");
-              details.add("• $winnerName 오버공증: ${winnerAllowedDecrease.toStringAsFixed(2)}% 더 낮아도 안전합니다.");
-              details.add("• $loserName 오버공증: ${loserNeededIncrease.toStringAsFixed(2)}% 더 높아도 버프를 탈취할 수 있습니다.");
-            } else {
-              resultMessage = "✅ 두 니케의 사전 공격력이 동일하여 모두 미란다 버프를 적용받습니다.";
-            }
-          }
-          needOverloadMessage = details.join("\n");
+          details.add("💡 현재 상태 기준 여유 수치 (최종공 기준)");
+          details.add("• $n1Name 오버공증: ${n1AllowedDecrease.toStringAsFixed(2)}% 더 낮아도 1위 유지됩니다.");
+          details.add("• $s2SecondName 오버공증: ${s2SecondNeededIncrease.toStringAsFixed(2)}% 더 높아지면 1위를 탈취합니다.");
         }
+
+        needOverloadMessage = details.join("\n");
       }
     });
   }
@@ -1272,7 +1246,7 @@ class _MatchaGakseolCalculatorFormState
       }
 
       return _buildSingleResultCard(
-        "미란다 버프 포함 최종 결과",
+        "최종 공격력 결과 (파워업 적용 후)",
         resNikke1FinalOnOtherB,
         resNikke2FinalOnOtherB,
         resNayutaFinal,
@@ -1335,6 +1309,7 @@ class _MatchaGakseolCalculatorFormState
 
   Widget _resRow(String name, String val, bool win, Color winColor, bool hasMiranda) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasWakeup = name == wakeupS2RecipientName;
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Row(
         children: [
@@ -1355,11 +1330,26 @@ class _MatchaGakseolCalculatorFormState
                 border: Border.all(color: Colors.orange, width: 0.8),
               ),
               child: const Text(
-                "미란다",
+                "파워업",
                 style: TextStyle(fontSize: 9, color: Colors.orange, fontWeight: FontWeight.bold),
               ),
             ),
-          ]
+          ],
+          if (hasWakeup) ...[
+            const SizedBox(width: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: Colors.yellow.shade700.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: Colors.yellow.shade700, width: 0.8),
+              ),
+              child: Text(
+                "크리확 1발",
+                style: TextStyle(fontSize: 9, color: Colors.yellow.shade700, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ],
       ),
       Text(val,
