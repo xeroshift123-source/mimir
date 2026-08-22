@@ -10,6 +10,7 @@ import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/login.dart';
 import 'package:mimir/screens/sync_screen.dart';
 import 'package:mimir/screens/my_nikke_screen.dart';
+import 'package:mimir/services/database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -382,19 +383,34 @@ class AppDrawer extends StatelessWidget {
               children: [
                 TextButton.icon(
                   onPressed: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.remove('last_synced_openid');
-                    await prefs.remove('saved_sync_url');
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("동기화 연동이 해제되었습니다."),
-                          backgroundColor: Colors.orange,
-                        ),
-                      );
+                    try {
+                      final uid = authProvider.userId;
+                      if (uid != null && uid.isNotEmpty) {
+                        await DatabaseService().unlinkCommanderFromUser(uid);
+                      } else {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.remove('last_synced_openid');
+                        await prefs.remove('saved_sync_url');
+                      }
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("동기화 연동이 해제되었습니다."),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
+                    } catch (_) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("연동 해제에 실패했습니다."),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
-                  },
-                  icon: const Icon(Icons.link_off, size: 16, color: Colors.redAccent),
+                  },                  icon: const Icon(Icons.link_off, size: 16, color: Colors.redAccent),
                   label: const Text(
                     "연동 해제",
                     style: TextStyle(color: Colors.redAccent, fontSize: 12),

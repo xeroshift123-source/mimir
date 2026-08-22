@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:mimir/providers/auth_provider.dart';
+import 'package:mimir/services/database_service.dart';
 import 'my_nikke_screen.dart';
 import 'package:mimir/widgets/app_footer.dart';
 
@@ -19,7 +22,8 @@ class _SyncScreenState extends State<SyncScreen> {
   bool _isLoading = false;
 
   // Cloud Functions Endpoint
-  final String _functionUrl = 'https://us-central1-nikke-mimir.cloudfunctions.net/scrapeNikkeProfile';
+  final String _functionUrl =
+      'https://us-central1-nikke-mimir.cloudfunctions.net/scrapeNikkeProfile';
 
   @override
   void initState() {
@@ -43,6 +47,22 @@ class _SyncScreenState extends State<SyncScreen> {
     super.dispose();
   }
 
+  Future<void> _persistLinkedProfile(String openId, String syncUrl) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_synced_openid', openId);
+    await prefs.setString('saved_sync_url', syncUrl);
+
+    if (!mounted) return;
+    final uid = context.read<AuthProvider>().userId;
+    if (uid != null && uid.isNotEmpty) {
+      await DatabaseService().linkCommanderToUser(
+        uid: uid,
+        openId: openId,
+        syncUrl: syncUrl,
+      );
+    }
+  }
+
   Future<void> _handleSync() async {
     final enteredUrl = _urlController.text.trim();
     if (enteredUrl.isEmpty) {
@@ -56,14 +76,8 @@ class _SyncScreenState extends State<SyncScreen> {
     }
 
     if (enteredUrl == "역시은화가제일이뻐") {
-      final resolvedOpenId = "eunhwa_is_the_best";
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('last_synced_openid', resolvedOpenId);
-        await prefs.setString('saved_sync_url', enteredUrl);
-      } catch (prefErr) {
-        debugPrint("Failed to save openId to SharedPreferences: $prefErr");
-      }
+      const resolvedOpenId = "eunhwa_is_the_best";
+      await _persistLinkedProfile(resolvedOpenId, enteredUrl);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -81,10 +95,12 @@ class _SyncScreenState extends State<SyncScreen> {
       return;
     }
 
-    if (!enteredUrl.contains("blablalink.com") || !enteredUrl.contains("openid=")) {
+    if (!enteredUrl.contains("blablalink.com") ||
+        !enteredUrl.contains("openid=")) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("올바른 블라블라링크 프로필 URL 형식이 아닙니다.\n(?openid= 매개변수가 포함되어야 합니다)"),
+          content:
+              Text("올바른 블라블라링크 프로필 URL 형식이 아닙니다.\n(?openid= 매개변수가 포함되어야 합니다)"),
           backgroundColor: Colors.red,
         ),
       );
@@ -123,20 +139,16 @@ class _SyncScreenState extends State<SyncScreen> {
           // 💡 backend와 동일하게 base64 디코딩 및 NULL 바이트 제거
           String resolvedOpenId = openId.trim();
           final base64Pattern = RegExp(r'^[A-Za-z0-9+/=]+$');
-          if (base64Pattern.hasMatch(resolvedOpenId) && resolvedOpenId.length % 4 == 0) {
+          if (base64Pattern.hasMatch(resolvedOpenId) &&
+              resolvedOpenId.length % 4 == 0) {
             try {
               resolvedOpenId = utf8.decode(base64.decode(resolvedOpenId));
             } catch (_) {}
           }
-          resolvedOpenId = resolvedOpenId.replaceAll(RegExp(r'\x00'), '').trim();
+          resolvedOpenId =
+              resolvedOpenId.replaceAll(RegExp(r'\x00'), '').trim();
 
-          try {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('last_synced_openid', resolvedOpenId);
-            await prefs.setString('saved_sync_url', enteredUrl);
-          } catch (prefErr) {
-            debugPrint("Failed to save openId to SharedPreferences: $prefErr");
-          }
+          await _persistLinkedProfile(resolvedOpenId, enteredUrl);
 
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -180,7 +192,8 @@ class _SyncScreenState extends State<SyncScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7),
       appBar: AppBar(
         title: const Text(
           "블라블라링크 원클릭 동기화",
@@ -213,7 +226,8 @@ class _SyncScreenState extends State<SyncScreen> {
                     "블라블라링크의 프로필 정보를 Mimir와 동기화하여 소장품/애장품, 오버로드 덱 장비 정보를 한눈에 분석할 수 있습니다.",
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                      color:
+                          isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -223,9 +237,13 @@ class _SyncScreenState extends State<SyncScreen> {
                     margin: const EdgeInsets.only(bottom: 24),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF2A1F10) : const Color(0xFFFFF9E6),
+                      color: isDark
+                          ? const Color(0xFF2A1F10)
+                          : const Color(0xFFFFF9E6),
                       border: Border.all(
-                        color: isDark ? Colors.orange.shade800 : Colors.orange.shade400,
+                        color: isDark
+                            ? Colors.orange.shade800
+                            : Colors.orange.shade400,
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(12),
@@ -235,7 +253,9 @@ class _SyncScreenState extends State<SyncScreen> {
                       children: [
                         Icon(
                           Icons.warning_amber_rounded,
-                          color: isDark ? Colors.orange.shade300 : Colors.orange.shade800,
+                          color: isDark
+                              ? Colors.orange.shade300
+                              : Colors.orange.shade800,
                           size: 24,
                         ),
                         const SizedBox(width: 12),
@@ -248,7 +268,9 @@ class _SyncScreenState extends State<SyncScreen> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
-                                  color: isDark ? Colors.orange.shade300 : Colors.orange.shade900,
+                                  color: isDark
+                                      ? Colors.orange.shade300
+                                      : Colors.orange.shade900,
                                 ),
                               ),
                               const SizedBox(height: 6),
@@ -257,7 +279,9 @@ class _SyncScreenState extends State<SyncScreen> {
                                 "동기화 전, 블라블라링크 프로필의 [소개글(상태메시지)]을 반드시 '미미르만만세'로 수정해 주세요. 인증 완료 후에는 자유롭게 복구하셔도 됩니다.",
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                                  color: isDark
+                                      ? Colors.grey.shade300
+                                      : Colors.grey.shade800,
                                   height: 1.5,
                                 ),
                               ),
@@ -274,32 +298,43 @@ class _SyncScreenState extends State<SyncScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.orange.shade300 : Colors.orange.shade800,
+                      color: isDark
+                          ? Colors.orange.shade300
+                          : Colors.orange.shade800,
                     ),
                   ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _urlController,
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: 14),
+                    style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                        fontSize: 14),
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.link, color: Colors.orange),
                       hintText: "https://www.blablalink.com/user?openid=...",
                       hintStyle: TextStyle(
-                        color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+                        color: isDark
+                            ? Colors.grey.shade500
+                            : Colors.grey.shade400,
                         fontSize: 13,
                       ),
                       filled: true,
-                      fillColor: isDark ? const Color(0xFF1E1E1E) : Colors.grey.shade50,
+                      fillColor: isDark
+                          ? const Color(0xFF1E1E1E)
+                          : Colors.grey.shade50,
                       contentPadding: const EdgeInsets.symmetric(vertical: 16),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
-                          color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                          color: isDark
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade300,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.orange, width: 1.5),
+                        borderSide:
+                            const BorderSide(color: Colors.orange, width: 1.5),
                       ),
                     ),
                   ),
@@ -322,20 +357,25 @@ class _SyncScreenState extends State<SyncScreen> {
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                               "동기화 시작하기",
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // 안내 카드
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E1E1E).withOpacity(0.5) : Colors.grey.shade100,
+                      color: isDark
+                          ? const Color(0xFF1E1E1E).withOpacity(0.5)
+                          : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                        color: isDark
+                            ? Colors.grey.shade800
+                            : Colors.grey.shade200,
                       ),
                     ),
                     child: Column(
@@ -343,7 +383,8 @@ class _SyncScreenState extends State<SyncScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.info_outline, color: Colors.orange, size: 18),
+                            const Icon(Icons.info_outline,
+                                color: Colors.orange, size: 18),
                             const SizedBox(width: 8),
                             Text(
                               "블라블라링크 프로필 URL 얻는 방법",
@@ -356,11 +397,24 @@ class _SyncScreenState extends State<SyncScreen> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        _buildStep("1", "모바일 또는 PC 브라우저에서 공식 블라블라링크 홈페이지에 로그인합니다.", isDark),
-                        _buildStep("2", "우측 상단 프로필 이미지 클릭 후 [마이페이지] 혹은 [프로필]에 진입합니다.", isDark),
-                        _buildStep("3", "프로필 설정에서 소개글(상태메시지)을 '미미르만만세'로 변경 및 저장합니다.", isDark),
-                        _buildStep("4", "주소창의 URL(openid 파라미터가 포함된 전체 주소)을 복사하여 위 필드에 입력합니다.", isDark),
-                        _buildStep("5", "블라블라링크 설정에서 '내 정보 공개' 및 '캐릭터 정보 공개' 옵션이 활성화되어 있어야 동기화가 가능합니다.", isDark),
+                        _buildStep("1",
+                            "모바일 또는 PC 브라우저에서 공식 블라블라링크 홈페이지에 로그인합니다.", isDark),
+                        _buildStep(
+                            "2",
+                            "우측 상단 프로필 이미지 클릭 후 [마이페이지] 혹은 [프로필]에 진입합니다.",
+                            isDark),
+                        _buildStep(
+                            "3",
+                            "프로필 설정에서 소개글(상태메시지)을 '미미르만만세'로 변경 및 저장합니다.",
+                            isDark),
+                        _buildStep(
+                            "4",
+                            "주소창의 URL(openid 파라미터가 포함된 전체 주소)을 복사하여 위 필드에 입력합니다.",
+                            isDark),
+                        _buildStep(
+                            "5",
+                            "블라블라링크 설정에서 '내 정보 공개' 및 '캐릭터 정보 공개' 옵션이 활성화되어 있어야 동기화가 가능합니다.",
+                            isDark),
                       ],
                     ),
                   ),
@@ -391,7 +445,10 @@ class _SyncScreenState extends State<SyncScreen> {
             ),
             child: Text(
               step,
-              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: 8),

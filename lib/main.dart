@@ -8,6 +8,7 @@ import 'screens/union_deck_builder.dart';
 import 'screens/deck_library.dart';
 import 'screens/calculate_list.dart';
 import 'screens/login.dart';
+import 'screens/account_settings.dart';
 import 'screens/sync_screen.dart';
 import 'screens/my_nikke_screen.dart';
 import 'screens/overload_simulator_screen.dart';
@@ -121,6 +122,8 @@ class MimirApp extends StatelessWidget {
               CalculateListScreen.routeName: (context) =>
                   const CalculateListScreen(),
               LoginScreen.routeName: (context) => const LoginScreen(),
+              AccountSettingsScreen.routeName: (context) =>
+                  const AccountSettingsScreen(),
               SyncScreen.routeName: (context) => const SyncScreen(),
               MyNikkeScreen.routeName: (context) => const MyNikkeScreen(),
               OverloadSimulatorScreen.routeName: (context) =>

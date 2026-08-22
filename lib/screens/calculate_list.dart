@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:mimir/providers/auth_provider.dart';
-import 'package:mimir/screens/login.dart';
 import 'package:mimir/widgets/ein_ada_form.dart';
 import 'package:mimir/widgets/nayuta_helm_form.dart';
 import 'package:mimir/widgets/scarlet_lib_form.dart';
 import 'package:mimir/widgets/matcha_gakseol_form.dart';
 import 'package:mimir/widgets/app_drawer.dart';
+import 'package:mimir/widgets/auth_account_button.dart';
 
 class CalculateListScreen extends StatefulWidget {
   static const routeName = '/calculate-list';
@@ -60,65 +58,8 @@ class _CalculateListScreenState extends State<CalculateListScreen> {
           "전용 계산기 목록",
           style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
         ),
-        actions: [
-          if (AuthProvider.showLoginFeatures)
-            Consumer<AuthProvider>(
-              builder: (context, auth, _) {
-                if (auth.isLoggedIn) {
-                  return Tooltip(
-                    message: '${auth.nickname} (계정 설정)',
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, LoginScreen.routeName);
-                      },
-                      borderRadius: BorderRadius.circular(99),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [Colors.white, Colors.orangeAccent],
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              radius: 14,
-                              backgroundColor: Colors.orange,
-                              child: Text(
-                                (auth.nickname != null && auth.nickname!.isNotEmpty)
-                                    ? auth.nickname!.substring(0, 1).toUpperCase()
-                                    : 'C',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                } else {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: TextButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, LoginScreen.routeName);
-                      },
-                      icon: const Icon(Icons.login_rounded, size: 16, color: Colors.white),
-                      label: const Text(
-                        "로그인",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
+        actions: const [
+          AuthAccountButton(),
         ],
         backgroundColor: Colors.orange,
         elevation: 0,

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mimir/utils/blabla_map.dart';
 
 class DatabaseService {
@@ -27,6 +28,47 @@ class DatabaseService {
       debugPrint("DB 조회 에러: ${e.toString()}");
     }
     return null;
+  }
+
+  Future<Map<String, dynamic>?> getUserProfile(String uid) async {
+    if (uid.isEmpty) return null;
+    final snapshot = await _db.collection('users').doc(uid).get();
+    return snapshot.data();
+  }
+
+  Future<void> linkCommanderToUser({
+    required String uid,
+    required String openId,
+    String? syncUrl,
+  }) async {
+    await _db.collection('users').doc(uid).set({
+      'openId': openId,
+      'isVerified': true,
+      'verifiedAt': FieldValue.serverTimestamp(),
+      if (syncUrl != null && syncUrl.isNotEmpty) 'syncUrl': syncUrl,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_synced_openid', openId);
+    if (syncUrl != null && syncUrl.isNotEmpty) {
+      await prefs.setString('saved_sync_url', syncUrl);
+    }
+  }
+
+  Future<void> unlinkCommanderFromUser(String uid) async {
+    await _db.collection('users').doc(uid).update({
+      'openId': FieldValue.delete(),
+      'syncUrl': FieldValue.delete(),
+      'isVerified': false,
+      'verifiedAt': FieldValue.delete(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('last_synced_openid');
+    await prefs.remove('saved_sync_url');
+    await prefs.remove('auth_bound_openid');
   }
 
   Map<String, dynamic> _getMockEunhwaProfile() {

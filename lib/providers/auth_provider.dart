@@ -19,6 +19,7 @@ class AuthProvider extends ChangeNotifier {
   bool _isInitialized = false;
   Object? _initializationError;
   String? _userId;
+  String? _email;
   String? _nickname;
   String? _profileImageUrl;
   String? _loginProvider;
@@ -30,6 +31,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isInitialized => _isInitialized;
   Object? get initializationError => _initializationError;
   String? get userId => _userId;
+  String? get email => _email;
   String? get nickname => _nickname;
   String? get profileImageUrl => _profileImageUrl;
   String? get loginProvider => _loginProvider;
@@ -76,6 +78,7 @@ class AuthProvider extends ChangeNotifier {
     if (userMap == null) {
       _isLoggedIn = false;
       _userId = null;
+      _email = null;
       _nickname = null;
       _profileImageUrl = null;
       _loginProvider = null;
@@ -84,6 +87,7 @@ class AuthProvider extends ChangeNotifier {
     } else {
       _isLoggedIn = true;
       _userId = userMap['uid'] as String?;
+      _email = userMap['email'] as String?;
       _nickname = (userMap['nickname'] ?? userMap['displayName']) as String?;
       _profileImageUrl = userMap['photoUrl'] as String?;
       _loginProvider = userMap['provider'] as String?;
