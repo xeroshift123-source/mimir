@@ -1,273 +1,244 @@
-// ignore_for_file: avoid_web_libraries_in_flutter
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:universal_html/html.dart' as html;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
 import '../firebase_options.dart';
 
 class AuthService {
-  static final AuthService _instance = AuthService._internal();
-  factory AuthService() => _instance;
   AuthService._internal();
 
-  bool _isFirebaseInitialized = false;
-  bool _useRealFirebase = false;
+  static final AuthService _instance = AuthService._internal();
 
-  // Real SDK Clients
+  factory AuthService() => _instance;
+
   FirebaseAuth? _auth;
-  GoogleSignIn? _googleSignIn;
-
-  // Simulated Fallback User State Controllers
-  bool _simulatedLoggedIn = false;
-  String? _simulatedUid;
-  String? _simulatedEmail;
-  String? _simulatedDisplayName;
-
-  // Current User Cache for synchronous access during AuthProvider load
+  FirebaseFirestore? _firestore;
+  StreamSubscription<User?>? _firebaseAuthSubscription;
+  Future<void>? _initialization;
   Map<String, dynamic>? _currentUserMap;
+
+  final Map<String, Future<Map<String, dynamic>>> _profileSyncs = {};
+  String? _lastSyncedUid;
+  DateTime? _lastSyncedAt;
+  Map<String, dynamic>? _lastSyncedUserMap;
 
   final StreamController<Map<String, dynamic>?> _authStreamController =
       StreamController<Map<String, dynamic>?>.broadcast();
 
-  /// Returns whether actual Firebase Authentication backend is fully initialized and operational.
-  bool get isRealAuthActive => _isFirebaseInitialized && _useRealFirebase;
+  Stream<Map<String, dynamic>?> get authStateChanges =>
+      _authStreamController.stream;
 
-  /// Exposes user authentication state updates dynamically (works in both real & simulated modes).
-  Stream<Map<String, dynamic>?> get authStateChanges => _authStreamController.stream;
-
-  /// Synchronously retrieve the current logged-in user details.
   Map<String, dynamic>? get currentUser => _currentUserMap;
 
-  void _updateUser(Map<String, dynamic>? userMap) {
-    _currentUserMap = userMap;
-    _authStreamController.add(userMap);
-  }
+  Future<void> initialize() => _initialization ??= _initialize();
 
-  /// Initialize Firebase Auth & Google Sign-In with robust error handling.
-  Future<void> initialize() async {
-    try {
-      // 💡 On Web, check if Firebase CDN is reachable to prevent dynamic import freezes
-      if (kIsWeb) {
-        try {
-          // A simple HEAD or GET request to the CDN URL to verify connectivity.
-          // If blocked by an adblocker or firewall, this throws a catchable network exception.
-          await html.HttpRequest.getString('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js')
-              .timeout(const Duration(seconds: 2));
-        } catch (e) {
-          throw Exception("Firebase CDN is blocked or unreachable (possibly by AdBlocker/Firewall).");
-        }
-      }
-
-      // 1. Try to initialize Firebase.
-      // On Web, firebase_core dynamically loads the modular JS SDK. We use a generous timeout (10 seconds)
-      // to allow downloading of SDK files over the network without blocking startup.
-      if (Firebase.apps.isEmpty) {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ).timeout(const Duration(seconds: 10));
-      }
-
-      _auth = FirebaseAuth.instance;
-      _googleSignIn = GoogleSignIn(
-        scopes: ['email'],
-      );
-
-      _isFirebaseInitialized = true;
-
-      // 💡 Verify if credentials are valid or still placeholders
-      final apiKey = DefaultFirebaseOptions.currentPlatform.apiKey;
-      if (apiKey.contains('MOCK_API_KEY')) {
-        // If dummy placeholder keys are found, run in highly robust Simulation Mode
-        _useRealFirebase = false;
-        debugPrint("✔ MIMIR Auth: Firebase initialized using Mock Keys. Running in resilient Simulation Mode.");
-      } else {
-        // Configuration files/keys are valid and set! Enable actual Firebase connection!
-        _useRealFirebase = true;
-        debugPrint("✔ MIMIR Auth: Firebase successfully connected to Google Authentication backend!");
-      }
-    } catch (e) {
-      // Graceful fallback to Simulation Mode on any error (e.g. missing native configurations or timeout)
-      _isFirebaseInitialized = false;
-      _useRealFirebase = false;
-      debugPrint("⚠️ MIMIR Auth Failure during Firebase init: $e");
-      debugPrint("✔ MIMIR Auth Fallback: Switched to Hybrid Simulated Auth Mode (Crash Avoided).");
+  Future<void> _initialize() async {
+    if (!kIsWeb) {
+      throw UnsupportedError('현재 Google 로그인 1차 구현은 웹만 지원합니다.');
     }
 
-    // Load initial local mock sessions if in Simulation Mode
-    if (!_useRealFirebase) {
-      await _loadSimulatedSession();
-    } else {
-      // If real Firebase is operational, listen to actual authStateChanges
-      _auth!.authStateChanges().listen((User? user) {
-        if (user != null) {
-          _updateUser({
-            'uid': user.uid,
-            'email': user.email,
-            'displayName': user.displayName,
-            'photoUrl': user.photoURL,
-            'provider': 'google',
-          });
-        } else {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+
+    _auth = FirebaseAuth.instance;
+    _firestore = FirebaseFirestore.instanceFor(
+      app: Firebase.app(),
+      databaseId: 'mimirdb',
+    );
+
+    await _auth!.setPersistence(Persistence.LOCAL);
+
+    await _firebaseAuthSubscription?.cancel();
+    _firebaseAuthSubscription = _auth!.authStateChanges().listen(
+      (user) async {
+        if (user == null) {
+          _clearProfileSyncCache();
           _updateUser(null);
+          return;
         }
-      });
-    }
-  }
 
-  // --- Real Firebase/Google Sign-In logic ---
-
-  Future<Map<String, dynamic>?> signInWithGoogleReal() async {
-    if (!isRealAuthActive) return null;
-
-    try {
-      // 1. Trigger the actual Google interactive sign-in window
-      final GoogleSignInAccount? googleUser = await _googleSignIn!.signIn();
-      if (googleUser == null) return null; // Sign-in was cancelled by user
-
-      // 2. Fetch authentication details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      // 3. Create a new credential for Firebase
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // 4. Sign in to Firebase with the credential
-      final UserCredential userCredential = await _auth!.signInWithCredential(credential);
-      final User? user = userCredential.user;
-
-      if (user != null) {
-        final userMap = {
-          'uid': user.uid,
-          'email': user.email,
-          'displayName': user.displayName ?? googleUser.displayName,
-          'photoUrl': user.photoURL ?? googleUser.photoUrl,
-          'provider': 'google',
-        };
+        final userMap = await _syncUserProfileSafely(user);
         _updateUser(userMap);
-        return userMap;
-      }
-    } catch (e) {
-      debugPrint("⚠️ Real Google Sign-in failed: $e");
-      rethrow;
-    }
-    return null;
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        debugPrint('Firebase 인증 상태 구독 실패: $error');
+      },
+    );
   }
 
-  // --- Simulated Fallback Auth Logic ---
+  Future<Map<String, dynamic>?> signInWithGoogle() async {
+    await initialize();
 
-  Future<void> _loadSimulatedSession() async {
-    final prefs = await SharedPreferences.getInstance();
-    _simulatedLoggedIn = prefs.getBool('auth_is_logged_in') ?? false;
-    if (_simulatedLoggedIn) {
-      _simulatedUid = prefs.getString('auth_user_id');
-      _simulatedDisplayName = prefs.getString('auth_nickname');
-      _simulatedEmail = '${_simulatedUid ?? 'commander'}@mimir.com';
+    final provider = GoogleAuthProvider()
+      ..addScope('email')
+      ..setCustomParameters({'prompt': 'select_account'});
+    final credential = await _auth!.signInWithPopup(provider);
+    final user = credential.user;
 
-      _updateUser({
-        'uid': _simulatedUid,
-        'email': _simulatedEmail,
-        'displayName': _simulatedDisplayName,
-        'photoUrl': 'google',
-        'provider': 'google',
-      });
-    } else {
-      _updateUser(null);
+    if (user == null) {
+      return null;
     }
-  }
 
-  Future<Map<String, dynamic>> signInWithGoogleSimulated(String customNickname) async {
-    final prefs = await SharedPreferences.getInstance();
-    _simulatedLoggedIn = true;
-    _simulatedUid = 'commander_${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
-    
-    final trimmedName = customNickname.trim();
-    _simulatedDisplayName = trimmedName.isEmpty ? '사령관_${_simulatedUid!.substring(_simulatedUid!.length - 4)}' : trimmedName;
-    _simulatedEmail = '$_simulatedUid@mimir.com';
-
-    await prefs.setBool('auth_is_logged_in', true);
-    await prefs.setString('auth_user_id', _simulatedUid!);
-    await prefs.setString('auth_nickname', _simulatedDisplayName!);
-    await prefs.setString('auth_profile_image_url', 'google');
-    await prefs.setString('auth_login_provider', 'google');
-
-    final userMap = {
-      'uid': _simulatedUid,
-      'email': _simulatedEmail,
-      'displayName': _simulatedDisplayName,
-      'photoUrl': 'google',
-      'provider': 'google',
-    };
-
+    // 인증 성공은 Firestore 프로필 동기화 성공 여부와 분리한다.
+    final userMap = await _syncUserProfileSafely(user);
     _updateUser(userMap);
     return userMap;
   }
 
-  // --- Unified Public Interface ---
-
-  /// Perform Google Sign-In (automatically routes to real or simulated mode based on context)
-  Future<Map<String, dynamic>?> signIn({required String customNickname}) async {
-    if (isRealAuthActive) {
-      return await signInWithGoogleReal();
-    } else {
-      return await signInWithGoogleSimulated(customNickname);
-    }
-  }
-
-  /// Perform Sign-Out (works seamlessly in both real & simulated contexts)
   Future<void> signOut() async {
-    if (isRealAuthActive) {
-      await _googleSignIn?.signOut();
-      await _auth?.signOut();
-      _updateUser(null);
-    } else {
-      final prefs = await SharedPreferences.getInstance();
-      _simulatedLoggedIn = false;
-      _simulatedUid = null;
-      _simulatedDisplayName = null;
-      _simulatedEmail = null;
+    await initialize();
+    await _auth!.signOut();
+    _clearProfileSyncCache();
+  }
 
-      await prefs.remove('auth_is_logged_in');
-      await prefs.remove('auth_user_id');
-      await prefs.remove('auth_nickname');
-      await prefs.remove('auth_profile_image_url');
-      await prefs.remove('auth_login_provider');
+  Future<void> updateNickname(String newDisplayName) async {
+    await initialize();
+    final user = _auth!.currentUser;
+    if (user == null) {
+      throw StateError('로그인된 사용자가 없습니다.');
+    }
 
-      _updateUser(null);
+    await user.updateDisplayName(newDisplayName);
+    await user.reload();
+    final refreshedUser = _auth!.currentUser;
+    if (refreshedUser == null) {
+      throw StateError('사용자 정보를 새로고침할 수 없습니다.');
+    }
+
+    final userMap = await _syncUserProfile(
+      refreshedUser,
+      nickname: newDisplayName,
+      force: true,
+    );
+    _updateUser(userMap);
+  }
+
+  Future<Map<String, dynamic>> _syncUserProfileSafely(User user) async {
+    try {
+      return await _syncUserProfile(user);
+    } catch (error) {
+      debugPrint('Firebase 사용자 프로필 동기화 실패: $error');
+      return _toUserMap(
+        user,
+        profileSyncError: error,
+      );
     }
   }
 
-  /// Update nickname (propagates to local SharedPreferences during simulation)
-  Future<void> updateNickname(String newDisplayName) async {
-    if (isRealAuthActive) {
-      final user = _auth?.currentUser;
-      if (user != null) {
-        await user.updateDisplayName(newDisplayName);
-        _updateUser({
-          'uid': user.uid,
-          'email': user.email,
-          'displayName': newDisplayName,
-          'photoUrl': user.photoURL,
-          'provider': 'google',
-        });
+  Future<Map<String, dynamic>> _syncUserProfile(
+    User user, {
+    String? nickname,
+    bool force = false,
+  }) {
+    if (!force) {
+      final inFlight = _profileSyncs[user.uid];
+      if (inFlight != null) {
+        return inFlight;
       }
-    } else {
-      final prefs = await SharedPreferences.getInstance();
-      _simulatedDisplayName = newDisplayName;
-      await prefs.setString('auth_nickname', newDisplayName);
-      _updateUser({
-        'uid': _simulatedUid,
-        'email': _simulatedEmail,
-        'displayName': _simulatedDisplayName,
-        'photoUrl': 'google',
-        'provider': 'google',
-      });
+
+      final syncedAt = _lastSyncedAt;
+      if (_lastSyncedUid == user.uid &&
+          syncedAt != null &&
+          DateTime.now().difference(syncedAt) < const Duration(seconds: 2) &&
+          _lastSyncedUserMap != null) {
+        return Future.value(_lastSyncedUserMap!);
+      }
     }
+
+    late final Future<Map<String, dynamic>> operation;
+    operation = _writeUserProfile(user, nickname: nickname).then((userMap) {
+      _lastSyncedUid = user.uid;
+      _lastSyncedAt = DateTime.now();
+      _lastSyncedUserMap = userMap;
+      return userMap;
+    }).whenComplete(() {
+      if (identical(_profileSyncs[user.uid], operation)) {
+        _profileSyncs.remove(user.uid);
+      }
+    });
+
+    if (!force) {
+      _profileSyncs[user.uid] = operation;
+    }
+    return operation;
+  }
+
+  Map<String, dynamic> _toUserMap(
+    User user, {
+    Map<String, dynamic>? profile,
+    Object? profileSyncError,
+  }) {
+    final nickname = _readNickname(profile);
+    return {
+      'uid': user.uid,
+      'email': user.email,
+      'displayName': nickname ?? user.displayName,
+      'nickname': nickname,
+      'hasCompletedProfile': nickname != null,
+      'photoUrl': user.photoURL,
+      'provider': 'google',
+      'profileSyncError': profileSyncError,
+    };
+  }
+
+  Future<Map<String, dynamic>> _writeUserProfile(
+    User user, {
+    String? nickname,
+  }) async {
+    final document = _firestore!.collection('users').doc(user.uid);
+    final snapshot = await document.get();
+    final existingProfile = snapshot.data() ?? <String, dynamic>{};
+    final profile = <String, dynamic>{
+      'uid': user.uid,
+      'email': user.email,
+      'photoUrl': user.photoURL,
+      'provider': 'google',
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+
+    if (!existingProfile.containsKey('createdAt')) {
+      profile['createdAt'] = FieldValue.serverTimestamp();
+    }
+
+    final normalizedNickname = nickname?.trim();
+    if (normalizedNickname != null && normalizedNickname.isNotEmpty) {
+      profile['nickname'] = normalizedNickname;
+      profile['displayName'] = normalizedNickname;
+      profile['profileCompletedAt'] = FieldValue.serverTimestamp();
+    } else if (!existingProfile.containsKey('displayName')) {
+      profile['displayName'] = user.displayName;
+    }
+
+    await document.set(profile, SetOptions(merge: true));
+    return _toUserMap(
+      user,
+      profile: {...existingProfile, ...profile},
+    );
+  }
+
+  String? _readNickname(Map<String, dynamic>? profile) {
+    final value = profile?['nickname'];
+    if (value is! String || value.trim().isEmpty) {
+      return null;
+    }
+    return value.trim();
+  }
+
+  void _clearProfileSyncCache() {
+    _profileSyncs.clear();
+    _lastSyncedUid = null;
+    _lastSyncedAt = null;
+    _lastSyncedUserMap = null;
+  }
+
+  void _updateUser(Map<String, dynamic>? userMap) {
+    _currentUserMap = userMap;
+    _authStreamController.add(userMap);
   }
 }

@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 set -e
 
-# Flutter 설치
+# 로컬 개발 환경과 동일한 Flutter 버전 설치
+FLUTTER_VERSION="3.19.6"
 rm -rf flutter
-git clone https://github.com/flutter/flutter.git -b stable --depth 1
+git clone https://github.com/flutter/flutter.git \
+  --branch "$FLUTTER_VERSION" \
+  --depth 1 \
+  flutter
 export PATH="$PWD/flutter/bin:$PATH"
 
 flutter --version
 flutter config --enable-web
 
 flutter pub get
-flutter build web --release --no-wasm-dry-run
+flutter build web --release
 
 # ------------------------------
 # Netlify secrets scan 오탐지 회피용 정리

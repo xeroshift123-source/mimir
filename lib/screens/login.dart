@@ -1,7 +1,6 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:mimir/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/login';
@@ -12,553 +11,661 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
+  static const orange = Color(0xFFF57C00);
+
   final TextEditingController _nicknameController = TextEditingController();
-  late AnimationController _animController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _scaleAnimation;
+
   bool _isLoading = false;
-  
-  // 💡 Defer nickname setup until successful Google Sign-In
   bool _showNicknameSetup = false;
+  bool _isGoogleButtonHovered = false;
 
   @override
   void initState() {
     super.initState();
-    _animController = AnimationController(
+    _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 650),
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
     );
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
+    _scaleAnimation = Tween<double>(begin: 0.97, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutBack,
+      ),
     );
-    _animController.forward();
+    _animationController.forward();
   }
 
   @override
   void dispose() {
     _nicknameController.dispose();
-    _animController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleSocialLogin(String provider) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate standard smooth OAuth callback loading delay
-    await Future.delayed(const Duration(milliseconds: 1200));
-
-    if (!mounted) return;
-
+  Future<void> _handleSocialLogin() async {
+    setState(() => _isLoading = true);
     final authProvider = context.read<AuthProvider>();
-    // Call login with empty nickname to authenticate first
-    await authProvider.login(provider, customNickname: '');
 
-    setState(() {
-      _isLoading = false;
-      // Prefill controller with the standard default generated name or Google name
-      _nicknameController.text = authProvider.nickname ?? '';
-      _showNicknameSetup = true; // Switch view to post-login Nickname Setup!
-    });
+    try {
+      final signedIn = await authProvider.login('google', customNickname: '');
+      if (!mounted) return;
+
+      if (!signedIn) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      if (authProvider.hasProfileSyncError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Google 로그인은 완료됐지만 프로필 동기화에 실패했습니다. 잠시 후 새로고침해 주세요.',
+            ),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.of(context).pop(true);
+        return;
+      }
+
+      if (authProvider.hasCompletedProfile) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${authProvider.nickname} 사령관님, 다시 오신 것을 환영합니다!',
+            ),
+            backgroundColor: orange,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.of(context).pop(true);
+        return;
+      }
+
+      setState(() {
+        _isLoading = false;
+        _nicknameController.clear();
+        _showNicknameSetup = true;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      _showError(_loginErrorMessage(error));
+    }
+  }
+
+  String _loginErrorMessage(Object error) {
+    final message = error.toString();
+    if (message.contains('popup-closed-by-user') ||
+        message.contains('cancelled-popup-request')) {
+      return 'Google 로그인이 취소되었습니다.';
+    }
+    if (message.contains('popup-blocked')) {
+      return '브라우저에서 로그인 팝업을 허용해 주세요.';
+    }
+    return 'Google 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.';
   }
 
   Future<void> _handleNicknameSubmit() async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
-
-    final enteredName = _nicknameController.text.trim();
-    if (enteredName.isEmpty) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: const Text("사령관 닉네임을 입력해 주세요."),
-          backgroundColor: Colors.red.shade700,
-        ),
-      );
+    final nickname = _nicknameController.text.trim();
+    if (nickname.isEmpty) {
+      _showError('사령관 닉네임을 입력해 주세요.');
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
-
+    setState(() => _isLoading = true);
     final authProvider = context.read<AuthProvider>();
-    await authProvider.updateNickname(enteredName);
 
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      await authProvider.updateNickname(nickname);
+      if (!mounted) return;
 
-    // Beautiful snackbar
-    scaffoldMessenger.showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 8),
-            Text(
-              '${authProvider.nickname} 사령관님, 환영합니다!',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(
+                '${authProvider.nickname} 사령관님, 환영합니다!',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          backgroundColor: orange,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
-        backgroundColor: Colors.orange,
+      );
+      Navigator.of(context).pop(true);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      _showError('닉네임 저장에 실패했습니다. 다시 시도해 주세요.');
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade700,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
-
-    // pop screen
-    navigator.pop(true);
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final size = MediaQuery.of(context).size;
+    final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _showNicknameSetup ? "사령관 등록" : "소셜 로그인",
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        centerTitle: true,
-      ),
-      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // 🎨 Premium Background with elegant glowing shapes
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: isDark ? const Color(0xFF0D0E12) : const Color(0xFFF5F5F7),
-          ),
-          if (isDark) ...[
-            // Glowing neon orange ambient light
-            Positioned(
-              top: -size.height * 0.1,
-              left: -size.width * 0.2,
-              child: Container(
-                width: size.width * 0.8,
-                height: size.width * 0.8,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.orange.withOpacity(0.15),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-                  child: Container(color: Colors.transparent),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -size.height * 0.2,
-              right: -size.width * 0.1,
-              child: Container(
-                width: size.width * 0.7,
-                height: size.width * 0.7,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.red.withOpacity(0.1),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
-                  child: Container(color: Colors.transparent),
-                ),
-              ),
-            ),
-          ],
+          Positioned.fill(child: _Background(isDark: isDark)),
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final compact = constraints.maxWidth < 620;
 
-          // 📐 Center Form
-          Center(
-            child: SingleChildScrollView(
-              primary: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 450),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(24),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF1E1F26).withOpacity(0.7)
-                                  : Colors.white.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: isDark
-                                    ? Colors.orange.withOpacity(0.3)
-                                    : Colors.orange.withOpacity(0.2),
-                                width: 1.5,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.orange.withOpacity(isDark ? 0.08 : 0.03),
-                                  blurRadius: 20,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.all(32),
-                            child: AnimatedSize(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  // Logo icon representation
-                                  Center(
-                                    child: Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange.withOpacity(0.15),
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.orange,
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        _showNicknameSetup ? Icons.person : Icons.security,
-                                        size: 36,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-
-                                  if (!_showNicknameSetup) ...[
-                                    // STEP 1: Google Authentication View
-                                    Text(
-                                      "MIMIR PLATFORM",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 1.2,
-                                        color: isDark ? Colors.white : Colors.black87,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "Google 계정으로 편리하게 로그인하여\n사령관님들께 강력한 덱을 공유해 보세요!",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                                        height: 1.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    // 🎨 Premium Segmented Control for Authentication Mode
-                                    Center(
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: BoxDecoration(
-                                          color: isDark ? const Color(0xFF14151B) : Colors.grey.shade200,
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            _buildSegment(
-                                              title: "시뮬레이션 모드 (권장)",
-                                              isActive: !context.watch<AuthProvider>().useRealFirebaseMode,
-                                              onTap: () {
-                                                context.read<AuthProvider>().setRealFirebaseMode(false);
-                                              },
-                                            ),
-                                            _buildSegment(
-                                              title: "Firebase 실시간 연동",
-                                              isActive: context.watch<AuthProvider>().useRealFirebaseMode,
-                                              onTap: () {
-                                                context.read<AuthProvider>().setRealFirebaseMode(true);
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Center(
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: context.watch<AuthProvider>().isRealAuthActive
-                                              ? Colors.green.withOpacity(0.12)
-                                              : Colors.orange.withOpacity(0.12),
-                                          borderRadius: BorderRadius.circular(20),
-                                          border: Border.all(
-                                            color: context.watch<AuthProvider>().isRealAuthActive
-                                                ? Colors.green
-                                                : Colors.orange,
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 6,
-                                              height: 6,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: context.watch<AuthProvider>().isRealAuthActive
-                                                    ? Colors.green
-                                                    : Colors.orange,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              context.watch<AuthProvider>().isRealAuthActive
-                                                  ? "Firebase 백엔드 실시간 연결됨"
-                                                  : "하이브리드 시뮬레이션 모드 활성",
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: context.watch<AuthProvider>().isRealAuthActive
-                                                    ? Colors.green
-                                                    : Colors.orange,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 24),
-                                    const Divider(height: 32, thickness: 1),
-                                    const SizedBox(height: 8),
-
-                                    if (_isLoading) ...[
-                                      Center(
-                                        child: Column(
-                                          children: [
-                                            const CircularProgressIndicator(color: Colors.orange),
-                                            const SizedBox(height: 16),
-                                            Text(
-                                              "Google 인증을 진행하고 있습니다...",
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ] else ...[
-                                      // Only Google login button
-                                      _buildSocialButton(
-                                        title: "Google 계정으로 로그인",
-                                        icon: Icons.g_mobiledata,
-                                        iconColor: const Color(0xFFEA4335),
-                                        color: isDark ? const Color(0xFFF5F5F7) : Colors.white,
-                                        textColor: Colors.black87,
-                                        border: Border.all(color: Colors.grey.shade300),
-                                        onTap: () => _handleSocialLogin('google'),
-                                      ),
-                                    ],
-                                  ] else ...[
-                                    // STEP 2: Deferred Nickname Registration View
-                                    const Text(
-                                      "사령관 닉네임 등록",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "구글 인증 성공! MIMIR 플랫폼에서 활약할\n사령관님의 고유 닉네임을 설정해 주세요.",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                                        height: 1.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 24),
-                                    
-                                    // Nickname Input field
-                                    Text(
-                                      "사령관 닉네임 설정",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark ? Colors.orange.shade300 : Colors.orange.shade800,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextField(
-                                      controller: _nicknameController,
-                                      style: TextStyle(
-                                        color: isDark ? Colors.white : Colors.black87,
-                                        fontSize: 14,
-                                      ),
-                                      decoration: InputDecoration(
-                                        prefixIcon: const Icon(Icons.person, color: Colors.orange),
-                                        hintText: "사령관 닉네임을 채워주세요",
-                                        hintStyle: TextStyle(
-                                          color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
-                                          fontSize: 13,
-                                        ),
-                                        filled: true,
-                                        fillColor: isDark
-                                            ? const Color(0xFF14151B).withOpacity(0.8)
-                                            : Colors.grey.shade50,
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                          borderSide: BorderSide(
-                                            color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                          borderSide: const BorderSide(
-                                            color: Colors.orange,
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 24),
-                                    const Divider(height: 32, thickness: 1),
-                                    const SizedBox(height: 8),
-
-                                    if (_isLoading) ...[
-                                      const Center(child: CircularProgressIndicator(color: Colors.orange)),
-                                    ] else ...[
-                                      // Setup confirmation button
-                                      _buildSocialButton(
-                                        title: "MIMIR 시작하기",
-                                        icon: Icons.rocket_launch_rounded,
-                                        color: Colors.orange,
-                                        textColor: Colors.white,
-                                        onTap: _handleNicknameSubmit,
-                                      ),
-                                    ],
-                                  ],
-                                ],
+                return Stack(
+                  children: [
+                    Center(
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: compact ? 16 : 40,
+                          vertical: compact ? 16 : 36,
+                        ),
+                        child: FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: ScaleTransition(
+                            scale: _scaleAnimation,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 760),
+                              child: _buildCard(
+                                isDark: isDark,
+                                compact: compact,
+                                authProvider: authProvider,
                               ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: _BackButton(isDark: isDark),
+                    ),
+                  ],
+                );
+              },
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSocialButton({
-    required String title,
-    required IconData icon,
-    Color? iconColor,
-    required Color color,
-    required Color textColor,
-    BoxBorder? border,
-    required VoidCallback onTap,
+  Widget _buildCard({
+    required bool isDark,
+    required bool compact,
+    required AuthProvider authProvider,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: border,
+    final primaryText = isDark ? Colors.white : const Color(0xFF1D1E22);
+    final secondaryText =
+        isDark ? const Color(0xFFAAADB5) : const Color(0xFF696C73);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      constraints: BoxConstraints(minHeight: compact ? 560 : 680),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 26 : 72,
+        vertical: compact ? 42 : 64,
       ),
-      child: Material(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  color: iconColor ?? textColor,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1D21) : Colors.white,
+        borderRadius: BorderRadius.circular(compact ? 24 : 30),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withOpacity(0.08)
+              : Colors.white.withOpacity(0.96),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.32 : 0.12),
+            blurRadius: 44,
+            offset: const Offset(0, 18),
+          ),
+          BoxShadow(
+            color: orange.withOpacity(isDark ? 0.06 : 0.035),
+            blurRadius: 34,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Image.asset(
+              'assets/logo.png',
+              width: compact ? 92 : 118,
+              height: compact ? 92 : 118,
+              fit: BoxFit.contain,
             ),
           ),
-        ),
+          SizedBox(height: compact ? 22 : 28),
+          Text(
+            'MIMIR',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: primaryText,
+              fontSize: compact ? 32 : 42,
+              height: 1,
+              fontWeight: FontWeight.w900,
+              letterSpacing: compact ? 8 : 13,
+            ),
+          ),
+          const SizedBox(height: 18),
+          _BrandSubtitle(color: secondaryText),
+          SizedBox(height: compact ? 38 : 54),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 280),
+            child: _showNicknameSetup
+                ? _buildNicknameForm(
+                    key: const ValueKey('nickname'),
+                    isDark: isDark,
+                    primaryText: primaryText,
+                    secondaryText: secondaryText,
+                  )
+                : _buildLoginForm(
+                    key: const ValueKey('login'),
+                    isDark: isDark,
+                    authProvider: authProvider,
+                    secondaryText: secondaryText,
+                  ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSegment({
-    required String title,
-    required bool isActive,
-    required VoidCallback onTap,
+  Widget _buildLoginForm({
+    required Key key,
+    required bool isDark,
+    required AuthProvider authProvider,
+    required Color secondaryText,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive ? Colors.orange : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: isActive
-              ? [
-                  BoxShadow(
-                    color: Colors.orange.withOpacity(0.3),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  )
-                ]
-              : [],
-        ),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: isActive
-                ? Colors.white
-                : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+    final canLogin = !_isLoading && authProvider.isInitialized;
+
+    return Column(
+      key: key,
+      children: [
+        MouseRegion(
+          onEnter: (_) => setState(() => _isGoogleButtonHovered = true),
+          onExit: (_) => setState(() => _isGoogleButtonHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: double.infinity,
+            constraints: const BoxConstraints(maxWidth: 470, minHeight: 66),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFFF7F7F8) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color:
+                    _isGoogleButtonHovered ? orange : const Color(0xFFD7D9DE),
+                width: _isGoogleButtonHovered ? 1.8 : 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: _isGoogleButtonHovered
+                      ? orange.withOpacity(0.14)
+                      : Colors.black.withOpacity(0.09),
+                  blurRadius: _isGoogleButtonHovered ? 22 : 14,
+                  offset: const Offset(0, 7),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              child: InkWell(
+                onTap: canLogin ? _handleSocialLogin : null,
+                borderRadius: BorderRadius.circular(16),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_isLoading)
+                        const SizedBox(
+                          width: 25,
+                          height: 25,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: orange,
+                          ),
+                        )
+                      else
+                        const _GoogleMark(),
+                      const SizedBox(width: 18),
+                      Flexible(
+                        child: Text(
+                          _isLoading ? 'Google 인증 중...' : 'Google 계정으로 로그인',
+                          style: TextStyle(
+                            color: canLogin || _isLoading
+                                ? const Color(0xFF1E1F23)
+                                : const Color(0xFF9A9CA2),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
+        ),
+        const SizedBox(height: 24),
+        _AuthStatus(authProvider: authProvider),
+        const SizedBox(height: 14),
+        Text(
+          'Google 계정으로 안전하게 로그인합니다.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: secondaryText, fontSize: 12.5),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNicknameForm({
+    required Key key,
+    required bool isDark,
+    required Color primaryText,
+    required Color secondaryText,
+  }) {
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          '사령관 닉네임 등록',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: primaryText,
+            fontSize: 23,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'MIMIR에서 사용할 닉네임을 설정해 주세요.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: secondaryText, fontSize: 13.5),
+        ),
+        const SizedBox(height: 28),
+        TextField(
+          controller: _nicknameController,
+          autofocus: true,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) {
+            if (!_isLoading) _handleNicknameSubmit();
+          },
+          style: TextStyle(color: primaryText, fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            hintText: '사령관 닉네임',
+            prefixIcon: const Icon(Icons.person_outline_rounded, color: orange),
+            filled: true,
+            fillColor:
+                isDark ? const Color(0xFF15161A) : const Color(0xFFF8F8F9),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: isDark
+                    ? Colors.white.withOpacity(0.12)
+                    : const Color(0xFFD9DBDF),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(color: orange, width: 1.8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 18),
+        SizedBox(
+          height: 58,
+          child: FilledButton(
+            onPressed: _isLoading ? null : _handleNicknameSubmit,
+            style: FilledButton.styleFrom(
+              backgroundColor: orange,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            child: _isLoading
+                ? const SizedBox(
+                    width: 23,
+                    height: 23,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Text(
+                    'MIMIR 시작하기',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Background extends StatelessWidget {
+  const _Background({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [Color(0xFF111215), Color(0xFF1B1713)]
+              : const [Color(0xFFF7F8FA), Color(0xFFF0F1F3)],
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -170,
+            right: -120,
+            child: _AmbientCircle(
+              size: 430,
+              color: _LoginScreenState.orange.withOpacity(isDark ? 0.12 : 0.07),
+            ),
+          ),
+          Positioned(
+            bottom: -220,
+            left: -160,
+            child: _AmbientCircle(
+              size: 500,
+              color:
+                  _LoginScreenState.orange.withOpacity(isDark ? 0.08 : 0.045),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BackButton extends StatelessWidget {
+  const _BackButton({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isDark
+          ? Colors.black.withOpacity(0.18)
+          : Colors.white.withOpacity(0.7),
+      shape: const CircleBorder(),
+      child: IconButton(
+        tooltip: '뒤로 가기',
+        onPressed: () => Navigator.of(context).pop(),
+        icon: Icon(
+          Icons.arrow_back_rounded,
+          color: isDark ? Colors.white : const Color(0xFF303136),
+        ),
+      ),
+    );
+  }
+}
+
+class _AmbientCircle extends StatelessWidget {
+  const _AmbientCircle({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+    );
+  }
+}
+
+class _BrandSubtitle extends StatelessWidget {
+  const _BrandSubtitle({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(width: 24, height: 2, color: _LoginScreenState.orange),
+        const SizedBox(width: 14),
+        Flexible(
+          child: Text(
+            '니케 덱 빌딩 도우미',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: color,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 3,
+            ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Container(width: 24, height: 2, color: _LoginScreenState.orange),
+      ],
+    );
+  }
+}
+
+class _AuthStatus extends StatelessWidget {
+  const _AuthStatus({required this.authProvider});
+
+  final AuthProvider authProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasError = authProvider.initializationError != null;
+    final isReady = authProvider.isInitialized;
+    final color = hasError
+        ? Colors.red.shade600
+        : isReady
+            ? Colors.green.shade600
+            : _LoginScreenState.orange;
+    final label = hasError
+        ? 'Firebase 연결을 확인해 주세요'
+        : isReady
+            ? '안전한 로그인 준비 완료'
+            : '로그인 준비 중';
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 7),
+        Flexible(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GoogleMark extends StatelessWidget {
+  const _GoogleMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn,
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color(0xFF4285F4),
+          Color(0xFFEA4335),
+          Color(0xFFFBBC05),
+          Color(0xFF34A853),
+        ],
+      ).createShader(bounds),
+      child: const Text(
+        'G',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 28,
+          height: 1,
+          fontWeight: FontWeight.w900,
         ),
       ),
     );
