@@ -288,7 +288,7 @@ class _EinAdaCalculatorFormState extends State<EinAdaCalculatorForm> {
       double aB = SkillData.adaBurst[_adaBurstLevel];
       double eS1 = SkillData.einS1[_einS1Level];
 
-      // 1. 미란다 타겟팅 수치 판정 (사령관님 공식 반영)
+      // 1. 미란다 타겟팅 수치 판정 (지휘관님 공식 반영)
       // 아인, 에이다: 400렙공 * (1 + 오버공증)
       // 타키나: 400렙공 * (1 + 1스킬 + 오버공증)
       targetAda = aAtk * (1 + aOver);

@@ -63,6 +63,7 @@ class AuthProvider extends ChangeNotifier {
     }
 
     final user = await _authService.signInWithGoogle();
+    _updateState(user);
     return user != null;
   }
 

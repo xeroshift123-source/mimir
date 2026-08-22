@@ -414,7 +414,7 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
                         controller: titleController,
                         style: const TextStyle(fontSize: 14),
                         decoration: InputDecoration(
-                          hintText: "사령관님만의 덱 제목을 입력해 주세요",
+                          hintText: "지휘관님만의 덱 제목을 입력해 주세요",
                           isDense: true,
                           filled: true,
                           fillColor: isDark
@@ -443,7 +443,7 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
                         style: const TextStyle(fontSize: 13),
                         decoration: InputDecoration(
                           hintText:
-                              "크라운/클루드 등 핵심 메인 딜러 연동과 5개 스쿼드 배치 팁을 꼼꼼히 채워주시면 다른 사령관님들께 큰 도움이 됩니다!",
+                              "크라운/클루드 등 핵심 메인 딜러 연동과 5개 스쿼드 배치 팁을 꼼꼼히 채워주시면 다른 지휘관님들께 큰 도움이 됩니다!",
                           isDense: true,
                           filled: true,
                           fillColor: isDark

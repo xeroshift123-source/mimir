@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart'
 /// Default [FirebaseOptions] for use with [Firebase.initializeApp].
 /// 
 /// 💡 이 파일은 Firebase 연결 환경을 사전에 정의합니다. 
-/// 사령관님이 Firebase Console 설정을 완료하시면 해당 값들이 실제 값들로 갱신됩니다.
+/// 지휘관님이 Firebase Console 설정을 완료하시면 해당 값들이 실제 값들로 갱신됩니다.
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {

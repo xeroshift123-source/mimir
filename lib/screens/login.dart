@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${authProvider.nickname} 사령관님, 다시 오신 것을 환영합니다!',
+              '${authProvider.nickname} 지휘관님, 다시 오신 것을 환영합니다!',
             ),
             backgroundColor: orange,
             behavior: SnackBarBehavior.floating,
@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> _handleNicknameSubmit() async {
     final nickname = _nicknameController.text.trim();
     if (nickname.isEmpty) {
-      _showError('사령관 닉네임을 입력해 주세요.');
+      _showError('지휘관 닉네임을 입력해 주세요.');
       return;
     }
 
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen>
               const Icon(Icons.check_circle, color: Colors.white),
               const SizedBox(width: 8),
               Text(
-                '${authProvider.nickname} 사령관님, 환영합니다!',
+                '${authProvider.nickname} 지휘관님, 환영합니다!',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -410,7 +410,7 @@ class _LoginScreenState extends State<LoginScreen>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          '사령관 닉네임 등록',
+          '지휘관 닉네임 등록',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: primaryText,
@@ -434,7 +434,7 @@ class _LoginScreenState extends State<LoginScreen>
           },
           style: TextStyle(color: primaryText, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-            hintText: '사령관 닉네임',
+            hintText: '지휘관 닉네임',
             prefixIcon: const Icon(Icons.person_outline_rounded, color: orange),
             filled: true,
             fillColor:
