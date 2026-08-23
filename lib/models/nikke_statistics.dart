@@ -63,6 +63,7 @@ class NikkeStatistics {
     required this.freshnessDays,
     required this.generatedAt,
     required this.canRefreshStatistics,
+    required this.mySkillPreset,
     required this.overload,
     required this.skillPresets,
   });
@@ -78,6 +79,7 @@ class NikkeStatistics {
       freshnessDays: (json['freshnessDays'] as num?)?.toInt() ?? 30,
       generatedAt: DateTime.tryParse(json['generatedAt']?.toString() ?? ''),
       canRefreshStatistics: json['canRefreshStatistics'] == true,
+      mySkillPreset: json['mySkillPreset']?.toString() ?? '-/-/-',
       overload: overloadJson
           .whereType<Map>()
           .map((item) =>
@@ -98,6 +100,7 @@ class NikkeStatistics {
   final int freshnessDays;
   final DateTime? generatedAt;
   final bool canRefreshStatistics;
+  final String mySkillPreset;
   final List<NikkeOverloadStatistic> overload;
   final List<NikkeSkillPresetStatistic> skillPresets;
 }

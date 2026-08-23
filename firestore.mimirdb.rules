@@ -113,6 +113,10 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    match /guest_profile_tokens/{document} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

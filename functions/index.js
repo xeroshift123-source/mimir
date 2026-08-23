@@ -7,6 +7,7 @@ const { fetchCDNJson } = require('./cdnDecrypt');
 const { createNikkeStatisticsHandler } = require('./nikkeStatisticsEndpoint');
 const { createDailyNikkeStatisticsHandler } = require('./nikkeStatisticsSchedule');
 const { createNikkeStatisticsRefreshHandler } = require('./nikkeStatisticsRefreshEndpoint');
+const { issueGuestProfileToken, createGuestCommanderProfileHandler } = require('./guestProfileAccess');
 
 admin.initializeApp();
 const db = getFirestore('mimirdb');
@@ -416,7 +417,14 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             await userDocRef.set(payloadToSave, { merge: true });
         }
 
-        return res.status(200).json({ success: true, data: payloadToSave });
+        const guestAccessToken = authenticatedUid
+            ? null
+            : await issueGuestProfileToken({ admin, db, openId });
+        return res.status(200).json({
+            success: true,
+            data: payloadToSave,
+            ...(guestAccessToken ? { guestAccessToken } : {})
+        });
     } catch (e) {
         console.error('Scraping handler critical error:', e);
         return res.status(200).json({ success: false, error: e.message });
@@ -549,3 +557,4 @@ exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
 exports.getNikkeStatistics = createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUid });
 exports.refreshDailyNikkeStatistics = createDailyNikkeStatisticsHandler({ functions, admin, db });
 exports.refreshNikkeStatisticsNow = createNikkeStatisticsRefreshHandler({ functions, admin, db, getAuthenticatedUid });
+exports.getGuestCommanderProfile = createGuestCommanderProfileHandler({ functions, db });

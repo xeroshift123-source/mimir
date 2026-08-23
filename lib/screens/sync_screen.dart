@@ -45,10 +45,17 @@ class _SyncScreenState extends State<SyncScreen> {
     super.dispose();
   }
 
-  Future<void> _persistLinkedProfile(String openId, String syncUrl) async {
+  Future<void> _persistLinkedProfile(
+    String openId,
+    String syncUrl, {
+    String? guestAccessToken,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('last_synced_openid', openId);
     await prefs.setString('saved_sync_url', syncUrl);
+    if (guestAccessToken != null && guestAccessToken.isNotEmpty) {
+      await prefs.setString('guest_profile_access_token', guestAccessToken);
+    }
   }
 
   Future<void> _handleSync() async {
@@ -141,7 +148,11 @@ class _SyncScreenState extends State<SyncScreen> {
           resolvedOpenId =
               resolvedOpenId.replaceAll(RegExp(r'\x00'), '').trim();
 
-          await _persistLinkedProfile(resolvedOpenId, enteredUrl);
+          await _persistLinkedProfile(
+            resolvedOpenId,
+            enteredUrl,
+            guestAccessToken: result['guestAccessToken']?.toString(),
+          );
 
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

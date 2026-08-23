@@ -213,6 +213,7 @@ class _NikkeStatisticsCardState extends State<NikkeStatisticsCard> {
                 ...statistics.skillPresets.map(
                   (preset) => _SkillPresetBar(
                     statistic: preset,
+                    isMine: preset.preset == statistics.mySkillPreset,
                     isDark: widget.isDark,
                   ),
                 ),
@@ -268,6 +269,9 @@ class _OverloadRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mine = statistic.myTotalPercent;
+    final topPercent = statistic.topPercent;
+    final rankingScore =
+        topPercent == null ? null : (100.0 - topPercent).clamp(0.0, 100.0);
     return Container(
       margin: const EdgeInsets.only(bottom: 7),
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
@@ -275,59 +279,137 @@ class _OverloadRow extends StatelessWidget {
         color: isDark ? Colors.white.withOpacity(.04) : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Column(
         children: [
-          SizedBox(
-            width: 24,
-            child: Text('$rank',
-                style: const TextStyle(
-                    color: Colors.orange, fontWeight: FontWeight.w900)),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(statistic.name,
+          Row(
+            children: [
+              SizedBox(
+                width: 24,
+                child: Text('$rank',
                     style: const TextStyle(
-                        fontSize: 12.5, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 2),
-                Text(
-                  '채택 ${statistic.adoptionRate.toStringAsFixed(1)}% · 평균 +${statistic.averageTotalPercent.toStringAsFixed(2)}% (${statistic.averageLineCount.toStringAsFixed(1)}줄)',
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  ),
+                        color: Colors.orange, fontWeight: FontWeight.w900)),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(statistic.name,
+                        style: const TextStyle(
+                            fontSize: 12.5, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    Text(
+                      '채택 ${statistic.adoptionRate.toStringAsFixed(1)}% · 평균 +${statistic.averageTotalPercent.toStringAsFixed(2)}% (${statistic.averageLineCount.toStringAsFixed(1)}줄)',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                mine == null ? '내 옵션 없음' : '+${mine.toStringAsFixed(2)}%',
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.bold,
+                  color: mine == null
+                      ? Colors.grey
+                      : _rankingColor(rankingScore ?? 0),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Text(
-            mine == null
-                ? '내 옵션 없음'
-                : '+${mine.toStringAsFixed(2)}%\n상위 ${statistic.topPercent?.toStringAsFixed(1) ?? '-'}%',
-            textAlign: TextAlign.right,
-            style: TextStyle(
-              fontSize: 10.5,
-              height: 1.35,
-              fontWeight: FontWeight.bold,
-              color: mine == null ? Colors.grey : Colors.blue.shade600,
+          if (rankingScore != null) ...[
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 24),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: LinearProgressIndicator(
+                        value: rankingScore / 100,
+                        minHeight: 8,
+                        color: _rankingColor(rankingScore),
+                        backgroundColor: isDark
+                            ? Colors.grey.shade800
+                            : Colors.grey.shade200,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 9),
+                  SizedBox(
+                    width: 62,
+                    child: Text(
+                      '상위 ${topPercent!.toStringAsFixed(1)}%',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        color: _rankingColor(rankingScore),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
   }
 }
 
+Color _rankingColor(double score) {
+  final normalized = score.clamp(0.0, 100.0);
+  if (normalized <= 33.3) {
+    return Color.lerp(
+      Colors.red.shade500,
+      Colors.amber.shade600,
+      normalized / 33.3,
+    )!;
+  }
+  if (normalized <= 66.6) {
+    return Color.lerp(
+      Colors.amber.shade600,
+      Colors.green.shade500,
+      (normalized - 33.3) / 33.3,
+    )!;
+  }
+  return Color.lerp(
+    Colors.green.shade500,
+    Colors.blue.shade600,
+    (normalized - 66.6) / 33.4,
+  )!;
+}
+
 class _SkillPresetBar extends StatelessWidget {
-  const _SkillPresetBar({required this.statistic, required this.isDark});
+  const _SkillPresetBar({
+    required this.statistic,
+    required this.isMine,
+    required this.isDark,
+  });
   final NikkeSkillPresetStatistic statistic;
+  final bool isMine;
   final bool isDark;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 9),
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.only(bottom: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+        decoration: BoxDecoration(
+          color: isMine ? Colors.orange.withOpacity(.06) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isMine ? Colors.orange : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
         child: Row(
           children: [
             SizedBox(

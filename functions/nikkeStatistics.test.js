@@ -50,6 +50,7 @@ test('내 옵션 합계를 동률 보정 백분위로 비교한다', () => {
 
   assert.equal(compared.overload[0].myTotalPercent, 10.24);
   assert.equal(compared.overload[0].topPercent, 75);
+  assert.equal(compared.mySkillPreset, '10/10/10');
   assert.equal(percentileFromHistogram({ '10.00': 2, '20.00': 1 }, 10), 66.7);
 });
 

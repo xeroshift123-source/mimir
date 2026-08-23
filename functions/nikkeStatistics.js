@@ -117,8 +117,11 @@ function aggregateNikkeStatistics(commanders, nameCode, { server = null, minimum
 
 function attachUserComparison(statistics, character) {
   const mine = characterOptionTotals(character);
+  const skills = character?.skills || {};
+  const mySkillPreset = `${Number(skills.skill1) || 1}/${Number(skills.skill2) || 1}/${Number(skills.burst) || 1}`;
   return {
     ...statistics,
+    mySkillPreset,
     overload: statistics.overload.map(option => {
       const myOption = mine.get(option.key);
       if (!myOption) return { ...option, myTotalPercent: null, myLineCount: 0, topPercent: null };

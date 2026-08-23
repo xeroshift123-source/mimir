@@ -27,6 +27,9 @@ class CommanderRefreshCooldown implements Exception {
 }
 
 class DatabaseService {
+  static const _guestProfileEndpoint =
+      'https://us-central1-nikke-mimir.cloudfunctions.net/getGuestCommanderProfile';
+
   final FirebaseFirestore _db = FirebaseFirestore.instanceFor(
     app: Firebase.app(),
     databaseId: 'mimirdb',
@@ -36,6 +39,10 @@ class DatabaseService {
   Future<Map<String, dynamic>?> getCommanderProfile(String openId) async {
     if (openId == 'eunhwa_is_the_best') {
       return _getMockEunhwaProfile();
+    }
+
+    if (FirebaseAuth.instance.currentUser == null) {
+      return _getGuestCommanderProfile(openId);
     }
 
     try {
@@ -48,6 +55,34 @@ class DatabaseService {
       }
     } catch (e) {
       debugPrint("DB 조회 에러: ${e.toString()}");
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> _getGuestCommanderProfile(String openId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final cachedOpenId = prefs.getString('last_synced_openid')?.trim();
+    final accessToken = prefs.getString('guest_profile_access_token')?.trim();
+    if (cachedOpenId != openId || accessToken == null || accessToken.isEmpty) {
+      return null;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse(_guestProfileEndpoint),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'openId': openId, 'accessToken': accessToken}),
+      );
+      final result = jsonDecode(response.body);
+      if (result is Map &&
+          response.statusCode == 200 &&
+          result['success'] == true) {
+        return Map<String, dynamic>.from(result['data'] as Map);
+      }
+      debugPrint(
+          '게스트 프로필 조회 실패: ${result is Map ? result['error'] : response.statusCode}');
+    } catch (error) {
+      debugPrint('게스트 프로필 조회 에러: $error');
     }
     return null;
   }
@@ -248,6 +283,7 @@ class DatabaseService {
     final activeSyncUrl = result['activeSyncUrl']?.toString().trim() ?? '';
     if (selectedOpenId.isEmpty) {
       await prefs.remove('last_synced_openid');
+      await prefs.remove('guest_profile_access_token');
     } else {
       await prefs.setString('last_synced_openid', selectedOpenId);
     }
