@@ -77,3 +77,25 @@ test('예약 집계는 서버와 니케별 통계 스냅샷을 만든다', () =>
   );
   assert.equal(snapshots.find(item => item.id === statisticsCacheKey('한국', 1001)).data.sampleCount, 1);
 });
+
+test('희귀 옵션의 평균과 백분위는 미채택자를 0으로 포함한다', () => {
+  const commanders = Array.from({ length: 100 }, (_, index) =>
+    commander(
+      '한국',
+      { skill1: 10, skill2: 10, burst: 10 },
+      index === 0 ? [7001301, 7001302, 7001303, 7001304] : [],
+    ));
+
+  const aggregate = aggregateNikkeStatistics(commanders, 1001, { server: '한국' });
+  const defense = aggregate.overload.find(option => option.key === 'defense');
+  const compared = attachUserComparison(aggregate, commanders[0].characters[0]);
+  const myDefense = compared.overload.find(option => option.key === 'defense');
+
+  assert.equal(defense.adoptionRate, 1);
+  assert.equal(defense.averageLineCount, 0.04);
+  assert.equal(defense.adopterAverageLineCount, 4);
+  assert.equal(defense.averageTotalPercent, 0.23);
+  assert.equal(defense.adopterAverageTotalPercent, 23.3);
+  assert.equal(defense.histogram['0.00'], 99);
+  assert.equal(myDefense.topPercent, 0.5);
+});

@@ -2,7 +2,7 @@
 
 const { aggregateNikkeStatistics } = require('./nikkeStatistics');
 
-const STATISTICS_SCHEMA_VERSION = 3;
+const STATISTICS_SCHEMA_VERSION = 4;
 const FRESHNESS_DAYS = 30;
 const MINIMUM_SAMPLE = 20;
 

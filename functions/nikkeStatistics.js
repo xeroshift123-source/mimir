@@ -83,15 +83,24 @@ function aggregateNikkeStatistics(commanders, nameCode, { server = null, minimum
   }
 
   const overload = [...optionBuckets.values()]
-    .map(bucket => ({
-      key: bucket.key,
-      name: bucket.name,
-      userCount: bucket.userCount,
-      adoptionRate: sampleCount === 0 ? 0 : Number((bucket.userCount / sampleCount * 100).toFixed(1)),
-      averageTotalPercent: Number((bucket.totalPercent / bucket.userCount).toFixed(2)),
-      averageLineCount: Number((bucket.totalLines / bucket.userCount).toFixed(1)),
-      histogram: bucket.histogram,
-    }))
+    .map(bucket => {
+      const histogram = { ...bucket.histogram };
+      const nonAdopterCount = sampleCount - bucket.userCount;
+      if (nonAdopterCount > 0) {
+        histogram['0.00'] = (histogram['0.00'] || 0) + nonAdopterCount;
+      }
+      return {
+        key: bucket.key,
+        name: bucket.name,
+        userCount: bucket.userCount,
+        adoptionRate: sampleCount === 0 ? 0 : Number((bucket.userCount / sampleCount * 100).toFixed(1)),
+        averageTotalPercent: sampleCount === 0 ? 0 : Number((bucket.totalPercent / sampleCount).toFixed(2)),
+        averageLineCount: sampleCount === 0 ? 0 : Number((bucket.totalLines / sampleCount).toFixed(2)),
+        adopterAverageTotalPercent: Number((bucket.totalPercent / bucket.userCount).toFixed(2)),
+        adopterAverageLineCount: Number((bucket.totalLines / bucket.userCount).toFixed(2)),
+        histogram,
+      };
+    })
     .sort((a, b) =>
       b.averageLineCount - a.averageLineCount
       || b.userCount - a.userCount
@@ -104,7 +113,7 @@ function aggregateNikkeStatistics(commanders, nameCode, { server = null, minimum
     .slice(0, 4);
 
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     nameCode: Number(nameCode),
     server,
     sampleCount,

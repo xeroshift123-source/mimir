@@ -298,7 +298,7 @@ class _OverloadRow extends StatelessWidget {
                             fontSize: 12.5, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 2),
                     Text(
-                      '채택 ${statistic.adoptionRate.toStringAsFixed(1)}% · 평균 +${statistic.averageTotalPercent.toStringAsFixed(2)}% (${statistic.averageLineCount.toStringAsFixed(1)}줄)',
+                      '채택 ${statistic.adoptionRate.toStringAsFixed(1)}% · 전체 평균 +${statistic.averageTotalPercent.toStringAsFixed(2)}% (${statistic.averageLineCount.toStringAsFixed(2)}줄)',
                       style: TextStyle(
                         fontSize: 10.5,
                         color: isDark
