@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:mimir/providers/auth_provider.dart';
-import 'package:mimir/services/database_service.dart';
 import 'my_nikke_screen.dart';
 import 'package:mimir/widgets/app_footer.dart';
 
@@ -51,16 +49,6 @@ class _SyncScreenState extends State<SyncScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('last_synced_openid', openId);
     await prefs.setString('saved_sync_url', syncUrl);
-
-    if (!mounted) return;
-    final uid = context.read<AuthProvider>().userId;
-    if (uid != null && uid.isNotEmpty) {
-      await DatabaseService().linkCommanderToUser(
-        uid: uid,
-        openId: openId,
-        syncUrl: syncUrl,
-      );
-    }
   }
 
   Future<void> _handleSync() async {
@@ -112,9 +100,14 @@ class _SyncScreenState extends State<SyncScreen> {
     });
 
     try {
+      final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
       final response = await http.post(
         Uri.parse(_functionUrl),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          if (idToken != null && idToken.isNotEmpty)
+            "Authorization": "Bearer $idToken",
+        },
         body: jsonEncode({
           "url": enteredUrl,
         }),

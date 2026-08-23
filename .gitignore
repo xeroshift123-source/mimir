@@ -52,3 +52,6 @@ app.*.map.json
 *-debug.log
 firebase-debug.log
 firestore-debug.log
+
+# Firebase Functions local secrets
+/functions/.env

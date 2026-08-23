@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mimir/utils/blabla_map.dart';
 
@@ -36,34 +40,30 @@ class DatabaseService {
     return snapshot.data();
   }
 
-  Future<void> linkCommanderToUser({
-    required String uid,
-    required String openId,
-    String? syncUrl,
-  }) async {
-    await _db.collection('users').doc(uid).set({
-      'openId': openId,
-      'isVerified': true,
-      'verifiedAt': FieldValue.serverTimestamp(),
-      if (syncUrl != null && syncUrl.isNotEmpty) 'syncUrl': syncUrl,
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('last_synced_openid', openId);
-    if (syncUrl != null && syncUrl.isNotEmpty) {
-      await prefs.setString('saved_sync_url', syncUrl);
-    }
-  }
-
   Future<void> unlinkCommanderFromUser(String uid) async {
-    await _db.collection('users').doc(uid).update({
-      'openId': FieldValue.delete(),
-      'syncUrl': FieldValue.delete(),
-      'isVerified': false,
-      'verifiedAt': FieldValue.delete(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.uid != uid) {
+      throw StateError('로그인 인증을 확인할 수 없습니다.');
+    }
+
+    final idToken = await user.getIdToken();
+    if (idToken == null || idToken.isEmpty) {
+      throw StateError('로그인 인증 토큰을 발급할 수 없습니다.');
+    }
+
+    final response = await http.post(
+      Uri.parse(
+        'https://us-central1-nikke-mimir.cloudfunctions.net/unlinkBlablaAccount',
+      ),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+    final result = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode != 200 || result['success'] != true) {
+      throw StateError(result['error']?.toString() ?? '연동 해제에 실패했습니다.');
+    }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('last_synced_openid');

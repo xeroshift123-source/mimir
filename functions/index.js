@@ -17,6 +17,12 @@ function safeBase64Decode(str) {
     }
 }
 
+async function getAuthenticatedUid(req) {
+    const authorization = req.headers.authorization || '';
+    if (!authorization.startsWith('Bearer ')) return null;
+    const decoded = await admin.auth().verifyIdToken(authorization.slice(7));
+    return decoded.uid;
+}
 exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
     // 💡 100% 무결점 동적 CORS 헤더 주입 및 Credentials 허용 (Flutter Web 연동 끝판왕)
     const origin = req.headers.origin || '*';
@@ -35,6 +41,13 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             return res.status(200).json({ success: false, error: 'Method Not Allowed' });
         }
 
+        let authenticatedUid = null;
+        try {
+            authenticatedUid = await getAuthenticatedUid(req);
+        } catch (authError) {
+            console.warn('Invalid Firebase ID token:', authError.message);
+            return res.status(401).json({ success: false, error: '로그인 인증이 만료되었습니다. 다시 로그인해 주세요.' });
+        }
         const { url } = req.body || {};
         if (!url) {
             return res.status(200).json({ success: false, error: 'Target URL is required.' });
@@ -277,12 +290,121 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
         };
 
-        await userDocRef.set(payloadToSave, { merge: true });
+        if (authenticatedUid) {
+            const bindingRef = db.collection('open_id_bindings').doc(openId);
+            const accountRef = db.collection('users').doc(authenticatedUid);
+
+            try {
+                await db.runTransaction(async (transaction) => {
+                    const bindingSnapshot = await transaction.get(bindingRef);
+                    const accountSnapshot = await transaction.get(accountRef);
+                    const previousOpenId = accountSnapshot.data()?.openId;
+
+                    let previousBindingRef = null;
+                    let previousBindingSnapshot = null;
+                    if (previousOpenId && previousOpenId !== openId) {
+                        previousBindingRef = db.collection('open_id_bindings').doc(previousOpenId);
+                        previousBindingSnapshot = await transaction.get(previousBindingRef);
+                    }
+
+                    const boundUid = bindingSnapshot.data()?.uid;
+                    if (boundUid && boundUid !== authenticatedUid) {
+                        const conflict = new Error('이미 다른 Google 계정에 연동된 BLABLALINK 계정입니다.');
+                        conflict.code = 'BLABLA_ALREADY_LINKED';
+                        throw conflict;
+                    }
+
+                    if (previousBindingRef && previousBindingSnapshot?.data()?.uid === authenticatedUid) {
+                        transaction.delete(previousBindingRef);
+                    }
+
+                    transaction.set(userDocRef, payloadToSave, { merge: true });
+                    transaction.set(bindingRef, {
+                        openId,
+                        uid: authenticatedUid,
+                        syncUrl: url,
+                        ...(!bindingSnapshot.exists ? { boundAt: admin.firestore.FieldValue.serverTimestamp() } : {}),
+                        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    transaction.set(accountRef, {
+                        openId,
+                        syncUrl: url,
+                        isVerified: true,
+                        verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                });
+            } catch (bindingError) {
+                if (bindingError.code === 'BLABLA_ALREADY_LINKED') {
+                    return res.status(409).json({ success: false, error: bindingError.message });
+                }
+                throw bindingError;
+            }
+        } else {
+            await userDocRef.set(payloadToSave, { merge: true });
+        }
 
         return res.status(200).json({ success: true, data: payloadToSave });
-
     } catch (e) {
         console.error('Scraping handler critical error:', e);
         return res.status(200).json({ success: false, error: e.message });
+    }
+});
+exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
+    const origin = req.headers.origin || '*';
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(204).send('');
+    }
+    if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Method Not Allowed' });
+    }
+
+    let uid;
+    try {
+        uid = await getAuthenticatedUid(req);
+    } catch (authError) {
+        console.warn('Invalid Firebase ID token:', authError.message);
+        return res.status(401).json({ success: false, error: '로그인 인증이 만료되었습니다. 다시 로그인해 주세요.' });
+    }
+    if (!uid) {
+        return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+    }
+
+    try {
+        await db.runTransaction(async (transaction) => {
+            const accountRef = db.collection('users').doc(uid);
+            const accountSnapshot = await transaction.get(accountRef);
+            const openId = accountSnapshot.data()?.openId;
+
+            let bindingRef = null;
+            let bindingSnapshot = null;
+            if (openId) {
+                bindingRef = db.collection('open_id_bindings').doc(openId);
+                bindingSnapshot = await transaction.get(bindingRef);
+            }
+
+            if (bindingRef && bindingSnapshot?.data()?.uid === uid) {
+                transaction.delete(bindingRef);
+            }
+            if (accountSnapshot.exists) {
+                transaction.update(accountRef, {
+                    openId: admin.firestore.FieldValue.delete(),
+                    syncUrl: admin.firestore.FieldValue.delete(),
+                    isVerified: false,
+                    verifiedAt: admin.firestore.FieldValue.delete(),
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                });
+            }
+        });
+
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Unlink BLABLALINK account failed:', error);
+        return res.status(500).json({ success: false, error: '연동 해제 중 서버 오류가 발생했습니다.' });
     }
 });
