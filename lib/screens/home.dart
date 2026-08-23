@@ -6,10 +6,11 @@ import 'package:mimir/screens/union_deck_builder.dart';
 import 'package:mimir/screens/sync_screen.dart';
 import 'package:mimir/screens/my_nikke_screen.dart';
 import 'package:mimir/providers/theme_provider.dart';
+import 'package:mimir/providers/auth_provider.dart';
+import 'package:mimir/services/database_service.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/auth_account_button.dart';
 import 'package:mimir/widgets/app_footer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/raid_info.dart';
@@ -898,21 +899,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icons.person_search,
                               color: Colors.purple,
                               onTap: () async {
-                                final prefs =
-                                    await SharedPreferences.getInstance();
+                                final uid =
+                                    context.read<AuthProvider>().userId;
+                                final selectedOpenId = await DatabaseService()
+                                    .getSelectedCommanderOpenId(uid);
                                 if (!context.mounted) return;
-                                final savedOpenId =
-                                    prefs.getString('last_synced_openid');
-                                if (savedOpenId != null &&
-                                    savedOpenId.isNotEmpty) {
+                                if (selectedOpenId != null) {
                                   Navigator.pushNamed(
                                       context, MyNikkeScreen.routeName,
-                                      arguments: savedOpenId);
+                                      arguments: selectedOpenId);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content:
-                                            Text("먼저 블라블라링크 프로필 동기화를 진행해 주세요."),
+                                        content: Text(
+                                            "먼저 BLABLALINK 계정을 연동해 주세요."),
                                         backgroundColor: Colors.orange),
                                   );
                                   Navigator.pushNamed(

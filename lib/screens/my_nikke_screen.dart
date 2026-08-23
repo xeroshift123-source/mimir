@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui' as ui;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -35,6 +37,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   Map<String, dynamic>? _profileData;
+  String? _openId;
+  bool _isRefreshing = false;
+  int _refreshCooldownSeconds = 0;
+  Timer? _refreshCooldownTimer;
   int _selectedCharIndex = 0;
 
   // 🔽 Search & Filter States
@@ -94,6 +100,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           _profileData = data;
           _isLoading = false;
         });
+        _restoreRefreshCooldown(data);
       } else {
         setState(() {
           _isLoading = false;
@@ -144,6 +151,100 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   String _getWeaponLabel(WeaponType type) {
     return type.name;
+  }
+
+  void _restoreRefreshCooldown(Map<String, dynamic> profile) {
+    final lastUpdatedAt = profile['lastUpdatedAt'];
+    if (lastUpdatedAt is! Timestamp) return;
+
+    final elapsedMs =
+        DateTime.now().difference(lastUpdatedAt.toDate()).inMilliseconds;
+    final remainingSeconds = ((30000 - elapsedMs) / 1000).ceil();
+    if (remainingSeconds > 0) {
+      _startRefreshCooldown(remainingSeconds.clamp(1, 30));
+    }
+  }
+
+  void _startRefreshCooldown(int seconds) {
+    _refreshCooldownTimer?.cancel();
+    if (!mounted) return;
+    setState(() => _refreshCooldownSeconds = seconds.clamp(0, 30));
+    if (_refreshCooldownSeconds == 0) return;
+
+    _refreshCooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_refreshCooldownSeconds <= 1) {
+        timer.cancel();
+        setState(() => _refreshCooldownSeconds = 0);
+      } else {
+        setState(() => _refreshCooldownSeconds--);
+      }
+    });
+  }
+
+  Future<void> _refreshCommanderProfile() async {
+    final openId = _openId;
+    if (openId == null ||
+        openId.isEmpty ||
+        _isRefreshing ||
+        _refreshCooldownSeconds > 0) {
+      return;
+    }
+
+    setState(() => _isRefreshing = true);
+    _startRefreshCooldown(30);
+    try {
+      await _dbService.refreshLinkedCommander(openId);
+      final refreshedProfile = await _dbService.getCommanderProfile(openId);
+      if (refreshedProfile == null) {
+        throw StateError('갱신된 지휘관 정보를 불러오지 못했습니다.');
+      }
+      if (!mounted) return;
+      setState(() => _profileData = refreshedProfile);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('최신 니케 정보로 갱신했습니다.'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } on CommanderRefreshCooldown catch (error) {
+      if (!mounted) return;
+      _startRefreshCooldown(error.retryAfterSeconds);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${error.retryAfterSeconds}초 후 다시 새로고침할 수 있습니다.',
+          ),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error is StateError
+                ? error.message.toString()
+                : '정보 갱신에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+          ),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isRefreshing = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _refreshCooldownTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -513,6 +614,53 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                Tooltip(
+                  message: _refreshCooldownSeconds > 0
+                      ? '$_refreshCooldownSeconds초 후 새로고침 가능'
+                      : '최신 니케 정보로 새로고침',
+                  child: SizedBox(
+                    width: 44,
+                    height: 38,
+                    child: IconButton(
+                      onPressed: _isRefreshing || _refreshCooldownSeconds > 0
+                          ? null
+                          : _refreshCommanderProfile,
+                      padding: EdgeInsets.zero,
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 160),
+                        child: _isRefreshing
+                            ? const SizedBox(
+                                key: ValueKey('refreshing'),
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2,
+                                  color: Colors.orange,
+                                ),
+                              )
+                            : _refreshCooldownSeconds > 0
+                                ? Text(
+                                    '${_refreshCooldownSeconds}s',
+                                    key: ValueKey(_refreshCooldownSeconds),
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.orange.shade300
+                                          : Colors.orange.shade700,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.refresh_rounded,
+                                    key: ValueKey('ready'),
+                                    color: Colors.orange,
+                                    size: 23,
+                                  ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 2),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -1636,7 +1784,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                 right: 0,
                 bottom: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,

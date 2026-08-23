@@ -12,10 +12,18 @@ class LinkedCommanderAccount {
   const LinkedCommanderAccount({
     required this.openId,
     required this.nickname,
+    required this.server,
   });
 
   final String openId;
   final String nickname;
+  final String server;
+}
+
+class CommanderRefreshCooldown implements Exception {
+  const CommanderRefreshCooldown(this.retryAfterSeconds);
+
+  final int retryAfterSeconds;
 }
 
 class DatabaseService {
@@ -75,13 +83,136 @@ class DatabaseService {
       linkedIds.map((openId) async {
         final profile = await getCommanderProfile(openId);
         final nickname = profile?['nickname']?.toString().trim();
+        final server = profile?['server']?.toString().trim();
         return LinkedCommanderAccount(
           openId: openId,
           nickname:
               nickname == null || nickname.isEmpty ? '지휘관 정보 없음' : nickname,
+          server: server == null || server.isEmpty ? '알 수 없음' : server,
         );
       }),
     );
+  }
+
+  Future<String?> getSelectedCommanderOpenId(String? uid) async {
+    if (uid != null && uid.isNotEmpty) {
+      try {
+        final profile = await getUserProfile(uid);
+        final linkedIds = _linkedOpenIdsFromProfile(profile);
+        final selectedOpenId = profile?['selectedOpenId']?.toString().trim();
+        final legacyOpenId = profile?['openId']?.toString().trim();
+
+        final resolved = selectedOpenId != null &&
+                selectedOpenId.isNotEmpty &&
+                linkedIds.contains(selectedOpenId)
+            ? selectedOpenId
+            : legacyOpenId != null &&
+                    legacyOpenId.isNotEmpty &&
+                    linkedIds.contains(legacyOpenId)
+                ? legacyOpenId
+                : linkedIds.firstOrNull;
+
+        if (resolved != null) {
+          await _rememberSelectedCommander(resolved);
+          if (selectedOpenId != resolved &&
+              FirebaseAuth.instance.currentUser?.uid == uid) {
+            try {
+              await _db.collection('users').doc(uid).set({
+                'selectedOpenId': resolved,
+                'selectedOpenIdUpdatedAt': FieldValue.serverTimestamp(),
+              }, SetOptions(merge: true));
+            } catch (error) {
+              debugPrint('선택된 지휘관 마이그레이션 에러: $error');
+            }
+          }
+        }
+        return resolved;
+      } catch (error) {
+        debugPrint('선택된 지휘관 조회 에러: $error');
+      }
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final cachedOpenId = prefs.getString('last_synced_openid')?.trim();
+    return cachedOpenId == null || cachedOpenId.isEmpty ? null : cachedOpenId;
+  }
+
+  Future<void> selectCommanderForUser(String uid, String openId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.uid != uid) {
+      throw StateError('로그인 인증을 확인할 수 없습니다.');
+    }
+
+    final normalizedOpenId = openId.trim();
+    final profile = await getUserProfile(uid);
+    final linkedIds = _linkedOpenIdsFromProfile(profile);
+    if (normalizedOpenId.isEmpty || !linkedIds.contains(normalizedOpenId)) {
+      throw StateError('연동된 지휘관만 표시 계정으로 선택할 수 있습니다.');
+    }
+
+    await _db.collection('users').doc(uid).set({
+      'selectedOpenId': normalizedOpenId,
+      'selectedOpenIdUpdatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+    await _rememberSelectedCommander(normalizedOpenId);
+  }
+
+  List<String> _linkedOpenIdsFromProfile(Map<String, dynamic>? profile) {
+    final linkedIds = <String>[];
+    final rawLinkedIds = profile?['linkedOpenIds'];
+    if (rawLinkedIds is List) {
+      for (final value in rawLinkedIds) {
+        final openId = value?.toString().trim() ?? '';
+        if (openId.isNotEmpty && !linkedIds.contains(openId)) {
+          linkedIds.add(openId);
+        }
+      }
+    }
+
+    final legacyOpenId = profile?['openId']?.toString().trim() ?? '';
+    if (legacyOpenId.isNotEmpty && !linkedIds.contains(legacyOpenId)) {
+      linkedIds.add(legacyOpenId);
+    }
+    return linkedIds;
+  }
+
+  Future<void> _rememberSelectedCommander(String openId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_synced_openid', openId);
+  }
+
+  Future<void> refreshLinkedCommander(String openId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw StateError('로그인이 필요합니다.');
+    }
+
+    final idToken = await user.getIdToken();
+    if (idToken == null || idToken.isEmpty) {
+      throw StateError('로그인 인증 토큰을 발급할 수 없습니다.');
+    }
+
+    final response = await http.post(
+      Uri.parse(
+        'https://us-central1-nikke-mimir.cloudfunctions.net/scrapeNikkeProfile',
+      ),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: jsonEncode({
+        'refresh': true,
+        'openId': openId,
+      }),
+    );
+    final result = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 429) {
+      final retryAfter = (result['retryAfterSeconds'] as num?)?.ceil() ?? 30;
+      throw CommanderRefreshCooldown(retryAfter.clamp(1, 30));
+    }
+    if (response.statusCode != 200 || result['success'] != true) {
+      throw StateError(result['error']?.toString() ?? '정보 갱신에 실패했습니다.');
+    }
   }
 
   Future<void> unlinkCommanderFromUser(String uid, String openId) async {
@@ -112,11 +243,13 @@ class DatabaseService {
 
     final prefs = await SharedPreferences.getInstance();
     final activeOpenId = result['activeOpenId']?.toString().trim() ?? '';
+    final selectedOpenId =
+        result['selectedOpenId']?.toString().trim() ?? activeOpenId;
     final activeSyncUrl = result['activeSyncUrl']?.toString().trim() ?? '';
-    if (activeOpenId.isEmpty) {
+    if (selectedOpenId.isEmpty) {
       await prefs.remove('last_synced_openid');
     } else {
-      await prefs.setString('last_synced_openid', activeOpenId);
+      await prefs.setString('last_synced_openid', selectedOpenId);
     }
     if (activeSyncUrl.isEmpty) {
       await prefs.remove('saved_sync_url');

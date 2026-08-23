@@ -22,6 +22,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   bool _loadingLink = true;
   List<LinkedCommanderAccount> _linkedCommanders = const [];
   String? _unlinkingOpenId;
+  String? _selectingOpenId;
+  String? _selectedOpenId;
   String? _linkError;
 
   @override
@@ -55,9 +57,11 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
 
     try {
       final accounts = await _database.getLinkedCommanderAccounts(uid);
+      final selectedOpenId = await _database.getSelectedCommanderOpenId(uid);
       if (!mounted) return;
       setState(() {
         _linkedCommanders = accounts;
+        _selectedOpenId = selectedOpenId;
         _loadingLink = false;
       });
     } catch (error) {
@@ -72,6 +76,24 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   Future<void> _openLinkScreen() async {
     await Navigator.pushNamed(context, SyncScreen.routeName);
     if (mounted) await _loadLinkedCommanders();
+  }
+
+  Future<void> _selectCommander(LinkedCommanderAccount account) async {
+    final uid = context.read<AuthProvider>().userId;
+    if (uid == null || uid.isEmpty || _selectedOpenId == account.openId) return;
+
+    setState(() => _selectingOpenId = account.openId);
+    try {
+      await _database.selectCommanderForUser(uid, account.openId);
+      if (!mounted) return;
+      setState(() => _selectedOpenId = account.openId);
+      _showMessage('${account.nickname}을(를) 표시 계정으로 선택했습니다.');
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('표시 계정 변경에 실패했습니다.', isError: true);
+    } finally {
+      if (mounted) setState(() => _selectingOpenId = null);
+    }
   }
 
   Future<void> _unlinkCommander(LinkedCommanderAccount account) async {
@@ -183,9 +205,12 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         secondary: secondary,
                         loading: _loadingLink,
                         accounts: _linkedCommanders,
+                        selectedOpenId: _selectedOpenId,
+                        selectingOpenId: _selectingOpenId,
                         unlinkingOpenId: _unlinkingOpenId,
                         error: _linkError,
                         onAdd: _openLinkScreen,
+                        onSelect: _selectCommander,
                         onUnlink: _unlinkCommander,
                         onRetry: _loadLinkedCommanders,
                       ),
@@ -399,9 +424,12 @@ class _BlablaLinkCard extends StatelessWidget {
     required this.secondary,
     required this.loading,
     required this.accounts,
+    required this.selectedOpenId,
+    required this.selectingOpenId,
     required this.unlinkingOpenId,
     required this.error,
     required this.onAdd,
+    required this.onSelect,
     required this.onUnlink,
     required this.onRetry,
   });
@@ -409,9 +437,12 @@ class _BlablaLinkCard extends StatelessWidget {
   final Color secondary;
   final bool loading;
   final List<LinkedCommanderAccount> accounts;
+  final String? selectedOpenId;
+  final String? selectingOpenId;
   final String? unlinkingOpenId;
   final String? error;
   final VoidCallback onAdd;
+  final ValueChanged<LinkedCommanderAccount> onSelect;
   final ValueChanged<LinkedCommanderAccount> onUnlink;
   final VoidCallback onRetry;
 
@@ -440,6 +471,11 @@ class _BlablaLinkCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 7),
+            Text(
+              '계정을 선택하면 내 니케 정보에 해당 지휘관이 표시됩니다.',
+              style: TextStyle(color: secondary, fontSize: 12, height: 1.4),
+            ),
             const SizedBox(height: 16),
             if (loading)
               const Center(
@@ -466,66 +502,23 @@ class _BlablaLinkCard extends StatelessWidget {
                   ),
                 ),
               for (final account in accounts) ...[
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
-                        child: Icon(Icons.shield_outlined),
-                      ),
-                      const SizedBox(width: 13),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '연동된 지휘관',
-                              style: TextStyle(color: secondary, fontSize: 12),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              account.nickname,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                _LinkedCommanderCard(
+                  account: account,
+                  secondary: secondary,
+                  selected: selectedOpenId == account.openId,
+                  selecting: selectingOpenId == account.openId,
+                  unlinking: unlinkingOpenId == account.openId,
+                  actionsEnabled:
+                      unlinkingOpenId == null && selectingOpenId == null,
+                  onSelect: () => onSelect(account),
+                  onUnlink: () => onUnlink(account),
                 ),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed:
-                      unlinkingOpenId == null ? () => onUnlink(account) : null,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.redAccent,
-                    side: const BorderSide(color: Colors.redAccent),
-                    minimumSize: const Size.fromHeight(44),
-                  ),
-                  icon: unlinkingOpenId == account.openId
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.link_off_rounded),
-                  label: const Text('연동 해제'),
-                ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
               ],
               FilledButton.icon(
-                onPressed: unlinkingOpenId == null ? onAdd : null,
+                onPressed: unlinkingOpenId == null && selectingOpenId == null
+                    ? onAdd
+                    : null,
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.orange,
                   foregroundColor: Colors.white,
@@ -540,6 +533,203 @@ class _BlablaLinkCard extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _LinkedCommanderCard extends StatelessWidget {
+  const _LinkedCommanderCard({
+    required this.account,
+    required this.secondary,
+    required this.selected,
+    required this.selecting,
+    required this.unlinking,
+    required this.actionsEnabled,
+    required this.onSelect,
+    required this.onUnlink,
+  });
+
+  final LinkedCommanderAccount account;
+  final Color secondary;
+  final bool selected;
+  final bool selecting;
+  final bool unlinking;
+  final bool actionsEnabled;
+  final VoidCallback onSelect;
+  final VoidCallback onUnlink;
+
+  String get _serverSymbol {
+    if (account.server.contains('한국')) return '🇰🇷';
+    if (account.server.contains('일본')) return '🇯🇵';
+    if (account.server.contains('글로벌')) return '🌐';
+    if (account.server.contains('동남아')) return '🌏';
+    return '🏳️';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final divider = Theme.of(context).dividerColor.withOpacity(0.18);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(selected ? 0.1 : 0.045),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.orange.withOpacity(selected ? 0.72 : 0.18),
+          width: selected ? 1.6 : 1,
+        ),
+        boxShadow: selected
+            ? [
+                BoxShadow(
+                  color: Colors.orange.withOpacity(0.09),
+                  blurRadius: 16,
+                  offset: const Offset(0, 5),
+                ),
+              ]
+            : null,
+      ),
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(16),
+            ),
+            child: InkWell(
+              onTap: actionsEnabled && !selected ? onSelect : null,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.28),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        _serverSymbol,
+                        style: const TextStyle(fontSize: 25),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  account.nickname,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ),
+                              if (selecting) ...[
+                                const SizedBox(width: 8),
+                                const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                              ] else if (selected) ...[
+                                const SizedBox(width: 7),
+                                const Icon(
+                                  Icons.check_circle_rounded,
+                                  color: Colors.orange,
+                                  size: 20,
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${account.server} 서버',
+                              style: TextStyle(
+                                color: secondary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Divider(height: 1, color: divider),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
+            child: SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: TextButton.icon(
+                onPressed: actionsEnabled ? onUnlink : null,
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                ),
+                icon: unlinking
+                    ? const SizedBox(
+                        width: 17,
+                        height: 17,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.redAccent,
+                        ),
+                      )
+                    : const Icon(Icons.link_off_rounded, size: 19),
+                label: const Text(
+                  '연동 해제',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

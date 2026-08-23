@@ -11,7 +11,7 @@ import 'package:mimir/screens/login.dart';
 import 'package:mimir/screens/sync_screen.dart';
 import 'package:mimir/screens/my_nikke_screen.dart';
 import 'package:mimir/screens/account_settings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mimir/services/database_service.dart';
 
 class AppDrawer extends StatelessWidget {
   final String activeRoute;
@@ -104,76 +104,65 @@ class AppDrawer extends StatelessWidget {
                   authProvider.isLoggedIn
                       ? Row(
                           children: [
-                            // Radiant profile avatar with glowing border
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [Colors.orange, Colors.redAccent, Colors.purpleAccent],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                              ),
-                              child: CircleAvatar(
-                                radius: 22,
-                                backgroundColor: const Color(0xFF121212),
-                                child: Icon(
-                                  authProvider.loginProvider == 'discord'
-                                      ? Icons.sports_esports
-                                      : authProvider.loginProvider == 'google'
-                                          ? Icons.g_mobiledata
-                                          : Icons.apple,
-                                  color: Colors.orange,
-                                  size: 24,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    authProvider.nickname!,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.verified_user,
-                                        size: 11,
-                                        color: Colors.orange.shade300,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${authProvider.loginProvider!.toUpperCase()} 로그인됨',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.white.withOpacity(0.7),
-                                          fontWeight: FontWeight.w600,
+                              child: Material(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    Navigator.pushNamed(
+                                      context,
+                                      AccountSettingsScreen.routeName,
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: Row(
+                                      children: [
+                                        _DrawerProfileAvatar(auth: authProvider),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                authProvider.nickname!,
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                '계정 정보 보기',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.white.withOpacity(0.72),
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                             IconButton(
                               icon: const Icon(Icons.logout_rounded, color: Colors.white70, size: 20),
-                              tooltip: "로그아웃",
+                              tooltip: '로그아웃',
                               onPressed: () {
                                 authProvider.logout();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text("로그아웃 되었습니다."),
+                                    content: Text('로그아웃 되었습니다.'),
                                     duration: Duration(seconds: 1),
                                   ),
                                 );
@@ -342,19 +331,21 @@ class AppDrawer extends StatelessWidget {
                   onTap: () async {
                     Navigator.pop(context);
                     if (activeRoute != MyNikkeScreen.routeName) {
-                      final prefs = await SharedPreferences.getInstance();
+                      final selectedOpenId = await DatabaseService()
+                          .getSelectedCommanderOpenId(authProvider.userId);
                       if (!context.mounted) return;
-                      final savedOpenId = prefs.getString('last_synced_openid');
-                      if (savedOpenId != null && savedOpenId.isNotEmpty) {
+                      if (selectedOpenId != null) {
                         Navigator.pushNamed(
                           context,
                           MyNikkeScreen.routeName,
-                          arguments: savedOpenId,
+                          arguments: selectedOpenId,
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("먼저 블라블라링크 프로필 동기화를 진행해 주세요."),
+                            content: Text(
+                              "먼저 BLABLALINK 계정을 연동해 주세요.",
+                            ),
                             backgroundColor: Colors.orange,
                           ),
                         );
@@ -379,33 +370,8 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton.icon(
-                  onPressed: authProvider.isLoggedIn
-                      ? () {
-                          Navigator.pop(context);
-                          Navigator.pushNamed(
-                            context,
-                            AccountSettingsScreen.routeName,
-                          );
-                        }
-                      : null,
-                  icon: const Icon(
-                    Icons.manage_accounts_outlined,
-                    size: 16,
-                    color: Colors.orange,
-                  ),
-                  label: const Text(
-                    "연동 관리",
-                    style: TextStyle(color: Colors.orange, fontSize: 12),
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
                 Row(
                   children: [
                     Text(
@@ -549,6 +515,71 @@ class AppDrawer extends StatelessWidget {
         ),
         onTap: onTap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+}
+
+class _DrawerProfileAvatar extends StatelessWidget {
+  const _DrawerProfileAvatar({required this.auth});
+
+  final AuthProvider auth;
+
+  @override
+  Widget build(BuildContext context) {
+    final photoUrl = auth.profileImageUrl;
+    final initial = (auth.nickname?.trim().isNotEmpty ?? false)
+        ? auth.nickname!.trim().substring(0, 1).toUpperCase()
+        : 'M';
+
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [Colors.white, Colors.orangeAccent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: CircleAvatar(
+        radius: 22,
+        backgroundColor: const Color(0xFF121212),
+        child: ClipOval(
+          child: photoUrl != null && photoUrl.startsWith('http')
+              ? Image.network(
+                  photoUrl,
+                  width: 44,
+                  height: 44,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      _DrawerProfileInitial(initial: initial),
+                )
+              : _DrawerProfileInitial(initial: initial),
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerProfileInitial extends StatelessWidget {
+  const _DrawerProfileInitial({required this.initial});
+
+  final String initial;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: 44,
+      child: Center(
+        child: Text(
+          initial,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 17,
+          ),
+        ),
       ),
     );
   }

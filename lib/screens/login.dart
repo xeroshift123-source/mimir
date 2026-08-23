@@ -649,25 +649,12 @@ class _GoogleMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShaderMask(
-      blendMode: BlendMode.srcIn,
-      shaderCallback: (bounds) => const LinearGradient(
-        colors: [
-          Color(0xFF4285F4),
-          Color(0xFFEA4335),
-          Color(0xFFFBBC05),
-          Color(0xFF34A853),
-        ],
-      ).createShader(bounds),
-      child: const Text(
-        'G',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 28,
-          height: 1,
-          fontWeight: FontWeight.w900,
-        ),
-      ),
+    return Image.asset(
+      'assets/icons/google_g_logo.png',
+      width: 24,
+      height: 24,
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.high,
     );
   }
 }

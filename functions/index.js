@@ -48,9 +48,69 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             console.warn('Invalid Firebase ID token:', authError.message);
             return res.status(401).json({ success: false, error: '로그인 인증이 만료되었습니다. 다시 로그인해 주세요.' });
         }
-        const { url } = req.body || {};
+        const body = req.body || {};
+        const isRefresh = body.refresh === true;
+        const refreshOpenId = body.openId?.toString().trim() || '';
+        let url = body.url?.toString().trim() || '';
+
+        if (isRefresh) {
+            if (!authenticatedUid) {
+                return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+            }
+            if (!refreshOpenId) {
+                return res.status(400).json({ success: false, error: '새로고침할 지휘관이 지정되지 않았습니다.' });
+            }
+
+            const refreshBindingRef = db.collection('open_id_bindings').doc(refreshOpenId);
+            try {
+                url = await db.runTransaction(async (transaction) => {
+                    const bindingSnapshot = await transaction.get(refreshBindingRef);
+                    const bindingData = bindingSnapshot.data();
+                    if (!bindingSnapshot.exists || bindingData?.uid !== authenticatedUid) {
+                        const notLinked = new Error('현재 Google 계정에 연동된 지휘관만 새로고침할 수 있습니다.');
+                        notLinked.code = 'REFRESH_NOT_LINKED';
+                        throw notLinked;
+                    }
+
+                    const lastRefreshMs = bindingData.lastRefreshAt?.toMillis?.() || 0;
+                    const remainingMs = 30000 - (Date.now() - lastRefreshMs);
+                    if (remainingMs > 0) {
+                        const cooldown = new Error('새로고침은 30초마다 할 수 있습니다.');
+                        cooldown.code = 'REFRESH_COOLDOWN';
+                        cooldown.retryAfterSeconds = Math.ceil(remainingMs / 1000);
+                        throw cooldown;
+                    }
+                    if (!bindingData.syncUrl) {
+                        const missingUrl = new Error('저장된 BLABLALINK 주소가 없습니다. 계정을 다시 연동해 주세요.');
+                        missingUrl.code = 'REFRESH_URL_MISSING';
+                        throw missingUrl;
+                    }
+
+                    transaction.set(refreshBindingRef, {
+                        lastRefreshAt: admin.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    return bindingData.syncUrl;
+                });
+            } catch (refreshError) {
+                if (refreshError.code === 'REFRESH_COOLDOWN') {
+                    return res.status(429).json({
+                        success: false,
+                        error: refreshError.message,
+                        retryAfterSeconds: refreshError.retryAfterSeconds
+                    });
+                }
+                if (refreshError.code === 'REFRESH_NOT_LINKED') {
+                    return res.status(403).json({ success: false, error: refreshError.message });
+                }
+                if (refreshError.code === 'REFRESH_URL_MISSING') {
+                    return res.status(409).json({ success: false, error: refreshError.message });
+                }
+                throw refreshError;
+            }
+        }
+
         if (!url) {
-            return res.status(200).json({ success: false, error: 'Target URL is required.' });
+            return res.status(400).json({ success: false, error: 'Target URL is required.' });
         }
         // 1. URL에서 openId 추출 및 디코딩
         let openId = '';
@@ -71,6 +131,9 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             openId = safeBase64Decode(openId);
         }
         openId = openId.replace(/\x00/g, '').trim(); // 💡 NULL 바이트 제거
+        if (isRefresh && openId !== refreshOpenId) {
+            return res.status(409).json({ success: false, error: '연동 정보가 일치하지 않습니다. 계정을 다시 연동해 주세요.' });
+        }
 
         let rawOpenId = openId;
         if (openId.includes('-')) {
@@ -131,7 +194,7 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
 
         // 💡 [소유권 검증]: 상태메세지(소개글)가 '미미르만만세' 인지 검증
         const profileStr = JSON.stringify(results.profile || {});
-        if (!profileStr.includes('미미르만만세')) {
+        if (!isRefresh && !profileStr.includes('미미르만만세')) {
             return res.status(200).json({
                 success: false,
                 error: "소유권 확인 실패: 블라블라링크 프로필의 소개글(상태메시지)에 '미미르만만세'가 포함되어 있지 않습니다. 블라블라링크에서 소개글을 수정한 후 다시 시도해 주세요."
@@ -323,15 +386,21 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
                         uid: authenticatedUid,
                         syncUrl: url,
                         ...(!bindingSnapshot.exists ? { boundAt: admin.firestore.FieldValue.serverTimestamp() } : {}),
-                        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        ...(isRefresh ? { lastRefreshSucceededAt: admin.firestore.FieldValue.serverTimestamp() } : {})
                     }, { merge: true });
                     transaction.set(accountRef, {
                         linkedOpenIds,
+                        ...(!accountData.selectedOpenId ? {
+                            selectedOpenId: openId,
+                            selectedOpenIdUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+                        } : {}),
                         openId,
                         syncUrl: url,
                         isVerified: true,
                         verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
-                        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        ...(isRefresh ? { lastRefreshSucceededAt: admin.firestore.FieldValue.serverTimestamp() } : {})
                     }, { merge: true });
                 });
             } catch (bindingError) {
@@ -383,6 +452,7 @@ exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
     try {
         let activeOpenId = null;
         let activeSyncUrl = null;
+        let selectedOpenId = null;
 
         await db.runTransaction(async (transaction) => {
             const accountRef = db.collection('users').doc(uid);
@@ -422,6 +492,9 @@ exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
             activeSyncUrl = activeOpenId === accountData.openId
                 ? (accountData.syncUrl || null)
                 : (activeBindingSnapshot?.data()?.syncUrl || null);
+            selectedOpenId = remainingOpenIds.includes(accountData.selectedOpenId)
+                ? accountData.selectedOpenId
+                : activeOpenId;
 
             if (bindingSnapshot.exists && (!boundUid || boundUid === uid)) {
                 transaction.delete(bindingRef);
@@ -432,6 +505,13 @@ exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
                     isVerified: remainingOpenIds.length > 0,
                     updatedAt: admin.firestore.FieldValue.serverTimestamp()
                 };
+                if (selectedOpenId) {
+                    accountUpdate.selectedOpenId = selectedOpenId;
+                    accountUpdate.selectedOpenIdUpdatedAt = admin.firestore.FieldValue.serverTimestamp();
+                } else {
+                    accountUpdate.selectedOpenId = admin.firestore.FieldValue.delete();
+                    accountUpdate.selectedOpenIdUpdatedAt = admin.firestore.FieldValue.delete();
+                }
                 if (activeOpenId) {
                     accountUpdate.openId = activeOpenId;
                     if (activeSyncUrl) {
@@ -451,7 +531,8 @@ exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
         return res.status(200).json({
             success: true,
             activeOpenId,
-            activeSyncUrl
+            activeSyncUrl,
+            selectedOpenId
         });
     } catch (error) {
         if (error.code === 'BLABLA_BINDING_FORBIDDEN') {
