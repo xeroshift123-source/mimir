@@ -21,6 +21,7 @@ import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/services/database_service.dart';
 import 'package:mimir/utils/cp_calculator.dart';
 import 'package:mimir/widgets/app_drawer.dart';
+import 'package:mimir/widgets/nikke_statistics_card.dart';
 import 'deck_builder.dart';
 
 class MyNikkeScreen extends StatefulWidget {
@@ -91,6 +92,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _openId = openId;
     });
 
     try {
@@ -2117,6 +2119,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 44.0),
       children: [
         _buildDetailHeader(char, localNikke, isDark),
+        if (_openId case final openId?) ...[
+          const SizedBox(height: 16),
+          NikkeStatisticsCard(
+            openId: openId,
+            nameCode: nameCode,
+            isDark: isDark,
+          ),
+        ],
         const SizedBox(height: 16),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,

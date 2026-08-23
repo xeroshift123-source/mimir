@@ -10,5 +10,12 @@
         "firestore-debug.log"
       ]
     }
+  ],
+  "firestore": [
+    {
+      "database": "mimirdb",
+      "rules": "firestore.mimirdb.rules",
+      "indexes": "firestore.mimirdb.indexes.json"
+    }
   ]
 }

@@ -4,6 +4,9 @@ const { getFirestore } = require('firebase-admin/firestore');
 const axios = require('axios');
 const cors = require('cors')({ origin: true });
 const { fetchCDNJson } = require('./cdnDecrypt');
+const { createNikkeStatisticsHandler } = require('./nikkeStatisticsEndpoint');
+const { createDailyNikkeStatisticsHandler } = require('./nikkeStatisticsSchedule');
+const { createNikkeStatisticsRefreshHandler } = require('./nikkeStatisticsRefreshEndpoint');
 
 admin.initializeApp();
 const db = getFirestore('mimirdb');
@@ -542,3 +545,7 @@ exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
         return res.status(500).json({ success: false, error: '연동 해제 중 서버 오류가 발생했습니다.' });
     }
 });
+
+exports.getNikkeStatistics = createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUid });
+exports.refreshDailyNikkeStatistics = createDailyNikkeStatisticsHandler({ functions, admin, db });
+exports.refreshNikkeStatisticsNow = createNikkeStatisticsRefreshHandler({ functions, admin, db, getAuthenticatedUid });

@@ -1,0 +1,120 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function currentUserPath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function isLinkedCommander(openId) {
+      return isSignedIn()
+        && exists(currentUserPath())
+        && (
+          (
+            'linkedOpenIds' in get(currentUserPath()).data
+            && get(currentUserPath()).data.linkedOpenIds is list
+            && openId in get(currentUserPath()).data.linkedOpenIds
+          )
+          || (
+            'openId' in get(currentUserPath()).data
+            && get(currentUserPath()).data.openId == openId
+          )
+        );
+    }
+
+    function allowedProfileFields() {
+      return [
+        'uid',
+        'email',
+        'photoUrl',
+        'provider',
+        'createdAt',
+        'updatedAt',
+        'nickname',
+        'displayName',
+        'profileCompletedAt'
+      ];
+    }
+
+    function allowedUserUpdateFields() {
+      return [
+        'email',
+        'photoUrl',
+        'provider',
+        'createdAt',
+        'updatedAt',
+        'nickname',
+        'displayName',
+        'profileCompletedAt',
+        'selectedOpenId',
+        'selectedOpenIdUpdatedAt'
+      ];
+    }
+
+    function selectedCommanderIsValid() {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['selectedOpenId'])
+        || (
+          request.resource.data.selectedOpenId is string
+          && (
+            (
+              'linkedOpenIds' in resource.data
+              && resource.data.linkedOpenIds is list
+              && request.resource.data.selectedOpenId in resource.data.linkedOpenIds
+            )
+            || (
+              'openId' in resource.data
+              && request.resource.data.selectedOpenId == resource.data.openId
+            )
+          )
+        );
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(allowedProfileFields())
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.provider == 'google';
+
+      allow update: if isOwner(uid)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(allowedUserUpdateFields())
+        && selectedCommanderIsValid();
+
+      allow delete: if false;
+    }
+
+    match /commanders/{openId} {
+      allow read: if isLinkedCommander(openId);
+      allow write: if false;
+    }
+
+    // 아래 컬렉션은 Cloud Functions Admin SDK만 접근합니다.
+    match /open_id_bindings/{document} {
+      allow read, write: if false;
+    }
+
+    match /nikke_statistics/{document} {
+      allow read, write: if false;
+    }
+
+    match /statistics_meta/{document} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
