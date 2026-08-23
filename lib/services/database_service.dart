@@ -8,6 +8,16 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mimir/utils/blabla_map.dart';
 
+class LinkedCommanderAccount {
+  const LinkedCommanderAccount({
+    required this.openId,
+    required this.nickname,
+  });
+
+  final String openId;
+  final String nickname;
+}
+
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instanceFor(
     app: Firebase.app(),
@@ -40,7 +50,41 @@ class DatabaseService {
     return snapshot.data();
   }
 
-  Future<void> unlinkCommanderFromUser(String uid) async {
+  Future<List<LinkedCommanderAccount>> getLinkedCommanderAccounts(
+    String uid,
+  ) async {
+    final userProfile = await getUserProfile(uid);
+    final linkedIds = <String>[];
+
+    final rawLinkedIds = userProfile?['linkedOpenIds'];
+    if (rawLinkedIds is List) {
+      for (final value in rawLinkedIds) {
+        final openId = value?.toString().trim() ?? '';
+        if (openId.isNotEmpty && !linkedIds.contains(openId)) {
+          linkedIds.add(openId);
+        }
+      }
+    }
+
+    final legacyOpenId = userProfile?['openId']?.toString().trim() ?? '';
+    if (legacyOpenId.isNotEmpty && !linkedIds.contains(legacyOpenId)) {
+      linkedIds.add(legacyOpenId);
+    }
+
+    return Future.wait(
+      linkedIds.map((openId) async {
+        final profile = await getCommanderProfile(openId);
+        final nickname = profile?['nickname']?.toString().trim();
+        return LinkedCommanderAccount(
+          openId: openId,
+          nickname:
+              nickname == null || nickname.isEmpty ? '지휘관 정보 없음' : nickname,
+        );
+      }),
+    );
+  }
+
+  Future<void> unlinkCommanderFromUser(String uid, String openId) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || user.uid != uid) {
       throw StateError('로그인 인증을 확인할 수 없습니다.');
@@ -59,6 +103,7 @@ class DatabaseService {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $idToken',
       },
+      body: jsonEncode({'openId': openId}),
     );
     final result = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode != 200 || result['success'] != true) {
@@ -66,8 +111,18 @@ class DatabaseService {
     }
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('last_synced_openid');
-    await prefs.remove('saved_sync_url');
+    final activeOpenId = result['activeOpenId']?.toString().trim() ?? '';
+    final activeSyncUrl = result['activeSyncUrl']?.toString().trim() ?? '';
+    if (activeOpenId.isEmpty) {
+      await prefs.remove('last_synced_openid');
+    } else {
+      await prefs.setString('last_synced_openid', activeOpenId);
+    }
+    if (activeSyncUrl.isEmpty) {
+      await prefs.remove('saved_sync_url');
+    } else {
+      await prefs.setString('saved_sync_url', activeSyncUrl);
+    }
     await prefs.remove('auth_bound_openid');
   }
 

@@ -20,9 +20,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   bool _initialized = false;
   bool _saving = false;
   bool _loadingLink = true;
-  bool _unlinking = false;
-  String? _linkedOpenId;
-  String? _linkedCommanderName;
+  List<LinkedCommanderAccount> _linkedCommanders = const [];
+  String? _unlinkingOpenId;
   String? _linkError;
 
   @override
@@ -33,7 +32,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     _nicknameController.text =
         context.read<AuthProvider>().nickname?.trim() ?? '';
     _initialized = true;
-    _loadLinkedCommander();
+    _loadLinkedCommanders();
   }
 
   @override
@@ -42,7 +41,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     super.dispose();
   }
 
-  Future<void> _loadLinkedCommander() async {
+  Future<void> _loadLinkedCommanders() async {
     final uid = context.read<AuthProvider>().userId;
     if (uid == null || uid.isEmpty) {
       if (mounted) setState(() => _loadingLink = false);
@@ -55,26 +54,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     });
 
     try {
-      final userProfile = await _database.getUserProfile(uid);
-      final openId = userProfile?['openId']?.toString().trim();
-      if (openId == null || openId.isEmpty) {
-        if (!mounted) return;
-        setState(() {
-          _linkedOpenId = null;
-          _linkedCommanderName = null;
-          _loadingLink = false;
-        });
-        return;
-      }
-
-      final commander = await _database.getCommanderProfile(openId);
-      final commanderName = commander?['nickname']?.toString().trim();
+      final accounts = await _database.getLinkedCommanderAccounts(uid);
       if (!mounted) return;
       setState(() {
-        _linkedOpenId = openId;
-        _linkedCommanderName = commanderName == null || commanderName.isEmpty
-            ? '지휘관 정보 없음'
-            : commanderName;
+        _linkedCommanders = accounts;
         _loadingLink = false;
       });
     } catch (error) {
@@ -88,19 +71,19 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
 
   Future<void> _openLinkScreen() async {
     await Navigator.pushNamed(context, SyncScreen.routeName);
-    if (mounted) await _loadLinkedCommander();
+    if (mounted) await _loadLinkedCommanders();
   }
 
-  Future<void> _unlinkCommander() async {
+  Future<void> _unlinkCommander(LinkedCommanderAccount account) async {
     final uid = context.read<AuthProvider>().userId;
-    if (uid == null || uid.isEmpty || _linkedOpenId == null) return;
+    if (uid == null || uid.isEmpty) return;
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('BLABLALINK 연동 해제'),
         content: Text(
-          '${_linkedCommanderName ?? '현재 지휘관'}과의 연동을 해제할까요?\n동기화된 지휘관 정보는 더 이상 자동으로 불러오지 않습니다.',
+          '${account.nickname}과의 연동을 해제할까요?\n다른 연동 계정은 그대로 유지됩니다.',
         ),
         actions: [
           TextButton(
@@ -117,20 +100,18 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     );
     if (confirmed != true) return;
 
-    setState(() => _unlinking = true);
+    setState(() => _unlinkingOpenId = account.openId);
     try {
-      await _database.unlinkCommanderFromUser(uid);
+      await _database.unlinkCommanderFromUser(uid, account.openId);
       if (!mounted) return;
-      setState(() {
-        _linkedOpenId = null;
-        _linkedCommanderName = null;
-      });
-      _showMessage('BLABLALINK 연동을 해제했습니다.');
+      await _loadLinkedCommanders();
+      if (!mounted) return;
+      _showMessage('${account.nickname} 연동을 해제했습니다.');
     } catch (error) {
       if (!mounted) return;
       _showMessage('연동 해제에 실패했습니다.', isError: true);
     } finally {
-      if (mounted) setState(() => _unlinking = false);
+      if (mounted) setState(() => _unlinkingOpenId = null);
     }
   }
 
@@ -201,12 +182,12 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                       _BlablaLinkCard(
                         secondary: secondary,
                         loading: _loadingLink,
-                        unlinking: _unlinking,
-                        linkedCommanderName: _linkedCommanderName,
+                        accounts: _linkedCommanders,
+                        unlinkingOpenId: _unlinkingOpenId,
                         error: _linkError,
-                        onLink: _openLinkScreen,
+                        onAdd: _openLinkScreen,
                         onUnlink: _unlinkCommander,
-                        onRetry: _loadLinkedCommander,
+                        onRetry: _loadLinkedCommanders,
                       ),
                     ],
                   ),
@@ -417,27 +398,25 @@ class _BlablaLinkCard extends StatelessWidget {
   const _BlablaLinkCard({
     required this.secondary,
     required this.loading,
-    required this.unlinking,
-    required this.linkedCommanderName,
+    required this.accounts,
+    required this.unlinkingOpenId,
     required this.error,
-    required this.onLink,
+    required this.onAdd,
     required this.onUnlink,
     required this.onRetry,
   });
 
   final Color secondary;
   final bool loading;
-  final bool unlinking;
-  final String? linkedCommanderName;
+  final List<LinkedCommanderAccount> accounts;
+  final String? unlinkingOpenId;
   final String? error;
-  final VoidCallback onLink;
-  final VoidCallback onUnlink;
+  final VoidCallback onAdd;
+  final ValueChanged<LinkedCommanderAccount> onUnlink;
   final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final linked = linkedCommanderName != null;
-
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -477,70 +456,76 @@ class _BlablaLinkCard extends StatelessWidget {
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('다시 불러오기'),
               ),
-            ] else if (linked) ...[
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      child: Icon(Icons.shield_outlined),
-                    ),
-                    const SizedBox(width: 13),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '연동된 지휘관',
-                            style: TextStyle(color: secondary, fontSize: 12),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            linkedCommanderName!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-              OutlinedButton.icon(
-                onPressed: unlinking ? null : onUnlink,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.redAccent,
-                  side: const BorderSide(color: Colors.redAccent),
-                  minimumSize: const Size.fromHeight(48),
-                ),
-                icon: unlinking
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.link_off_rounded),
-                label: const Text('연동 해제'),
-              ),
             ] else ...[
-              Text(
-                'BLABLALINK 프로필을 연결하면 동기화된 지휘관 정보를 MIMIR에서 사용할 수 있습니다.',
-                style: TextStyle(color: secondary, height: 1.45),
-              ),
-              const SizedBox(height: 14),
+              if (accounts.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    '연동된 지휘관이 없습니다. BLABLALINK 계정을 추가해 주세요.',
+                    style: TextStyle(color: secondary, height: 1.45),
+                  ),
+                ),
+              for (final account in accounts) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                        child: Icon(Icons.shield_outlined),
+                      ),
+                      const SizedBox(width: 13),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '연동된 지휘관',
+                              style: TextStyle(color: secondary, fontSize: 12),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              account.nickname,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed:
+                      unlinkingOpenId == null ? () => onUnlink(account) : null,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.redAccent,
+                    side: const BorderSide(color: Colors.redAccent),
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                  icon: unlinkingOpenId == account.openId
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.link_off_rounded),
+                  label: const Text('연동 해제'),
+                ),
+                const SizedBox(height: 14),
+              ],
               FilledButton.icon(
-                onPressed: onLink,
+                onPressed: unlinkingOpenId == null ? onAdd : null,
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.orange,
                   foregroundColor: Colors.white,
@@ -548,7 +533,7 @@ class _BlablaLinkCard extends StatelessWidget {
                 ),
                 icon: const Icon(Icons.add_link_rounded),
                 label: const Text(
-                  'BLABLALINK 연동하기',
+                  '계정 추가',
                   style: TextStyle(fontWeight: FontWeight.w800),
                 ),
               ),

@@ -298,13 +298,15 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
                 await db.runTransaction(async (transaction) => {
                     const bindingSnapshot = await transaction.get(bindingRef);
                     const accountSnapshot = await transaction.get(accountRef);
-                    const previousOpenId = accountSnapshot.data()?.openId;
-
-                    let previousBindingRef = null;
-                    let previousBindingSnapshot = null;
-                    if (previousOpenId && previousOpenId !== openId) {
-                        previousBindingRef = db.collection('open_id_bindings').doc(previousOpenId);
-                        previousBindingSnapshot = await transaction.get(previousBindingRef);
+                    const accountData = accountSnapshot.data() || {};
+                    const linkedOpenIds = Array.isArray(accountData.linkedOpenIds)
+                        ? accountData.linkedOpenIds.filter(value => typeof value === 'string' && value.trim())
+                        : [];
+                    if (accountData.openId && !linkedOpenIds.includes(accountData.openId)) {
+                        linkedOpenIds.push(accountData.openId);
+                    }
+                    if (!linkedOpenIds.includes(openId)) {
+                        linkedOpenIds.push(openId);
                     }
 
                     const boundUid = bindingSnapshot.data()?.uid;
@@ -314,9 +316,6 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
                         throw conflict;
                     }
 
-                    if (previousBindingRef && previousBindingSnapshot?.data()?.uid === authenticatedUid) {
-                        transaction.delete(previousBindingRef);
-                    }
 
                     transaction.set(userDocRef, payloadToSave, { merge: true });
                     transaction.set(bindingRef, {
@@ -327,6 +326,7 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
                         updatedAt: admin.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
                     transaction.set(accountRef, {
+                        linkedOpenIds,
                         openId,
                         syncUrl: url,
                         isVerified: true,
@@ -375,35 +375,88 @@ exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
         return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
     }
 
+    const openId = req.body?.openId?.toString().trim();
+    if (!openId) {
+        return res.status(400).json({ success: false, error: '해제할 BLABLALINK 계정이 지정되지 않았습니다.' });
+    }
+
     try {
+        let activeOpenId = null;
+        let activeSyncUrl = null;
+
         await db.runTransaction(async (transaction) => {
             const accountRef = db.collection('users').doc(uid);
+            const bindingRef = db.collection('open_id_bindings').doc(openId);
             const accountSnapshot = await transaction.get(accountRef);
-            const openId = accountSnapshot.data()?.openId;
+            const bindingSnapshot = await transaction.get(bindingRef);
+            const accountData = accountSnapshot.data() || {};
+            const boundUid = bindingSnapshot.data()?.uid;
 
-            let bindingRef = null;
-            let bindingSnapshot = null;
-            if (openId) {
-                bindingRef = db.collection('open_id_bindings').doc(openId);
-                bindingSnapshot = await transaction.get(bindingRef);
+            if (boundUid && boundUid !== uid) {
+                const forbidden = new Error('다른 Google 계정의 연동은 해제할 수 없습니다.');
+                forbidden.code = 'BLABLA_BINDING_FORBIDDEN';
+                throw forbidden;
             }
 
-            if (bindingRef && bindingSnapshot?.data()?.uid === uid) {
+            const linkedOpenIds = Array.isArray(accountData.linkedOpenIds)
+                ? accountData.linkedOpenIds.filter(value => typeof value === 'string' && value.trim())
+                : [];
+            if (accountData.openId && !linkedOpenIds.includes(accountData.openId)) {
+                linkedOpenIds.push(accountData.openId);
+            }
+            const remainingOpenIds = linkedOpenIds.filter(value => value !== openId);
+
+            activeOpenId = accountData.openId;
+            if (!activeOpenId || activeOpenId === openId || !remainingOpenIds.includes(activeOpenId)) {
+                activeOpenId = remainingOpenIds.length > 0
+                    ? remainingOpenIds[remainingOpenIds.length - 1]
+                    : null;
+            }
+
+            let activeBindingSnapshot = null;
+            if (activeOpenId && activeOpenId !== accountData.openId) {
+                activeBindingSnapshot = await transaction.get(
+                    db.collection('open_id_bindings').doc(activeOpenId)
+                );
+            }
+            activeSyncUrl = activeOpenId === accountData.openId
+                ? (accountData.syncUrl || null)
+                : (activeBindingSnapshot?.data()?.syncUrl || null);
+
+            if (bindingSnapshot.exists && (!boundUid || boundUid === uid)) {
                 transaction.delete(bindingRef);
             }
             if (accountSnapshot.exists) {
-                transaction.update(accountRef, {
-                    openId: admin.firestore.FieldValue.delete(),
-                    syncUrl: admin.firestore.FieldValue.delete(),
-                    isVerified: false,
-                    verifiedAt: admin.firestore.FieldValue.delete(),
+                const accountUpdate = {
+                    linkedOpenIds: remainingOpenIds,
+                    isVerified: remainingOpenIds.length > 0,
                     updatedAt: admin.firestore.FieldValue.serverTimestamp()
-                });
+                };
+                if (activeOpenId) {
+                    accountUpdate.openId = activeOpenId;
+                    if (activeSyncUrl) {
+                        accountUpdate.syncUrl = activeSyncUrl;
+                    } else {
+                        accountUpdate.syncUrl = admin.firestore.FieldValue.delete();
+                    }
+                } else {
+                    accountUpdate.openId = admin.firestore.FieldValue.delete();
+                    accountUpdate.syncUrl = admin.firestore.FieldValue.delete();
+                    accountUpdate.verifiedAt = admin.firestore.FieldValue.delete();
+                }
+                transaction.update(accountRef, accountUpdate);
             }
         });
 
-        return res.status(200).json({ success: true });
+        return res.status(200).json({
+            success: true,
+            activeOpenId,
+            activeSyncUrl
+        });
     } catch (error) {
+        if (error.code === 'BLABLA_BINDING_FORBIDDEN') {
+            return res.status(403).json({ success: false, error: error.message });
+        }
         console.error('Unlink BLABLALINK account failed:', error);
         return res.status(500).json({ success: false, error: '연동 해제 중 서버 오류가 발생했습니다.' });
     }
