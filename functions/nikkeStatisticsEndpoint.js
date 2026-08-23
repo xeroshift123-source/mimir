@@ -97,14 +97,13 @@ function createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUi
       }
 
       const commander = commanderSnapshot.data();
-      const server = commander.server?.toString() || '알 수 없음';
       const character = (Array.isArray(commander.characters) ? commander.characters : [])
         .find(item => Number(item?.name_code) === nameCode);
       if (!character) {
         return res.status(404).json({ success: false, error: '선택한 니케의 저장 정보를 찾을 수 없습니다.' });
       }
 
-      const cacheKey = statisticsCacheKey(server, nameCode);
+      const cacheKey = statisticsCacheKey(nameCode);
       const cacheRef = db.collection('nikke_statistics').doc(cacheKey);
       const cacheSnapshot = await cacheRef.get();
       const cacheData = cacheSnapshot.data();
@@ -123,7 +122,6 @@ function createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUi
         const eligibleCommanders = await loadEligibleLinkedCommanders(db);
 
         statistics = aggregateNikkeStatistics(eligibleCommanders, nameCode, {
-          server,
           minimumSample: MINIMUM_SAMPLE,
         });
         generatedAtMs = Date.now();

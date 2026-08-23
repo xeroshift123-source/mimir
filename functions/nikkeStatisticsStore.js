@@ -2,12 +2,12 @@
 
 const { aggregateNikkeStatistics } = require('./nikkeStatistics');
 
-const STATISTICS_SCHEMA_VERSION = 4;
+const STATISTICS_SCHEMA_VERSION = 5;
 const FRESHNESS_DAYS = 30;
 const MINIMUM_SAMPLE = 20;
 
-function statisticsCacheKey(server, nameCode) {
-  return `${encodeURIComponent(server)}_${Number(nameCode)}`;
+function statisticsCacheKey(nameCode) {
+  return `all_${Number(nameCode)}`;
 }
 
 function timestampMillis(value) {
@@ -36,32 +36,21 @@ async function loadEligibleLinkedCommanders(db, nowMs = Date.now()) {
 }
 
 function buildStatisticsSnapshots(commanders) {
-  const nameCodesByServer = new Map();
+  const nameCodes = new Set();
 
   for (const commander of commanders) {
-    const server = commander?.server?.toString().trim();
-    if (!server) continue;
-    const nameCodes = nameCodesByServer.get(server) || new Set();
     for (const character of Array.isArray(commander.characters) ? commander.characters : []) {
       const nameCode = Number(character?.name_code);
       if (Number.isInteger(nameCode) && nameCode > 0) nameCodes.add(nameCode);
     }
-    nameCodesByServer.set(server, nameCodes);
   }
 
-  const results = [];
-  for (const [server, nameCodes] of nameCodesByServer.entries()) {
-    for (const nameCode of nameCodes) {
-      results.push({
-        id: statisticsCacheKey(server, nameCode),
-        data: aggregateNikkeStatistics(commanders, nameCode, {
-          server,
-          minimumSample: MINIMUM_SAMPLE,
-        }),
-      });
-    }
-  }
-  return results;
+  return [...nameCodes].map(nameCode => ({
+    id: statisticsCacheKey(nameCode),
+    data: aggregateNikkeStatistics(commanders, nameCode, {
+      minimumSample: MINIMUM_SAMPLE,
+    }),
+  }));
 }
 
 async function writeStatisticsSnapshots({ db, admin, snapshots, generatedAt = new Date() }) {

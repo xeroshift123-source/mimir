@@ -47,13 +47,13 @@ function percentileFromHistogram(histogram, value) {
   return Number((((greater + equal * 0.5) / total) * 100).toFixed(1));
 }
 
-function aggregateNikkeStatistics(commanders, nameCode, { server = null, minimumSample = 20 } = {}) {
+function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } = {}) {
   const optionBuckets = new Map();
   const skillCounts = new Map();
   let sampleCount = 0;
 
   for (const commander of commanders) {
-    if (!commander || (server && commander.server !== server)) continue;
+    if (!commander) continue;
     const character = (Array.isArray(commander.characters) ? commander.characters : [])
       .find(item => Number(item?.name_code) === Number(nameCode));
     if (!character) continue;
@@ -113,9 +113,9 @@ function aggregateNikkeStatistics(commanders, nameCode, { server = null, minimum
     .slice(0, 4);
 
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     nameCode: Number(nameCode),
-    server,
+    server: '전체',
     sampleCount,
     minimumSample,
     isSufficient: sampleCount >= minimumSample,
