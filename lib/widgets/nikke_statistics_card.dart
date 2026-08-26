@@ -19,10 +19,14 @@ class NikkeStatisticsCard extends StatefulWidget {
   State<NikkeStatisticsCard> createState() => _NikkeStatisticsCardState();
 }
 
-class _NikkeStatisticsCardState extends State<NikkeStatisticsCard> {
+class _NikkeStatisticsCardState extends State<NikkeStatisticsCard>
+    with AutomaticKeepAliveClientMixin {
   final _service = NikkeStatisticsService();
   late Future<NikkeStatistics> _future;
   bool _isRefreshing = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -91,6 +95,7 @@ class _NikkeStatisticsCardState extends State<NikkeStatisticsCard> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final border = widget.isDark ? Colors.grey.shade800 : Colors.grey.shade300;
     final background = widget.isDark ? const Color(0xFF17181E) : Colors.white;
     return Container(
@@ -214,6 +219,29 @@ class _NikkeStatisticsCardState extends State<NikkeStatisticsCard> {
                   (preset) => _SkillPresetBar(
                     statistic: preset,
                     isMine: preset.preset == statistics.mySkillPreset,
+                    isDark: widget.isDark,
+                  ),
+                ),
+              const SizedBox(height: 18),
+              _SectionTitle(title: '장비 강화 프리셋 TOP 4', isDark: widget.isDark),
+              const SizedBox(height: 3),
+              Text(
+                '머리 / 장갑 / 상의 / 다리 · 오버로드·T9 기업 장비 외 X',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  color: widget.isDark
+                      ? Colors.grey.shade500
+                      : Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 7),
+              if (statistics.equipmentPresets.isEmpty)
+                const _EmptyText('집계할 장비 강화 정보가 없습니다.')
+              else
+                ...statistics.equipmentPresets.map(
+                  (preset) => _EquipmentPresetBar(
+                    statistic: preset,
+                    isMine: preset.preset == statistics.myEquipmentPreset,
                     isDark: widget.isDark,
                   ),
                 ),
@@ -437,6 +465,66 @@ class _SkillPresetBar extends StatelessWidget {
                   textAlign: TextAlign.right,
                   style: const TextStyle(
                       fontSize: 11, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+}
+
+class _EquipmentPresetBar extends StatelessWidget {
+  const _EquipmentPresetBar({
+    required this.statistic,
+    required this.isMine,
+    required this.isDark,
+  });
+
+  final NikkeEquipmentPresetStatistic statistic;
+  final bool isMine;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.only(bottom: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+        decoration: BoxDecoration(
+          color: isMine ? Colors.orange.withOpacity(.06) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isMine ? Colors.orange : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 82,
+              child: Text(
+                statistic.preset,
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: LinearProgressIndicator(
+                  value: (statistic.ratio / 100).clamp(0, 1),
+                  minHeight: 8,
+                  color: Colors.orange,
+                  backgroundColor:
+                      isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            SizedBox(
+              width: 45,
+              child: Text(
+                '${statistic.ratio.toStringAsFixed(1)}%',
+                textAlign: TextAlign.right,
+                style:
+                    const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),

@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mimir/utils/blabla_map.dart';
 
 class LinkedCommanderAccount {
   const LinkedCommanderAccount({
@@ -295,12 +295,17 @@ class DatabaseService {
     await prefs.remove('auth_bound_openid');
   }
 
-  Map<String, dynamic> _getMockEunhwaProfile() {
+  Future<Map<String, dynamic>> _getMockEunhwaProfile() async {
     final List<Map<String, dynamic>> characters = [];
     final List<String> slots = ['head', 'torso', 'arm', 'leg'];
     final List<int> overloadOptions = [7000515, 7000815, 7000715];
+    final nikkeJson = await rootBundle.loadString('assets/nikkes.json');
+    final nikkes = jsonDecode(nikkeJson) as List<dynamic>;
+    final nameCodes = nikkes
+        .map((nikke) => (nikke as Map<String, dynamic>)['blablaNameCode'])
+        .whereType<int>();
 
-    for (var code in BlablaMap.characterNames.keys) {
+    for (final code in nameCodes) {
       final equipment = slots.map((slot) {
         return {
           "slot": slot,
@@ -341,6 +346,15 @@ class DatabaseService {
     return {
       "nickname": "은화단",
       "synchroLevel": 700,
+      "towerFloor": 759,
+      "normalCampaign": "48-36",
+      "hardCampaign": "38-36",
+      "ownedNikkesCount": 183,
+      "combatPower": 978491,
+      "joinedAt": "2024-11-15T00:00:00Z",
+      "overclockSeasonHighScore": 28,
+      "overclockSubseasonHighScore": 28,
+      "overclockHighScore": 28,
       "recycleRoom": recycleRoom,
       "characters": characters,
     };

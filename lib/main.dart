@@ -12,6 +12,7 @@ import 'screens/account_settings.dart';
 import 'screens/sync_screen.dart';
 import 'screens/my_nikke_screen.dart';
 import 'screens/overload_simulator_screen.dart';
+import 'screens/recap_screen.dart';
 import 'providers/nikke_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/auth_provider.dart';
@@ -128,6 +129,7 @@ class MimirApp extends StatelessWidget {
               MyNikkeScreen.routeName: (context) => const MyNikkeScreen(),
               OverloadSimulatorScreen.routeName: (context) =>
                   const OverloadSimulatorScreen(),
+              RecapScreen.routeName: (context) => const RecapScreen(),
             },
           );
         },

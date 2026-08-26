@@ -38,6 +38,35 @@ function characterOptionTotals(character) {
   return totals;
 }
 
+const EQUIPMENT_PRESET_SLOTS = ['head', 'arm', 'torso', 'leg'];
+
+function equipmentTier(equipment) {
+  const explicitTier = Number(equipment?.tier) || 0;
+  if (explicitTier > 0) return explicitTier;
+  const tid = Number(equipment?.tid) || 0;
+  return Math.trunc(tid / 100) % 100;
+}
+
+function equipmentPreset(character) {
+  const equipmentBySlot = new Map(
+    (Array.isArray(character?.equipment) ? character.equipment : [])
+      .filter(equipment => equipment?.slot)
+      .map(equipment => [equipment.slot, equipment]),
+  );
+
+  return EQUIPMENT_PRESET_SLOTS.map(slot => {
+    const equipment = equipmentBySlot.get(slot);
+    if (!equipment) return 'X';
+    const tier = equipmentTier(equipment);
+    const corporationType = Number(equipment.corporationType) || 0;
+    const isOverload = tier >= 10;
+    const isManufacturerT9 = tier === 9 && corporationType > 0;
+    return isOverload || isManufacturerT9
+      ? String(Math.max(0, Number(equipment.level) || 0))
+      : 'X';
+  }).join('/');
+}
+
 function percentileFromHistogram(histogram, value) {
   const entries = Object.entries(histogram || {}).map(([rawValue, count]) => ({ value: Number(rawValue), count: Number(count) || 0 }));
   const total = entries.reduce((sum, item) => sum + item.count, 0);
@@ -50,6 +79,7 @@ function percentileFromHistogram(histogram, value) {
 function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } = {}) {
   const optionBuckets = new Map();
   const skillCounts = new Map();
+  const equipmentCounts = new Map();
   let sampleCount = 0;
 
   for (const commander of commanders) {
@@ -62,6 +92,8 @@ function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } =
     const skills = character.skills || {};
     const preset = `${Number(skills.skill1) || 1}/${Number(skills.skill2) || 1}/${Number(skills.burst) || 1}`;
     skillCounts.set(preset, (skillCounts.get(preset) || 0) + 1);
+    const gearPreset = equipmentPreset(character);
+    equipmentCounts.set(gearPreset, (equipmentCounts.get(gearPreset) || 0) + 1);
 
     for (const option of characterOptionTotals(character).values()) {
       const bucket = optionBuckets.get(option.key) || {
@@ -112,8 +144,13 @@ function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } =
     .sort((a, b) => b.count - a.count || a.preset.localeCompare(b.preset))
     .slice(0, 4);
 
+  const equipmentPresets = [...equipmentCounts.entries()]
+    .map(([preset, count]) => ({ preset, count, ratio: sampleCount === 0 ? 0 : Number((count / sampleCount * 100).toFixed(1)) }))
+    .sort((a, b) => b.count - a.count || a.preset.localeCompare(b.preset))
+    .slice(0, 4);
+
   return {
-    schemaVersion: 5,
+    schemaVersion: 7,
     nameCode: Number(nameCode),
     server: '전체',
     sampleCount,
@@ -121,6 +158,7 @@ function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } =
     isSufficient: sampleCount >= minimumSample,
     overload,
     skillPresets,
+    equipmentPresets,
   };
 }
 
@@ -131,6 +169,7 @@ function attachUserComparison(statistics, character) {
   return {
     ...statistics,
     mySkillPreset,
+    myEquipmentPreset: equipmentPreset(character),
     overload: statistics.overload.map(option => {
       const myOption = mine.get(option.key);
       if (!myOption) return { ...option, myTotalPercent: null, myLineCount: 0, topPercent: null };
@@ -149,5 +188,7 @@ module.exports = {
   aggregateNikkeStatistics,
   attachUserComparison,
   characterOptionTotals,
+  equipmentPreset,
+  equipmentTier,
   percentileFromHistogram,
 };

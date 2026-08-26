@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mimir/providers/auth_provider.dart';
 import 'package:mimir/screens/sync_screen.dart';
+import 'package:mimir/screens/recap_screen.dart';
 import 'package:mimir/services/database_service.dart';
+import 'package:mimir/utils/safe_network_image_provider.dart';
 import 'package:provider/provider.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
@@ -212,6 +215,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         onAdd: _openLinkScreen,
                         onSelect: _selectCommander,
                         onUnlink: _unlinkCommander,
+                        onRecap: (account) {
+                          HapticFeedback.mediumImpact();
+                          Navigator.pushNamed(
+                            context,
+                            RecapScreen.routeName,
+                            arguments: account.openId,
+                          );
+                        },
                         onRetry: _loadLinkedCommanders,
                       ),
                     ],
@@ -259,8 +270,8 @@ class _ProfileHeader extends StatelessWidget {
               backgroundColor: Colors.orange,
               child: ClipOval(
                 child: hasPhoto
-                    ? Image.network(
-                        auth.profileImageUrl!,
+                    ? Image(
+                        image: SafeNetworkImageProvider(auth.profileImageUrl!),
                         width: 68,
                         height: 68,
                         fit: BoxFit.cover,
@@ -431,6 +442,7 @@ class _BlablaLinkCard extends StatelessWidget {
     required this.onAdd,
     required this.onSelect,
     required this.onUnlink,
+    required this.onRecap,
     required this.onRetry,
   });
 
@@ -444,6 +456,7 @@ class _BlablaLinkCard extends StatelessWidget {
   final VoidCallback onAdd;
   final ValueChanged<LinkedCommanderAccount> onSelect;
   final ValueChanged<LinkedCommanderAccount> onUnlink;
+  final ValueChanged<LinkedCommanderAccount> onRecap;
   final VoidCallback onRetry;
 
   @override
@@ -512,6 +525,7 @@ class _BlablaLinkCard extends StatelessWidget {
                       unlinkingOpenId == null && selectingOpenId == null,
                   onSelect: () => onSelect(account),
                   onUnlink: () => onUnlink(account),
+                  onRecap: () => onRecap(account),
                 ),
                 const SizedBox(height: 12),
               ],
@@ -548,6 +562,7 @@ class _LinkedCommanderCard extends StatelessWidget {
     required this.actionsEnabled,
     required this.onSelect,
     required this.onUnlink,
+    required this.onRecap,
   });
 
   final LinkedCommanderAccount account;
@@ -558,6 +573,7 @@ class _LinkedCommanderCard extends StatelessWidget {
   final bool actionsEnabled;
   final VoidCallback onSelect;
   final VoidCallback onUnlink;
+  final VoidCallback onRecap;
 
   String get _serverSymbol {
     if (account.server.contains('한국')) return '🇰🇷';
@@ -599,6 +615,7 @@ class _LinkedCommanderCard extends StatelessWidget {
             ),
             child: InkWell(
               onTap: actionsEnabled && !selected ? onSelect : null,
+              onLongPress: actionsEnabled ? onRecap : null,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16),
               ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,14 +23,21 @@ class NikkeStatisticsService {
       throw StateError('로그인 인증 토큰을 발급할 수 없습니다.');
     }
 
-    final response = await http.post(
-      Uri.parse(_endpoint),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({'openId': openId, 'nameCode': nameCode}),
-    );
+    late final http.Response response;
+    try {
+      response = await http
+          .post(
+            Uri.parse(_endpoint),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode({'openId': openId, 'nameCode': nameCode}),
+          )
+          .timeout(const Duration(seconds: 75));
+    } on TimeoutException {
+      throw StateError('통계 서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해 주세요.');
+    }
     final decoded = jsonDecode(response.body);
     if (decoded is! Map<String, dynamic> ||
         response.statusCode != 200 ||

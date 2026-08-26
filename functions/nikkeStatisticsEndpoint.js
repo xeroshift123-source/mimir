@@ -14,7 +14,9 @@ const {
 } = require('./nikkeStatisticsStore');
 
 function createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUid }) {
-  return functions.https.onRequest(async (req, res) => {
+  return functions
+    .runWith({ memory: '1GB', timeoutSeconds: 120 })
+    .https.onRequest(async (req, res) => {
     const origin = req.headers.origin || '*';
     res.set('Access-Control-Allow-Origin', origin);
     res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -149,7 +151,7 @@ function createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUi
       console.error('Nikke statistics failed:', error);
       return res.status(500).json({ success: false, error: '니케 통계를 계산하는 중 서버 오류가 발생했습니다.' });
     }
-  });
+    });
 }
 
 module.exports = { createNikkeStatisticsHandler };

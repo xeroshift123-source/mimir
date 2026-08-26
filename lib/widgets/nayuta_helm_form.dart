@@ -80,14 +80,11 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
 
       final characters = profile['characters'] as List<dynamic>? ?? [];
       final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
-      var localNikkes = context.read<NikkeProvider>().nikkeList;
-      if (localNikkes.isEmpty) {
-        await context.read<NikkeProvider>().loadNikkes();
-        localNikkes = context.read<NikkeProvider>().nikkeList;
+      final nikkeProvider = context.read<NikkeProvider>();
+      if (nikkeProvider.nikkeList.isEmpty) {
+        await nikkeProvider.loadNikkes();
       }
-      final Map<String, Nikke> nikkeNameMap = {
-        for (final n in localNikkes) n.name: n
-      };
+      final nikkeCodeMap = nikkeProvider.nikkeByBlablaCode;
 
       Map<String, dynamic> injectConsoleLevels(Map<String, dynamic> c, Nikke? n) {
         int common = 0, classConsole = 0, companyConsole = 0;
@@ -124,12 +121,11 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       
       for (final char in characters) {
         final nameCode = char['name_code'] as int? ?? 0;
-        final mappedName = BlablaMap.characterNames[nameCode] ?? '';
-        if (mappedName == '나유타') nayutaChar = char;
-        if (mappedName == '헬름') helmChar = char;
-        if (mappedName == '루드밀라 : 윈터 오너') cludChar = char;
-        if (mappedName == '디젤 : 윈터 스위츠') cdieselChar = char;
-        if (mappedName == '미란다') mirandaChar = char;
+        if (nameCode == 5155) nayutaChar = char;
+        if (nameCode == 5066) helmChar = char;
+        if (nameCode == 5103) cludChar = char;
+        if (nameCode == 5159) cdieselChar = char;
+        if (nameCode == 5017) mirandaChar = char;
       }
 
       if (nayutaChar == null && helmChar == null) {
@@ -170,7 +166,8 @@ class _NayutaHelmCalculatorFormState extends State<NayutaHelmCalculatorForm> {
       }
 
       void applyCharStats(Map<String, dynamic> char, String name, TextEditingController atkCtrl, TextEditingController overCtrl) {
-        final localNikke = nikkeNameMap[name];
+        final nameCode = char['name_code'] as int? ?? 0;
+        final localNikke = nikkeCodeMap[nameCode];
         final modChar = injectConsoleLevels(char, localNikke);
         
         final customOptions = selectedCubeLevels[name] ?? SyncOptions();

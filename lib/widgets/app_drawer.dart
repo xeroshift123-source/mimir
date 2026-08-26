@@ -12,6 +12,7 @@ import 'package:mimir/screens/sync_screen.dart';
 import 'package:mimir/screens/my_nikke_screen.dart';
 import 'package:mimir/screens/account_settings.dart';
 import 'package:mimir/services/database_service.dart';
+import 'package:mimir/utils/safe_network_image_provider.dart';
 
 class AppDrawer extends StatelessWidget {
   final String activeRoute;
@@ -547,8 +548,8 @@ class _DrawerProfileAvatar extends StatelessWidget {
         backgroundColor: const Color(0xFF121212),
         child: ClipOval(
           child: photoUrl != null && photoUrl.startsWith('http')
-              ? Image.network(
-                  photoUrl,
+              ? Image(
+                  image: SafeNetworkImageProvider(photoUrl),
                   width: 44,
                   height: 44,
                   fit: BoxFit.cover,

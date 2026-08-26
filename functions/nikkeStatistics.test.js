@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const {
   aggregateNikkeStatistics,
   attachUserComparison,
+  equipmentPreset,
   percentileFromHistogram,
 } = require('./nikkeStatistics');
 const { buildStatisticsSnapshots, statisticsCacheKey } = require('./nikkeStatisticsStore');
@@ -95,4 +96,28 @@ test('희귀 옵션의 평균과 백분위는 미채택자를 0으로 포함한�
   assert.equal(defense.adopterAverageTotalPercent, 23.3);
   assert.equal(defense.histogram['0.00'], 99);
   assert.equal(myDefense.topPercent, 0.5);
+});
+
+test('장비 강화 프리셋은 머리/장갑/상의/다리 순서로 유효한 장비만 집계한다', () => {
+  const character = {
+    equipment: [
+      { slot: 'torso', tier: 9, corporationType: 0, level: 4 },
+      { slot: 'leg', tier: 8, corporationType: 2, level: 3 },
+      { slot: 'head', tid: 3111001, corporationType: 0, level: 5 },
+      { slot: 'arm', tid: 3310901, corporationType: 3, level: 2 },
+    ],
+  };
+
+  assert.equal(equipmentPreset(character), '5/2/X/X');
+
+  const first = commander('한국', { skill1: 10, skill2: 10, burst: 10 }, []);
+  first.characters[0].equipment = character.equipment;
+  const second = commander('일본', { skill1: 10, skill2: 10, burst: 10 }, []);
+  second.characters[0].equipment = character.equipment;
+  const aggregate = aggregateNikkeStatistics([first, second], 1001);
+  const compared = attachUserComparison(aggregate, first.characters[0]);
+
+  assert.equal(aggregate.equipmentPresets[0].preset, '5/2/X/X');
+  assert.equal(aggregate.equipmentPresets[0].ratio, 100);
+  assert.equal(compared.myEquipmentPreset, '5/2/X/X');
 });

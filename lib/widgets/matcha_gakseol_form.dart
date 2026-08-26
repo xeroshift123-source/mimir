@@ -129,15 +129,12 @@ class _MatchaGakseolCalculatorFormState
       final characters = profile['characters'] as List<dynamic>? ?? [];
       final recycleRoom = profile['recycleRoom'] as List<dynamic>? ?? [];
       if (!mounted) return;
-      var localNikkes = context.read<NikkeProvider>().nikkeList;
-      if (localNikkes.isEmpty) {
-        await context.read<NikkeProvider>().loadNikkes();
+      final nikkeProvider = context.read<NikkeProvider>();
+      if (nikkeProvider.nikkeList.isEmpty) {
+        await nikkeProvider.loadNikkes();
         if (!mounted) return;
-        localNikkes = context.read<NikkeProvider>().nikkeList;
       }
-      final Map<String, Nikke> nikkeNameMap = {
-        for (final n in localNikkes) n.name: n
-      };
+      final nikkeCodeMap = nikkeProvider.nikkeByBlablaCode;
 
       Map<String, dynamic> injectConsoleLevels(
           Map<String, dynamic> c, Nikke? n) {
@@ -172,16 +169,12 @@ class _MatchaGakseolCalculatorFormState
       Map<String, dynamic>? nayutaChar;
       Map<String, dynamic>? mirandaChar;
 
-      final n1Name = _nikke1?.name ?? '';
-      final n2Name = _nikke2?.name ?? '';
-
       for (final char in characters) {
         final nameCode = char['name_code'] as int? ?? 0;
-        final mappedName = BlablaMap.characterNames[nameCode] ?? '';
-        if (n1Name.isNotEmpty && (mappedName == n1Name || (n1Name == '에이다' && mappedName == '에이다'))) nikke1Char = char;
-        if (n2Name.isNotEmpty && (mappedName == n2Name || (n2Name == '에이다' && mappedName == '에이다'))) nikke2Char = char;
-        if (mappedName == '나유타') nayutaChar = char;
-        if (mappedName == '미란다') mirandaChar = char;
+        if (_nikke1?.blablaNameCode == nameCode) nikke1Char = char;
+        if (_nikke2?.blablaNameCode == nameCode) nikke2Char = char;
+        if (nameCode == 5155) nayutaChar = char;
+        if (nameCode == 5017) mirandaChar = char;
       }
 
       if (nikke1Char == null && nikke2Char == null && (!_useNayuta || nayutaChar == null)) {
@@ -233,7 +226,8 @@ class _MatchaGakseolCalculatorFormState
 
       void applyCharStats(Map<String, dynamic> char, String name,
           TextEditingController atkCtrl, TextEditingController overCtrl) {
-        final localNikke = nikkeNameMap[name];
+        final nameCode = char['name_code'] as int? ?? 0;
+        final localNikke = nikkeCodeMap[nameCode];
         final modChar = injectConsoleLevels(char, localNikke);
         final customOptions = selectedCubeLevels[name] ?? SyncOptions();
         final customCube = customOptions.cubeLevel;

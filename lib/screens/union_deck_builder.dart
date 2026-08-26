@@ -1108,7 +1108,8 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final nikkeList = context.watch<NikkeProvider>().nikkeList;
+    final nikkeProvider = context.watch<NikkeProvider>();
+    final nikkeList = nikkeProvider.nikkeList;
     _weaknessElement ??= '전격';
 
     // 각 니케가 몇 번 스쿼드에 배치되어 있는지 계산
@@ -1126,15 +1127,15 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
       }
     }
 
-    final Map<String, Map<String, dynamic>> syncedCharsByName = {};
+    final Map<String, Map<String, dynamic>> syncedCharsById = {};
     if (_profileData != null && _profileData!['characters'] != null) {
       final chars = _profileData!['characters'] as List<dynamic>;
       for (final char in chars) {
         if (char is Map<String, dynamic>) {
           final nameCode = char['name_code'] as int? ?? 0;
-          final String mappedName = BlablaMap.characterNames[nameCode] ?? '';
-          if (mappedName.isNotEmpty) {
-            syncedCharsByName[mappedName] = char;
+          final localNikke = nikkeProvider.nikkeByBlablaCode[nameCode];
+          if (localNikke != null) {
+            syncedCharsById[localNikke.id] = char;
           }
         }
       }
@@ -1177,11 +1178,11 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
           if (isMobile) {
             // 📱 모바일 레이아웃
             return _buildMobileLayout(
-                context, nikkeList, assignedSquadMap, syncedCharsByName);
+                context, nikkeList, assignedSquadMap, syncedCharsById);
           } else {
             // 💻 데스크탑 / 태블릿 레이아웃
             return _buildDesktopLayout(
-                context, nikkeList, assignedSquadMap, syncedCharsByName);
+                context, nikkeList, assignedSquadMap, syncedCharsById);
           }
         },
       ),
@@ -1513,15 +1514,15 @@ class _NikkeListPanelState extends State<NikkeListPanel>
     /// 정렬
     if (widget.syncedCharacters.isNotEmpty) {
       filtered.sort((a, b) {
-        final aOwned = widget.syncedCharacters.containsKey(a.name);
-        final bOwned = widget.syncedCharacters.containsKey(b.name);
+        final aOwned = widget.syncedCharacters.containsKey(a.id);
+        final bOwned = widget.syncedCharacters.containsKey(b.id);
 
         if (aOwned && !bOwned) return -1;
         if (!aOwned && bOwned) return 1;
 
         if (aOwned && bOwned) {
-          final aChar = widget.syncedCharacters[a.name]!;
-          final bChar = widget.syncedCharacters[b.name]!;
+          final aChar = widget.syncedCharacters[a.id]!;
+          final bChar = widget.syncedCharacters[b.id]!;
           final aPower = aChar['combat'] as int? ?? 0;
           final bPower = bChar['combat'] as int? ?? 0;
           final powerDiff = bPower.compareTo(aPower); // Descending
@@ -1688,7 +1689,7 @@ class _NikkeListPanelState extends State<NikkeListPanel>
 
                 final bool isSynced = widget.syncedCharacters.isNotEmpty;
                 final bool isNotOwnedReal = isSynced &&
-                    !widget.syncedCharacters.containsKey(nikke.name) &&
+                    !widget.syncedCharacters.containsKey(nikke.id) &&
                     !nikke.isTemporary;
                 final bool isNotOwned = isNotOwnedReal && !widget.allowUnowned;
 
@@ -1707,7 +1708,7 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                         : widget.squadNames[squadIndex]);
 
                 final Map<String, dynamic>? syncedChar =
-                    widget.syncedCharacters[nikke.name];
+                    widget.syncedCharacters[nikke.id];
 
                 final card = NikkeCard(
                   nikke: nikke,

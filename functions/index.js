@@ -295,7 +295,11 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
                                 slot,
                                 tid,
                                 level: d[`${slot}_equip_lv`] || 0,
-                                tier: d[`${slot}_equip_tier`] || 0,
+                                // The profile response does not expose an equip_tier field.
+                                // Equipment TIDs encode the tier in the two digits before
+                                // the final two-digit variant (e.g. 3110901 -> T9).
+                                tier: Math.trunc(Number(tid) / 100) % 100,
+                                corporationType: d[`${slot}_equip_corporation_type`] || 0,
                                 overloadOptions: options
                             });
                         }
@@ -333,6 +337,17 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
 
         // [Step 5] Firestore DB에 정적 스냅샷 저장
         const userDocRef = db.collection('commanders').doc(openId);
+        const gameInfo = results.gameInfo || {};
+        const overclockSeasonHighScore = Number(
+            gameInfo.overlock_season
+            ?? gameInfo.sim_room_overclock_latest_season_high_score
+            ?? 0
+        ) || 0;
+        const overclockSubseasonHighScore = Number(
+            gameInfo.overlock_subseason
+            ?? gameInfo.sim_room_overclock_current_sub_season_high_score
+            ?? 0
+        ) || 0;
 
         const payloadToSave = {
             nickname: results.profile ? (results.profile.info ? results.profile.info.username : '지휘관') : '지휘관',
@@ -343,14 +358,22 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
             })() : '알 수 없음',
             union: results.gameInfo ? results.gameInfo.guild_name : '없음',
             unionLevel: results.gameInfo ? results.gameInfo.guild_level : 0,
-            combatPower: results.gameInfo ? results.gameInfo.team_combat : 0,
-            synchroLevel: results.gameInfo ? results.gameInfo.synchro_level : 0,
-            commanderLevel: results.gameInfo ? results.gameInfo.player_level : 0,
-            ownedNikkesCount: results.gameInfo ? results.gameInfo.own_nikke_cnt : 0,
-            costumeCount: results.gameInfo ? results.gameInfo.costume : 0,
-            normalCampaign: results.gameInfo ? results.gameInfo.normal_progress : 0,
-            hardCampaign: results.gameInfo ? results.gameInfo.hard_progress : 0,
-            towerFloor: results.gameInfo ? results.gameInfo.tower_floor : 0,
+            combatPower: Number(gameInfo.team_combat) || 0,
+            synchroLevel: Number(gameInfo.synchro_level) || 0,
+            commanderLevel: Number(gameInfo.player_level) || 0,
+            ownedNikkesCount: Number(gameInfo.own_nikke_cnt ?? gameInfo.character_count) || 0,
+            costumeCount: Number(gameInfo.costume ?? gameInfo.character_costume_count) || 0,
+            normalCampaign: gameInfo.normal_progress ?? gameInfo.progress_normal_campaign ?? 0,
+            hardCampaign: gameInfo.hard_progress ?? gameInfo.progress_hard_campaign ?? 0,
+            towerFloor: Number(gameInfo.tower_floor ?? gameInfo.progress_tribe_tower) || 0,
+            joinedAt: gameInfo.created_at ?? null,
+            lastLoginAt: gameInfo.last_login_time ?? gameInfo.last_action_at ?? null,
+            overclockSeasonHighScore,
+            overclockSubseasonHighScore,
+            overclockHighScore: Math.max(
+                overclockSeasonHighScore,
+                overclockSubseasonHighScore
+            ),
             recycleRoom: results.gameInfo ? results.gameInfo.recycle_room_researches : [],
             infraCoreLevel: results.gameInfo ? results.gameInfo.infra_core_level : 0,
             characters: results.characters, // 176명 상세 덱

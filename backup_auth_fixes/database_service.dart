@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mimir/utils/blabla_map.dart';
 import '../firebase_options.dart';
 
 class DatabaseService {
@@ -102,7 +101,6 @@ class DatabaseService {
             {
               'openId': openId,
               'nameCode': nameCode,
-              'nikkeName': BlablaMap.characterNames[nameCode] ?? '',
               'grade': char['grade'] ?? 3,
               'core': char['core'] ?? 0,
               'bondLevel': char['bondLevel'] ?? 0,

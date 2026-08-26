@@ -3,6 +3,7 @@ import 'enums.dart';
 class Nikke {
   final String id; // 니케 고유 ID (내부 식별용)
   final String name; // 니케 이름
+  final int? blablaNameCode; // BlablaLink name_code (외부 연결 식별자)
   final String imageUrl; // 이미지 주소
   final BurstType burst; // 버스트 단계 (burst0~3)
   final ElementType element; // 속성
@@ -21,6 +22,7 @@ class Nikke {
   Nikke({
     required this.id,
     required this.name,
+    this.blablaNameCode,
     required this.imageUrl,
     required this.burst,
     required this.element,
@@ -72,6 +74,7 @@ class Nikke {
     return Nikke(
       id: json['id'] as String,
       name: json['name'] as String,
+      blablaNameCode: json['blablaNameCode'] as int?,
       imageUrl: json['imageUrl'] as String,
       burst: burst,
       element: element,
@@ -91,6 +94,7 @@ class Nikke {
     return {
       'id': id,
       'name': name,
+      'blablaNameCode': blablaNameCode,
       'imageUrl': imageUrl,
       'burst': _burstToNumber(burst), // 0/1/2/3 숫자로 저장
       'element': element.name,

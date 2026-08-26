@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mimir/providers/auth_provider.dart';
 import 'package:mimir/screens/account_settings.dart';
 import 'package:mimir/screens/login.dart';
+import 'package:mimir/utils/safe_network_image_provider.dart';
 import 'package:provider/provider.dart';
 
 enum _AccountAction { settings, logout }
@@ -168,8 +169,8 @@ class _ProfileAvatar extends StatelessWidget {
         backgroundColor: Colors.orange,
         child: ClipOval(
           child: photoUrl != null && photoUrl.startsWith('http')
-              ? Image.network(
-                  photoUrl,
+              ? Image(
+                  image: SafeNetworkImageProvider(photoUrl),
                   width: radius * 2,
                   height: radius * 2,
                   fit: BoxFit.cover,

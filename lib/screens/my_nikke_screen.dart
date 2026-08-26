@@ -52,7 +52,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final Set<Company> _companyFilters = {};
   bool _filterExpanded = false;
   bool _profileExpanded = true;
-  bool _assumeCube15 = false;
+  static const bool _useLevel15CubeForCalculations = true;
   bool _showNicknameOnLicense = false;
   bool _sortByLevel40Cp = false;
   bool _sortByUko = false;
@@ -349,19 +349,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   Widget _buildMainContent(bool isDark) {
     final characters = _profileData?['characters'] as List<dynamic>? ?? [];
-    final localNikkes = context.watch<NikkeProvider>().nikkeList;
-
-    // Cache local nikkes by name for quick lookup
-    final Map<String, Nikke> nikkeNameMap = {
-      for (final n in localNikkes) n.name: n
-    };
+    final nikkeProvider = context.watch<NikkeProvider>();
+    final nikkeCodeMap = nikkeProvider.nikkeByBlablaCode;
 
     // Filter characters
     final filteredChars = characters.where((char) {
       final nameCode = char['name_code'] as int? ?? 0;
-      final String mappedName = BlablaMap.characterNames[nameCode] ?? '';
-
-      final localNikke = nikkeNameMap[mappedName];
+      final localNikke = nikkeCodeMap[nameCode];
+      final mappedName = localNikke?.name ?? '';
 
       // 1. Search Query
       if (_searchQuery.isNotEmpty) {
@@ -403,11 +398,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     if (_sortByLevel40Cp) {
       for (var char in filteredChars) {
         final nameCode = char['name_code'] as int? ?? 0;
-        final String mappedName = BlablaMap.characterNames[nameCode] ?? '';
-        final localNikke = nikkeNameMap[mappedName];
+        final localNikke = nikkeCodeMap[nameCode];
         final modifiableChar = _getCharWithConsoleLevels(char, localNikke);
         char['level40Cp'] = CpCalculator.calculateCp(modifiableChar, localNikke,
-                targetLevel: 40, assumeCube15: _assumeCube15)
+                targetLevel: 40, assumeCube15: _useLevel15CubeForCalculations)
             .toInt();
       }
       filteredChars.sort((a, b) {
@@ -535,9 +529,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                           Expanded(
                             child: _isGridViewInWideMode
                                 ? _buildNikkeGrid(
-                                    filteredChars, nikkeNameMap, isDark, false)
+                                    filteredChars, nikkeCodeMap, isDark, false)
                                 : _buildNikkeList(
-                                    filteredChars, nikkeNameMap, isDark),
+                                    filteredChars, nikkeCodeMap, isDark),
                           ),
                         ],
                       ),
@@ -551,7 +545,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                         : _buildDetailPanel(
                             filteredChars[_selectedCharIndex.clamp(
                                 0, filteredChars.length - 1)],
-                            nikkeNameMap,
+                            nikkeCodeMap,
                             isDark),
                   ),
                 ],
@@ -566,7 +560,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               _buildSearchAndFilters(isDark, false),
               Expanded(
                 child:
-                    _buildNikkeGrid(filteredChars, nikkeNameMap, isDark, true),
+                    _buildNikkeGrid(filteredChars, nikkeCodeMap, isDark, true),
               ),
             ],
           );
@@ -1227,7 +1221,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   Widget _buildNikkeGrid(
     List<dynamic> filteredChars,
-    Map<String, Nikke> nameMap,
+    Map<int, Nikke> codeMap,
     bool isDark,
     bool isMobile,
   ) {
@@ -1248,9 +1242,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       itemBuilder: (context, index) {
         final char = filteredChars[index];
         final nameCode = char['name_code'] as int? ?? 0;
-        final String mappedName =
-            BlablaMap.characterNames[nameCode] ?? '알 수 없음';
-        final localNikke = nameMap[mappedName];
+        final localNikke = codeMap[nameCode];
+        final mappedName = localNikke?.name ?? '알 수 없음';
 
         final isSelected = !isMobile && _selectedCharIndex == index;
         final grade = char['grade'] as int? ?? 0;
@@ -1277,7 +1270,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         return GestureDetector(
           onTap: () {
             if (isMobile) {
-              _showMobileDetailsSheet(char, nameMap, isDark);
+              _showMobileDetailsSheet(char, codeMap, isDark);
             } else {
               setState(() {
                 _selectedCharIndex = index;
@@ -1476,7 +1469,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   }
 
   void _showMobileDetailsSheet(
-      Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark) {
+      Map<String, dynamic> char, Map<int, Nikke> codeMap, bool isDark) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1491,7 +1484,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           minChildSize: 0.5,
           expand: false,
           builder: (context, scrollController) {
-            return _buildDetailPanel(char, nameMap, isDark,
+            return _buildDetailPanel(char, codeMap, isDark,
                 scrollController: scrollController);
           },
         );
@@ -1501,7 +1494,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   Widget _buildNikkeList(
     List<dynamic> filteredChars,
-    Map<String, Nikke> nameMap,
+    Map<int, Nikke> codeMap,
     bool isDark,
   ) {
     if (filteredChars.isEmpty) {
@@ -1514,9 +1507,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       itemBuilder: (context, index) {
         final char = filteredChars[index];
         final nameCode = char['name_code'] as int? ?? 0;
-        final String mappedName =
-            BlablaMap.characterNames[nameCode] ?? '알 수 없음';
-        final localNikke = nameMap[mappedName];
+        final localNikke = codeMap[nameCode];
+        final mappedName = localNikke?.name ?? '알 수 없음';
 
         final isSelected = _selectedCharIndex == index;
         final grade = char['grade'] as int? ?? 0;
@@ -2106,11 +2098,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   }
 
   Widget _buildDetailPanel(
-      Map<String, dynamic> char, Map<String, Nikke> nameMap, bool isDark,
+      Map<String, dynamic> char, Map<int, Nikke> codeMap, bool isDark,
       {ScrollController? scrollController}) {
     final nameCode = char['name_code'] as int? ?? 0;
-    final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
-    final localNikke = nameMap[mappedName];
+    final localNikke = codeMap[nameCode];
 
     final modifiableChar = _getCharWithConsoleLevels(char, localNikke);
 
@@ -2219,7 +2210,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     arguments: {
                       'nikke': localNikke,
                       'charData': modifiableChar,
-                      'assumeCube15': _assumeCube15,
+                      'assumeCube15': _useLevel15CubeForCalculations,
                     },
                   );
                 },
@@ -2342,7 +2333,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   Widget _buildDetailHeader(
       Map<String, dynamic> char, Nikke? localNikke, bool isDark) {
     final nameCode = char['name_code'] as int? ?? 0;
-    final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
+    final mappedName = localNikke?.name ?? '알 수 없음';
     final grade = char['grade'] as int? ?? 0;
     final core = char['core'] as int? ?? 0;
     final level = char['level'] as int? ?? 1;
@@ -2503,11 +2494,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
     if (CpCalculator.isInitialized) {
       cp40 = CpCalculator.calculateCp(char, localNikke,
-          targetLevel: 40, assumeCube15: _assumeCube15);
+          targetLevel: 40, assumeCube15: _useLevel15CubeForCalculations);
       cp400 = CpCalculator.calculateCp(char, localNikke,
-          targetLevel: 400, assumeCube15: _assumeCube15);
+          targetLevel: 400, assumeCube15: _useLevel15CubeForCalculations);
       stats400 = CpCalculator.calculateTargetStats(char, localNikke,
-          targetLevel: 400, assumeCube15: _assumeCube15);
+          targetLevel: 400, assumeCube15: _useLevel15CubeForCalculations);
     }
 
     final skills = char['skills'] as Map<String, dynamic>? ?? {};
@@ -2541,9 +2532,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         favItem != null && (favItem['tid'] as int? ?? 0) >= 200000;
 
     final cube = char['harmonyCube'] as Map<String, dynamic>?;
-    final int cubeLv = cube != null ? (cube['level'] as int? ?? 0) : 0;
     final String cubeText = _getShortCubeName(cube);
-    final bool showCubeToggle = cubeLv < 15;
 
     final List<Map<String, dynamic>> statItems = [
       {
@@ -2555,7 +2544,6 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         "label": "40Lv 투력 (Pow)",
         "value": formattedPow40,
         "color": Colors.redAccent.shade200,
-        "showToggle": showCubeToggle,
         "showLicenseButton": true,
       },
       {
@@ -2621,32 +2609,6 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (item['showToggle'] == true)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text("15Lv큐브",
-                            style: TextStyle(
-                                fontSize: 10,
-                                color: isDark
-                                    ? Colors.grey.shade400
-                                    : Colors.grey.shade600)),
-                        SizedBox(
-                          height: 20,
-                          child: Transform.scale(
-                            scale: 0.6,
-                            child: Switch(
-                              value: _assumeCube15,
-                              onChanged: (val) {
-                                setState(() {
-                                  _assumeCube15 = val;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                 ],
               ),
               const SizedBox(height: 4),
@@ -2944,7 +2906,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     if (!CpCalculator.isInitialized) return const SizedBox();
 
     final debug = CpCalculator.debugCalculateCp(char, localNikke,
-        targetLevel: 40, assumeCube15: _assumeCube15);
+        targetLevel: 40, assumeCube15: _useLevel15CubeForCalculations);
 
     final Color titleColor = isDark ? Colors.yellowAccent : Colors.deepOrange;
     final Color textColor = isDark ? Colors.white70 : Colors.black87;
@@ -3041,7 +3003,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
     double cp40 = 0;
     if (CpCalculator.isInitialized) {
       cp40 = CpCalculator.calculateCp(char, localNikke,
-          targetLevel: 40, assumeCube15: _assumeCube15);
+          targetLevel: 40, assumeCube15: _useLevel15CubeForCalculations);
     }
 
     final GlobalKey captureKey = GlobalKey();
@@ -3163,8 +3125,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   Widget _buildDriverLicenseCanvas(
       Map<String, dynamic> char, Nikke? localNikke, double cp40) {
-    final nameCode = char['name_code'] as int? ?? 0;
-    final String mappedName = BlablaMap.characterNames[nameCode] ?? '알 수 없음';
+    final mappedName = localNikke?.name ?? '알 수 없음';
     final nickname = _profileData?['nickname'] ?? '지휘관';
     final displayName =
         _showNicknameOnLicense ? "$nickname의 $mappedName" : mappedName;

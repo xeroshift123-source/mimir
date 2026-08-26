@@ -1097,7 +1097,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final nikkeList = context.watch<NikkeProvider>().nikkeList;
+    final nikkeProvider = context.watch<NikkeProvider>();
+    final nikkeList = nikkeProvider.nikkeList;
     _weaknessElement ??= '전격';
 
     // 각 니케가 몇 번 스쿼드에 배치되어 있는지 계산
@@ -1115,15 +1116,15 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
       }
     }
 
-    final Map<String, Map<String, dynamic>> syncedCharsByName = {};
+    final Map<String, Map<String, dynamic>> syncedCharsById = {};
     if (_profileData != null && _profileData!['characters'] != null) {
       final chars = _profileData!['characters'] as List<dynamic>;
       for (final char in chars) {
         if (char is Map<String, dynamic>) {
           final nameCode = char['name_code'] as int? ?? 0;
-          final String mappedName = BlablaMap.characterNames[nameCode] ?? '';
-          if (mappedName.isNotEmpty) {
-            syncedCharsByName[mappedName] = char;
+          final localNikke = nikkeProvider.nikkeByBlablaCode[nameCode];
+          if (localNikke != null) {
+            syncedCharsById[localNikke.id] = char;
           }
         }
       }
@@ -1247,11 +1248,11 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
           if (isMobile) {
             // 📱 모바일 레이아웃
             return _buildMobileLayout(
-                context, nikkeList, assignedSquadMap, syncedCharsByName);
+                context, nikkeList, assignedSquadMap, syncedCharsById);
           } else {
             // 💻 데스크탑 / 태블릿 레이아웃
             return _buildDesktopLayout(
-                context, nikkeList, assignedSquadMap, syncedCharsByName);
+                context, nikkeList, assignedSquadMap, syncedCharsById);
           }
         },
       ),
@@ -1317,7 +1318,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                   candidateSquad: _candidateSquad,
                   onAddCandidate: _addCandidate,
                   onRemoveCandidate: _removeCandidate,
-                  syncedCharsByName: syncedCharacters,
+                  syncedCharsById: syncedCharacters,
                 ),
               ),
             ),
@@ -1358,7 +1359,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     candidateSquad: _candidateSquad,
                     onAddCandidate: _addCandidate,
                     onRemoveCandidate: _removeCandidate,
-                    syncedCharsByName: syncedCharacters,
+                    syncedCharsById: syncedCharacters,
                   ),
                 ),
               ),
@@ -1585,15 +1586,15 @@ class _NikkeListPanelState extends State<NikkeListPanel>
     /// 정렬
     if (widget.syncedCharacters.isNotEmpty) {
       filtered.sort((a, b) {
-        final aOwned = widget.syncedCharacters.containsKey(a.name);
-        final bOwned = widget.syncedCharacters.containsKey(b.name);
+        final aOwned = widget.syncedCharacters.containsKey(a.id);
+        final bOwned = widget.syncedCharacters.containsKey(b.id);
 
         if (aOwned && !bOwned) return -1;
         if (!aOwned && bOwned) return 1;
 
         if (aOwned && bOwned) {
-          final aChar = widget.syncedCharacters[a.name]!;
-          final bChar = widget.syncedCharacters[b.name]!;
+          final aChar = widget.syncedCharacters[a.id]!;
+          final bChar = widget.syncedCharacters[b.id]!;
           final aPower = aChar['combat'] as int? ?? 0;
           final bPower = bChar['combat'] as int? ?? 0;
           final powerDiff = bPower.compareTo(aPower); // Descending
@@ -1760,7 +1761,7 @@ class _NikkeListPanelState extends State<NikkeListPanel>
 
                 final bool isSynced = widget.syncedCharacters.isNotEmpty;
                 final bool isNotOwnedReal = isSynced &&
-                    !widget.syncedCharacters.containsKey(nikke.name) &&
+                    !widget.syncedCharacters.containsKey(nikke.id) &&
                     !nikke.isTemporary;
                 final bool isNotOwned = isNotOwnedReal && !widget.allowUnowned;
 
@@ -1779,7 +1780,7 @@ class _NikkeListPanelState extends State<NikkeListPanel>
                         : widget.squadNames[squadIndex]);
 
                 final Map<String, dynamic>? syncedChar =
-                    widget.syncedCharacters[nikke.name];
+                    widget.syncedCharacters[nikke.id];
 
                 final card = NikkeCard(
                   nikke: nikke,
@@ -1993,7 +1994,7 @@ class SquadPanel extends StatelessWidget {
   final List<Nikke?> candidateSquad;
   final VoidCallback? onAddCandidate;
   final VoidCallback? onRemoveCandidate;
-  final Map<String, Map<String, dynamic>>? syncedCharsByName;
+  final Map<String, Map<String, dynamic>>? syncedCharsById;
 
   const SquadPanel({
     super.key,
@@ -2009,7 +2010,7 @@ class SquadPanel extends StatelessWidget {
     required this.candidateSquad,
     this.onAddCandidate,
     this.onRemoveCandidate,
-    this.syncedCharsByName,
+    this.syncedCharsById,
   });
 
   @override
@@ -2036,7 +2037,7 @@ class SquadPanel extends StatelessWidget {
                   onNameChanged: null, // 후보 덱은 이름 변경 필요 없음
                   onReset: () => onResetSquad?.call(5),
                   onDelete: onRemoveCandidate,
-                  syncedCharsByName: syncedCharsByName,
+                  syncedCharsById: syncedCharsById,
                 ),
               );
             } else {
@@ -2097,7 +2098,7 @@ class SquadPanel extends StatelessWidget {
               onSwapSlots: onSwapSlots,
               onNameChanged: (newName) => onEditName?.call(index, newName),
               onReset: () => onResetSquad?.call(index),
-              syncedCharsByName: syncedCharsByName,
+              syncedCharsById: syncedCharsById,
             ),
           );
         },
@@ -2121,7 +2122,7 @@ class SquadCard extends StatefulWidget {
 
   // ✅ 이름 확정 콜백 (부모가 _squadNames 갱신 + 저장)
   final ValueChanged<String>? onNameChanged;
-  final Map<String, Map<String, dynamic>>? syncedCharsByName;
+  final Map<String, Map<String, dynamic>>? syncedCharsById;
 
   const SquadCard({
     super.key,
@@ -2136,7 +2137,7 @@ class SquadCard extends StatefulWidget {
     this.squadIndex,
     this.onSwapSlots,
     this.onNameChanged,
-    this.syncedCharsByName,
+    this.syncedCharsById,
   });
 
   @override
@@ -2334,8 +2335,8 @@ class _SquadCardState extends State<SquadCard> {
                             displayIndex: colIndex + 1,
                             nikke: nikke,
                             charData: nikke != null &&
-                                    widget.syncedCharsByName != null
-                                ? widget.syncedCharsByName![nikke.name]
+                                    widget.syncedCharsById != null
+                                ? widget.syncedCharsById![nikke.id]
                                 : null,
                             onTap: widget.onSlotTap == null
                                 ? null
@@ -2366,8 +2367,8 @@ class _SquadCardState extends State<SquadCard> {
                               displayIndex: actualIndex + 1,
                               nikke: nikke,
                               charData: nikke != null &&
-                                      widget.syncedCharsByName != null
-                                  ? widget.syncedCharsByName![nikke.name]
+                                      widget.syncedCharsById != null
+                                  ? widget.syncedCharsById![nikke.id]
                                   : null,
                               onTap: widget.onSlotTap == null
                                   ? null

@@ -54,6 +54,26 @@ class NikkeSkillPresetStatistic {
   final double ratio;
 }
 
+class NikkeEquipmentPresetStatistic {
+  const NikkeEquipmentPresetStatistic({
+    required this.preset,
+    required this.count,
+    required this.ratio,
+  });
+
+  factory NikkeEquipmentPresetStatistic.fromJson(Map<String, dynamic> json) {
+    return NikkeEquipmentPresetStatistic(
+      preset: json['preset']?.toString() ?? 'X/X/X/X',
+      count: (json['count'] as num?)?.toInt() ?? 0,
+      ratio: (json['ratio'] as num?)?.toDouble() ?? 0,
+    );
+  }
+
+  final String preset;
+  final int count;
+  final double ratio;
+}
+
 class NikkeStatistics {
   const NikkeStatistics({
     required this.server,
@@ -64,13 +84,17 @@ class NikkeStatistics {
     required this.generatedAt,
     required this.canRefreshStatistics,
     required this.mySkillPreset,
+    required this.myEquipmentPreset,
     required this.overload,
     required this.skillPresets,
+    required this.equipmentPresets,
   });
 
   factory NikkeStatistics.fromJson(Map<String, dynamic> json) {
     final overloadJson = json['overload'] as List<dynamic>? ?? const [];
     final skillJson = json['skillPresets'] as List<dynamic>? ?? const [];
+    final equipmentJson =
+        json['equipmentPresets'] as List<dynamic>? ?? const [];
     return NikkeStatistics(
       server: json['server']?.toString() ?? '알 수 없음',
       sampleCount: (json['sampleCount'] as num?)?.toInt() ?? 0,
@@ -80,6 +104,7 @@ class NikkeStatistics {
       generatedAt: DateTime.tryParse(json['generatedAt']?.toString() ?? ''),
       canRefreshStatistics: json['canRefreshStatistics'] == true,
       mySkillPreset: json['mySkillPreset']?.toString() ?? '-/-/-',
+      myEquipmentPreset: json['myEquipmentPreset']?.toString() ?? 'X/X/X/X',
       overload: overloadJson
           .whereType<Map>()
           .map((item) =>
@@ -88,6 +113,11 @@ class NikkeStatistics {
       skillPresets: skillJson
           .whereType<Map>()
           .map((item) => NikkeSkillPresetStatistic.fromJson(
+              Map<String, dynamic>.from(item)))
+          .toList(),
+      equipmentPresets: equipmentJson
+          .whereType<Map>()
+          .map((item) => NikkeEquipmentPresetStatistic.fromJson(
               Map<String, dynamic>.from(item)))
           .toList(),
     );
@@ -101,6 +131,8 @@ class NikkeStatistics {
   final DateTime? generatedAt;
   final bool canRefreshStatistics;
   final String mySkillPreset;
+  final String myEquipmentPreset;
   final List<NikkeOverloadStatistic> overload;
   final List<NikkeSkillPresetStatistic> skillPresets;
+  final List<NikkeEquipmentPresetStatistic> equipmentPresets;
 }
