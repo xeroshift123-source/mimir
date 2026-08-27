@@ -232,7 +232,7 @@ class RecapCardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = card.accentColor ?? card.textColor.withOpacity(0.75);
-    return ClipRRect(
+    final canvas = ClipRRect(
       borderRadius: BorderRadius.circular(32),
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -387,6 +387,14 @@ class RecapCardView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: SizedBox(
+        width: 720,
+        height: 1080,
+        child: canvas,
       ),
     );
   }

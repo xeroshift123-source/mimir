@@ -125,8 +125,7 @@ void main() {
     expect(cards.first.title, contains('10일'));
   });
 
-  testWidgets('모든 카드가 세로형 캔버스에서 오버플로 없이 표시된다', (tester) async {
-    tester.view.physicalSize = const Size(480, 720);
+  testWidgets('모든 카드가 모바일과 데스크톱에서 같은 비율로 표시된다', (tester) async {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -195,25 +194,31 @@ void main() {
       now: DateTime(2026, 8, 26),
     );
 
-    for (var index = 0; index < cards.length; index++) {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 480,
-              height: 720,
-              child: RecapCardView(
+    for (final size in const [
+      Size(320, 480),
+      Size(480, 720),
+      Size(720, 1080),
+    ]) {
+      tester.view.physicalSize = size;
+      for (var index = 0; index < cards.length; index++) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: RecapCardView(
                 card: cards[index],
                 current: index + 1,
                 total: cards.length,
               ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull,
-          reason: '${cards[index].order}번 카드');
+        );
+        await tester.pumpAndSettle();
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '${size.width.toInt()}px · ${cards[index].order}번 카드',
+        );
+      }
     }
   });
 }
