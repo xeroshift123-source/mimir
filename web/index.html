@@ -104,7 +104,7 @@
   </style>
 </head>
 <script>
-  async function captureElementById(elementId, fileName) {
+  async function renderElementToCanvas(elementId) {
     const el = document.getElementById(elementId);
     if (!el) throw new Error("capture target not found: " + elementId);
 
@@ -139,13 +139,36 @@
       Math.round(rect.height * 2)
     );
 
-    // 다운로드 트리거
+    return out;
+  }
+
+  async function captureElementById(elementId, fileName) {
+    const out = await renderElementToCanvas(elementId);
     const a = document.createElement('a');
     a.href = out.toDataURL('image/png');
-    a.download = fileName || 'deck.png';
+    a.download = fileName || 'mimir_recap.png';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  }
+
+  async function copyElementById(elementId) {
+    if (!navigator.clipboard || typeof ClipboardItem === 'undefined') {
+      throw new Error('이 브라우저는 이미지 클립보드 복사를 지원하지 않습니다.');
+    }
+
+    // Safari는 사용자 입력 권한이 유지되는 동안 clipboard.write가 호출되어야 한다.
+    const pngBlob = renderElementToCanvas(elementId).then((canvas) =>
+      new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('PNG 이미지를 만들지 못했습니다.'));
+        }, 'image/png');
+      })
+    );
+    await navigator.clipboard.write([
+      new ClipboardItem({ 'image/png': pngBlob })
+    ]);
   }
 </script>
 

@@ -149,12 +149,81 @@ class RecapService {
       details: ['속성 칩 ${_number(elementChips)}개'],
     ));
 
+    final superiorCodeByElement = <ElementType, double>{};
+    final superiorCodeByCharacter = <int, double>{};
+    final topCharacterByElement = <ElementType, Map<String, dynamic>>{};
+    for (final char in chars) {
+      final nameCode = _asInt(char['name_code']);
+      final nikke = nikkesByCode[nameCode];
+      if (nameCode == null || nikke == null) continue;
+      final superiorCode = _equipment(char)
+          .expand((equipment) => equipment['overloadOptions'] is List
+              ? equipment['overloadOptions'] as List
+              : const [])
+          .map(_asInt)
+          .whereType<int>()
+          .where((option) => option >= 7000501 && option <= 7000515)
+          .fold<double>(
+            0,
+            (sum, option) => sum + BlablaMap.getOptionPercent(option),
+          );
+      if (superiorCode <= 0) continue;
+      superiorCodeByCharacter[nameCode] = superiorCode;
+      superiorCodeByElement.update(
+        nikke.element,
+        (value) => value + superiorCode,
+        ifAbsent: () => superiorCode,
+      );
+
+      final current = topCharacterByElement[nikke.element];
+      if (current == null) {
+        topCharacterByElement[nikke.element] = char;
+        continue;
+      }
+      final currentCode = _asInt(current['name_code'])!;
+      final currentSuperiorCode = superiorCodeByCharacter[currentCode]!;
+      final combat = _asInt(char['combat']) ?? 0;
+      final currentCombat = _asInt(current['combat']) ?? 0;
+      if (superiorCode > currentSuperiorCode ||
+          (superiorCode == currentSuperiorCode && combat > currentCombat) ||
+          (superiorCode == currentSuperiorCode &&
+              combat == currentCombat &&
+              nameCode < currentCode)) {
+        topCharacterByElement[nikke.element] = char;
+      }
+    }
+    if (superiorCodeByElement.isNotEmpty) {
+      final rankedElements = superiorCodeByElement.entries.toList()
+        ..sort((a, b) {
+          final total = b.value.compareTo(a.value);
+          return total != 0 ? total : a.key.index.compareTo(b.key.index);
+        });
+      final topSuperiorElement = rankedElements.first;
+      final representative = topCharacterByElement[topSuperiorElement.key]!;
+      final representativeNikke =
+          nikkesByCode[_asInt(representative['name_code'])]!;
+      final theme = _elementTheme(topSuperiorElement.key);
+      cards.add(RecapCardData(
+        order: 7,
+        eyebrow: 'SUPERIOR CODE',
+        title:
+            '우월코드 데미지 증가 옵션은\n${_elementName(topSuperiorElement.key)}에서 제일 높았어요!',
+        imageAsset: representativeNikke.imageUrl,
+        colors: theme.colors,
+        textColor: Colors.white,
+        accentColor: theme.accent,
+        details: [
+          '우월코드 데미지 증가 총합 ${topSuperiorElement.value.toStringAsFixed(2)}%',
+        ],
+      ));
+    }
+
     final overloadCount = chars.fold<int>(
       0,
       (sum, c) => sum + _equipment(c).where(_isOverloaded).length,
     );
     cards.add(RecapCardData(
-      order: 7,
+      order: 8,
       eyebrow: 'OVERLOAD',
       title: '${_number(overloadCount)}개의\n오버로드 장비를 만들었어요',
       imageAsset: _asset(nikkesByCode, 'centi'),
@@ -166,7 +235,7 @@ class RecapService {
     final favoriteItemCount =
         chars.where((c) => c['favoriteItem'] != null).length;
     cards.add(RecapCardData(
-      order: 8,
+      order: 9,
       eyebrow: 'PRECIOUS GIFT',
       title: '니케들에게 ${_number(favoriteItemCount)}개의\n인형을 선물했어요',
       imageAsset: _asset(nikkesByCode, 'maxwell'),
@@ -203,7 +272,7 @@ class RecapService {
           ? null
           : nikkesByCode[_asInt(shoeOwner['name_code'])];
       cards.add(RecapCardData(
-        order: 9,
+        order: 10,
         eyebrow: 'MASTERPIECE SHOES',
         title: '+5 강화 명품 신발을\n${_number(masterpieceShoes)}개나 가지고 있어요',
         imageAsset: shoeOwnerNikke?.imageUrl,
@@ -216,7 +285,7 @@ class RecapService {
 
     final costumeCount = _asInt(profile['costumeCount']) ?? 0;
     cards.add(RecapCardData(
-      order: 10,
+      order: 11,
       eyebrow: 'FASHION COLLECTION',
       title: '니케들의 코스튬을\n${_number(costumeCount)}개나 가지고 있어요',
       imageAsset: _asset(nikkesByCode, 'rupee'),
@@ -228,14 +297,80 @@ class RecapService {
     final strongest = _strongest(chars, nikkesByCode);
     if (strongest != null) {
       cards.add(RecapCardData(
-        order: 11,
+        order: 12,
         eyebrow: 'THE STRONGEST NIKKE',
         title: '가장 강력한 니케는…\n${strongest.nikke.name}',
         imageAsset: strongest.nikke.imageUrl,
         colors: _dynamicColors(strongest.nikke.element),
         textColor: Colors.white,
         accentColor: const Color(0xFFFFE17A),
-        details: ['우월 코드 + 공격력 ${strongest.score.toStringAsFixed(2)}%'],
+        details: ['우월코드 + 공격력이 제일 높은 니케'],
+      ));
+    }
+
+    const evangelionIds = {
+      'asuka',
+      'rei(eva)',
+      'asuka_wille',
+      'rei_tentative_name',
+    };
+    final fullLimitEvangelionNikkes = chars.where((char) {
+      final nikke = nikkesByCode[_asInt(char['name_code'])];
+      return nikke != null &&
+          evangelionIds.contains(nikke.id) &&
+          (_asInt(char['grade']) ?? 0) >= 3;
+    }).toList();
+    if (fullLimitEvangelionNikkes.isNotEmpty) {
+      fullLimitEvangelionNikkes.sort((a, b) =>
+          (_asInt(a['name_code']) ?? 0).compareTo(_asInt(b['name_code']) ?? 0));
+      final selected = fullLimitEvangelionNikkes[_stableIndex(
+        '$accountSeed:evangelion-full-limit',
+        fullLimitEvangelionNikkes.length,
+      )];
+      final selectedNikke = nikkesByCode[_asInt(selected['name_code'])]!;
+      final names = fullLimitEvangelionNikkes
+          .map((char) => nikkesByCode[_asInt(char['name_code'])]!.name)
+          .join(', ');
+      cards.add(RecapCardData(
+        order: 13,
+        eyebrow: 'EVANGELION LOVE',
+        title: '에반게리온을\n정말 사랑해요!',
+        imageAsset: selectedNikke.imageUrl,
+        colors: const [
+          Color(0xFF17132A),
+          Color(0xFF472B69),
+          Color(0xFF83A900),
+        ],
+        textColor: Colors.white,
+        accentColor: const Color(0xFFD4FF54),
+        details: ['$names의 풀 돌파 보유'],
+      ));
+    }
+
+    Map<String, dynamic>? crowCharacter;
+    for (final char in chars) {
+      final nikke = nikkesByCode[_asInt(char['name_code'])];
+      if (nikke?.id == 'crow' && (_asInt(char['core']) ?? 0) >= 1) {
+        crowCharacter = char;
+        break;
+      }
+    }
+    if (crowCharacter != null) {
+      final crow = nikkesByCode[_asInt(crowCharacter['name_code'])]!;
+      final crowCore = _asInt(crowCharacter['core'])!;
+      cards.add(RecapCardData(
+        order: 14,
+        eyebrow: 'CROW DEVOTEE',
+        title: '크로우단...\n이셨군요...? 세상에...',
+        imageAsset: crow.imageUrl,
+        colors: const [
+          Color(0xFF151217),
+          Color(0xFF28141B),
+          Color(0xFF8D1B2D),
+        ],
+        textColor: Colors.white,
+        accentColor: const Color(0xFFFF9BA8),
+        details: ['크로우의 코어강화 +$crowCore'],
       ));
     }
 
@@ -244,7 +379,7 @@ class RecapService {
     final firepowerDifference = attacker - defender;
     if (firepowerDifference > 0) {
       cards.add(RecapCardData(
-        order: 12,
+        order: 15,
         eyebrow: 'FIREPOWER!',
         title: '화력을 방어보다\n${_number(firepowerDifference)}만큼 더 사랑해요',
         imageAsset: _asset(nikkesByCode, 'neon_vision_eye'),
@@ -254,6 +389,35 @@ class RecapService {
         details: [
           '화력형 콘솔 레벨 $attacker, 방어형 콘솔 레벨 $defender',
         ],
+      ));
+    }
+
+    final ultimateNikkes = chars.where((char) {
+      return nikkesByCode[_asInt(char['name_code'])] != null &&
+          _isUltimateNikke(char);
+    }).toList();
+    if (ultimateNikkes.isNotEmpty) {
+      final selected = _stablePick(
+        ultimateNikkes,
+        '$accountSeed:ultimate-nikke',
+      )!;
+      final nikke = nikkesByCode[_asInt(selected['name_code'])]!;
+      final title = ultimateNikkes.length == 1
+          ? '최강의 니케 ${nikke.name}${_objectParticle(nikke.name)} 보유 중이에요'
+          : '최강의 니케를\n${_number(ultimateNikkes.length)}명 보유 중이에요';
+      cards.add(RecapCardData(
+        order: 16,
+        eyebrow: 'ULTIMATE NIKKE',
+        title: title,
+        imageAsset: nikke.imageUrl,
+        colors: const [
+          Color(0xFF090B10),
+          Color(0xFF251134),
+          Color(0xFFD6A528),
+        ],
+        textColor: Colors.white,
+        accentColor: const Color(0xFFFFE17A),
+        details: ['완전 강화 조건 달성'],
       ));
     }
 
@@ -269,9 +433,9 @@ class RecapService {
     }).toList();
     if (soulmates.isNotEmpty) {
       cards.add(const RecapCardData(
-        order: 13,
+        order: 17,
         eyebrow: 'ONE LAST STORY',
-        title: '당신의 천생연분 니케는…',
+        title: '왠지 당신에게 어울릴거 같은\n천생연분 니케를 찾아봤어요!',
         colors: [Color(0xFF11162D), Color(0xFF4B237B), Color(0xFF120D22)],
         textColor: Colors.white,
         accentColor: Color(0xFFD8B4FF),
@@ -282,9 +446,9 @@ class RecapService {
           soulmates[_stableIndex('$accountSeed:soulmate', soulmates.length)];
       final nikke = nikkesByCode[_asInt(selected['name_code'])]!;
       cards.add(RecapCardData(
-        order: 14,
+        order: 18,
         eyebrow: 'DESTINED PARTNER',
-        title: nikke.name,
+        title: '당신의 천생연분 니케는...\n${nikke.name}',
         imageAsset: nikke.imageUrl,
         colors: const [Color(0xFF6D1231), Color(0xFF2A101E), Color(0xFFD4A84F)],
         textColor: Colors.white,
@@ -388,6 +552,50 @@ class RecapService {
     return options is List && options.any((value) => (_asInt(value) ?? 0) != 0);
   }
 
+  static bool _isUltimateNikke(Map<String, dynamic> char) {
+    if (_asInt(char['core']) != 7) return false;
+
+    final skills = char['skills'] is Map
+        ? Map<String, dynamic>.from(char['skills'] as Map)
+        : const <String, dynamic>{};
+    if (const ['skill1', 'skill2', 'burst']
+        .any((key) => _asInt(skills[key]) != 10)) {
+      return false;
+    }
+
+    const requiredSlots = {'head', 'torso', 'arm', 'leg'};
+    final equipmentBySlot = <String, Map<String, dynamic>>{};
+    for (final equipment in _equipment(char)) {
+      final slot = equipment['slot']?.toString();
+      if (slot != null && requiredSlots.contains(slot)) {
+        equipmentBySlot[slot] = equipment;
+      }
+    }
+    if (equipmentBySlot.length != requiredSlots.length ||
+        equipmentBySlot.values.any(
+          (equipment) =>
+              !_isOverloaded(equipment) || _asInt(equipment['level']) != 5,
+        )) {
+      return false;
+    }
+
+    final optionLevels = equipmentBySlot.values
+        .expand((equipment) => equipment['overloadOptions'] is List
+            ? equipment['overloadOptions'] as List
+            : const [])
+        .map(_asInt)
+        .whereType<int>()
+        .where((option) => option != 0)
+        .map((option) => option % 100)
+        .where((level) => level >= 1 && level <= 15)
+        .toList();
+    if (optionLevels.length < 11) return false;
+
+    final averageLevel =
+        optionLevels.reduce((sum, level) => sum + level) / optionLevels.length;
+    return averageLevel >= 10;
+  }
+
   static List<Map<String, dynamic>> _equipment(Map<String, dynamic> char) =>
       _maps(char['equipment']);
 
@@ -478,6 +686,16 @@ class RecapService {
   }
 
   static String _number(num value) => NumberFormat('#,###').format(value);
+
+  static String _objectParticle(String word) {
+    final value = word.trim();
+    if (value.isEmpty) return '를';
+    final last = value.runes.last;
+    const firstHangulSyllable = 0xAC00;
+    const lastHangulSyllable = 0xD7A3;
+    if (last < firstHangulSyllable || last > lastHangulSyllable) return '를';
+    return (last - firstHangulSyllable) % 28 == 0 ? '를' : '을';
+  }
 
   static int _stableIndex(String seed, int length) {
     var hash = 0;

@@ -16,3 +16,13 @@ Future<void> captureByElementId({
     [elementId, fileName],
   );
 }
+
+Future<void> copyElementById({required String elementId}) async {
+  if (!kIsWeb) return;
+
+  await js_util.callMethod(
+    js_util.globalThis,
+    'copyElementById',
+    [elementId],
+  );
+}

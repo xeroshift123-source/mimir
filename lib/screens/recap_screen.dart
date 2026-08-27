@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:provider/provider.dart';
 
 import '../models/recap_card.dart';
@@ -11,6 +12,9 @@ import '../providers/nikke_provider.dart';
 import '../services/database_service.dart';
 import '../services/recap_service.dart';
 import '../utils/image_export.dart';
+import '../web/capture_marker.dart';
+import '../web/web_capture_stub.dart'
+    if (dart.library.html) '../web/web_capture.dart' as web_capture;
 
 class RecapScreen extends StatefulWidget {
   const RecapScreen({super.key});
@@ -27,10 +31,15 @@ class _RecapScreenState extends State<RecapScreen> {
 
   bool _started = false;
   bool _saving = false;
+  bool _copying = false;
   int _currentIndex = 0;
   String? _error;
   List<RecapCardData>? _cards;
   List<GlobalKey> _captureKeys = const [];
+  List<String> _captureElementIds = const [];
+  List<String> _captureViewTypes = const [];
+
+  bool get _busy => _saving || _copying;
 
   @override
   void didChangeDependencies() {
@@ -73,9 +82,26 @@ class _RecapScreenState extends State<RecapScreen> {
         accountSeed: openId,
       );
       if (!mounted) return;
+      final captureToken = DateTime.now().microsecondsSinceEpoch;
+      final captureElementIds = List.generate(
+        cards.length,
+        (index) => 'recap-card-$captureToken-$index',
+      );
+      final captureViewTypes = List.generate(
+        cards.length,
+        (index) => 'recap-capture-marker-$captureToken-$index',
+      );
+      for (var index = 0; index < cards.length; index++) {
+        registerCaptureMarkerView(
+          captureViewTypes[index],
+          captureElementIds[index],
+        );
+      }
       setState(() {
         _cards = cards;
         _captureKeys = List.generate(cards.length, (_) => GlobalKey());
+        _captureElementIds = captureElementIds;
+        _captureViewTypes = captureViewTypes;
       });
     } catch (error) {
       if (!mounted) return;
@@ -96,15 +122,23 @@ class _RecapScreenState extends State<RecapScreen> {
   }
 
   Future<void> _saveCurrentCard() async {
-    if (_saving || _cards == null) return;
+    if (_busy || _cards == null) return;
     setState(() => _saving = true);
     try {
-      final bytes = await _captureCurrentCard();
-      if (bytes == null) throw StateError('카드 캡처에 실패했습니다.');
       final cardNumber =
           _cards![_currentIndex].order.toString().padLeft(2, '0');
       final stamp = DateFormat('yyyyMMdd').format(DateTime.now());
-      await exportPng(bytes, 'mimir_recap_${stamp}_$cardNumber.png');
+      final filename = 'mimir_recap_${stamp}_$cardNumber.png';
+      if (kIsWeb) {
+        await web_capture.captureByElementId(
+          elementId: _captureElementIds[_currentIndex],
+          fileName: filename,
+        );
+      } else {
+        final bytes = await _captureCurrentCard();
+        if (bytes == null) throw StateError('카드 캡처에 실패했습니다.');
+        await exportPng(bytes, filename);
+      }
       if (!mounted) return;
       const feedback = kIsWeb
           ? SnackBar(
@@ -128,6 +162,36 @@ class _RecapScreenState extends State<RecapScreen> {
     }
   }
 
+  Future<void> _copyCurrentCard() async {
+    if (_busy || _cards == null) return;
+    setState(() => _copying = true);
+    try {
+      if (kIsWeb) {
+        await web_capture.copyElementById(
+          elementId: _captureElementIds[_currentIndex],
+        );
+      } else {
+        final bytes = await _captureCurrentCard();
+        if (bytes == null) throw StateError('카드 캡처에 실패했습니다.');
+        await Pasteboard.writeImage(bytes);
+      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('리캡 카드를 클립보드에 복사했습니다.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('클립보드 복사에 실패했습니다: $error')),
+      );
+    } finally {
+      if (mounted) setState(() => _copying = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cards = _cards;
@@ -140,18 +204,34 @@ class _RecapScreenState extends State<RecapScreen> {
             style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.1)),
         centerTitle: true,
         actions: [
-          if (cards != null && cards.isNotEmpty)
+          if (cards != null && cards.isNotEmpty) ...[
+            IconButton(
+              tooltip: '현재 카드 클립보드 복사',
+              onPressed: _busy ? null : _copyCurrentCard,
+              icon: _copying
+                  ? const SizedBox.square(
+                      dimension: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.content_copy_rounded),
+            ),
             IconButton(
               tooltip: '현재 카드 저장',
-              onPressed: _saving ? null : _saveCurrentCard,
+              onPressed: _busy ? null : _saveCurrentCard,
               icon: _saving
                   ? const SizedBox.square(
                       dimension: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Icon(Icons.download_rounded),
             ),
+          ],
           const SizedBox(width: 8),
         ],
       ),
@@ -177,13 +257,25 @@ class _RecapScreenState extends State<RecapScreen> {
                                 child: Center(
                                   child: AspectRatio(
                                     aspectRatio: 2 / 3,
-                                    child: RepaintBoundary(
-                                      key: _captureKeys[index],
-                                      child: RecapCardView(
-                                        card: cards[index],
-                                        current: index + 1,
-                                        total: cards.length,
-                                      ),
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        RepaintBoundary(
+                                          key: _captureKeys[index],
+                                          child: RecapCardView(
+                                            card: cards[index],
+                                            current: index + 1,
+                                            total: cards.length,
+                                          ),
+                                        ),
+                                        if (kIsWeb)
+                                          IgnorePointer(
+                                            child: HtmlElementView(
+                                              viewType:
+                                                  _captureViewTypes[index],
+                                            ),
+                                          ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -193,7 +285,6 @@ class _RecapScreenState extends State<RecapScreen> {
                           _RecapNavigation(
                             current: _currentIndex,
                             total: cards.length,
-                            saving: _saving,
                             onPrevious: _currentIndex == 0
                                 ? null
                                 : () => _pageController.previousPage(
@@ -208,7 +299,6 @@ class _RecapScreenState extends State<RecapScreen> {
                                           const Duration(milliseconds: 280),
                                       curve: Curves.easeOutCubic,
                                     ),
-                            onSave: _saveCurrentCard,
                           ),
                         ],
                       ),
@@ -260,11 +350,14 @@ class RecapCardView extends StatelessWidget {
                     end: Alignment.centerRight,
                     colors: [
                       Colors.transparent,
-                      Color(0x66000000),
+                      Color(0x0D000000),
+                      Color(0x40000000),
+                      Color(0x99000000),
+                      Color(0xE6000000),
                       Colors.black,
                       Colors.black,
                     ],
-                    stops: [0, 0.09, 0.24, 1],
+                    stops: [0, 0.05, 0.15, 0.28, 0.40, 0.48, 1],
                   ).createShader(bounds),
                   child: Image.asset(
                     card.imageAsset!,
@@ -317,7 +410,7 @@ class RecapCardView extends StatelessWidget {
                       card.title,
                       style: TextStyle(
                         color: card.textColor,
-                        fontSize: card.order == 14 ? 58 : 42,
+                        fontSize: 42,
                         height: 1.22,
                         letterSpacing: -1.8,
                         fontWeight: FontWeight.w900,
@@ -444,18 +537,14 @@ class _RecapNavigation extends StatelessWidget {
   const _RecapNavigation({
     required this.current,
     required this.total,
-    required this.saving,
     required this.onPrevious,
     required this.onNext,
-    required this.onSave,
   });
 
   final int current;
   final int total;
-  final bool saving;
   final VoidCallback? onPrevious;
   final VoidCallback? onNext;
-  final VoidCallback onSave;
 
   @override
   Widget build(BuildContext context) {
@@ -465,26 +554,24 @@ class _RecapNavigation extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           IconButton.filledTonal(
-              onPressed: onPrevious,
-              icon: const Icon(Icons.chevron_left_rounded)),
-          const SizedBox(width: 12),
-          Flexible(
-            child: Text('${current + 1} / $total',
-                style: const TextStyle(
-                    color: Colors.white70, fontWeight: FontWeight.w800)),
+            tooltip: '이전 카드',
+            onPressed: onPrevious,
+            icon: const Icon(Icons.chevron_left_rounded),
           ),
-          const SizedBox(width: 12),
-          FilledButton.icon(
-            onPressed: saving ? null : onSave,
-            style: FilledButton.styleFrom(
-                backgroundColor: Colors.orange, foregroundColor: Colors.white),
-            icon: const Icon(Icons.download_rounded, size: 19),
-            label: const Text('이 카드 저장',
-                style: TextStyle(fontWeight: FontWeight.w800)),
+          const SizedBox(width: 16),
+          Text(
+            '${current + 1} / $total',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.w800,
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           IconButton.filledTonal(
-              onPressed: onNext, icon: const Icon(Icons.chevron_right_rounded)),
+            tooltip: '다음 카드',
+            onPressed: onNext,
+            icon: const Icon(Icons.chevron_right_rounded),
+          ),
         ],
       ),
     );

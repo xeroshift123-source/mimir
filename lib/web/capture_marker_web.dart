@@ -11,7 +11,8 @@ void registerCaptureMarkerView(String viewType, String elementId) {
       ..id = elementId
       ..style.width = '100%'
       ..style.height = '100%'
-      ..style.backgroundColor = 'transparent';
+      ..style.backgroundColor = 'transparent'
+      ..style.pointerEvents = 'none';
     return div;
   });
 }
