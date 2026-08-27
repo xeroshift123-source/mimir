@@ -1054,8 +1054,10 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   }
 
   void _exportDeckCode() {
-    final List<List<String?>> squadIds = _squads.map((squad) => squad.map((n) => n?.id).toList()).toList();
-    final code = DeckCodeUtils.encodeDeck(type: 'solo', squads: squadIds);
+    final List<List<Object?>> squadCodes = _squads
+        .map((squad) => squad.map((n) => n?.blablaNameCode).toList())
+        .toList();
+    final code = DeckCodeUtils.encodeDeck(type: 'solo', squads: squadCodes);
     if (code.isNotEmpty) {
       Clipboard.setData(ClipboardData(text: code));
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1070,12 +1072,25 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
       final decodedSquads = result.squads;
       final nikkeList = context.read<NikkeProvider>().nikkeList;
       final mapById = {for (final n in nikkeList) n.id: n};
+      final mapByBlablaCode = {
+        for (final n in nikkeList)
+          if (n.blablaNameCode != null) n.blablaNameCode!: n,
+      };
+
+      Nikke? resolveNikke(Object? identifier) {
+        if (identifier is int) return mapByBlablaCode[identifier];
+        if (identifier is String) {
+          // String lookup preserves compatibility with legacy id-based codes.
+          return mapById[identifier] ??
+              mapByBlablaCode[int.tryParse(identifier)];
+        }
+        return null;
+      }
 
       setState(() {
         for (int s = 0; s < 5 && s < decodedSquads.length; s++) {
           for (int i = 0; i < 5; i++) {
-            final id = decodedSquads[s][i];
-            _squads[s][i] = id != null ? mapById[id] : null;
+            _squads[s][i] = resolveNikke(decodedSquads[s][i]);
           }
         }
         _activeSquadIndex = 0; // 첫 번째 스쿼드로 이동

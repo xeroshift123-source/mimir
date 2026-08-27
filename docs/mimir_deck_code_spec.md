@@ -21,8 +21,8 @@
 {
   "type": "solo", 
   "squads": [
-    ["red_hood", "crown", "liter", "naga", "modernia"], 
-    ["dorothy", "blanc", "alice", "noir", "anis"], 
+    [5101, 5065, 5011, 5099, 5044],
+    [5061, 5008, 5004, 5009, 3005],
     [null, null, null, null, null], 
     [null, null, null, null, null], 
     [null, null, null, null, null]  
@@ -35,7 +35,9 @@
 | 필드명 | 타입 | 필수 여부 | 설명 |
 | :--- | :--- | :--- | :--- |
 | `type` | `string` | 필수 | 덱 종류 (항상 `"solo"`) |
-| `squads` | `Array<Array<string\|null>>` | 필수 | 5개 스쿼드 x 5개 슬롯 배열 (총 25개 캐릭터 위치). 미배치 슬롯은 `null` |
+| `squads` | `Array<Array<number\|null>>` | 필수 | `blablaNameCode`로 구성된 5개 스쿼드 x 5개 슬롯 배열. 미배치 슬롯은 `null` |
+
+> 이 규격 변경 이전에 생성된 코드는 `squads`에 문자열 `id`가 들어 있을 수 있습니다. 미미르 앱은 기존 코드도 계속 불러올 수 있습니다.
 
 ---
 
@@ -45,7 +47,7 @@
 /**
  * 미미르 덱 코드를 파싱하여 덱 데이터 객체로 변환합니다.
  * @param {string} code - Base64URL 덱 코드 문자열
- * @returns {{ type: string, squads: Array<Array<string|null>> } | null}
+ * @returns {{ type: string, squads: Array<Array<number|null>> } | null}
  */
 function decodeMimirDeckCode(code) {
   try {
@@ -83,7 +85,7 @@ function decodeMimirDeckCode(code) {
 // ----------------------------------------------------
 // 🧪 테스트 예시
 // ----------------------------------------------------
-const sampleCode = "eyJ0eXBlIjoic29sbyIsInNxdWFkcyI6W1sicmVkX2hvb2QiLCJjcm93biIsImxpdGVyIiwibmFnYSIsIm1vZGVybmlhIl0sW251bGwsbnVsbCxudWxsLG51bGwsbnVsbF0sW251bGwsbnVsbCxudWxsLG51bGwsbnVsbF0sW251bGwsbnVsbCxudWxsLG51bGwsbnVsbF0sW251bGwsbnVsbCxudWxsLG51bGwsbnVsbF1dfQ";
+const sampleCode = "eyJ0eXBlIjoic29sbyIsInNxdWFkcyI6W1s1MTAxLDUwNjUsNTAxMSw1MDk5LDUwNDRdLFtudWxsLG51bGwsbnVsbCxudWxsLG51bGxdLFtudWxsLG51bGwsbnVsbCxudWxsLG51bGxdLFtudWxsLG51bGwsbnVsbCxudWxsLG51bGxdLFtudWxsLG51bGwsbnVsbCxudWxsLG51bGxdXX0";
 
 const deck = decodeMimirDeckCode(sampleCode);
 console.log(deck);
@@ -92,7 +94,7 @@ console.log(deck);
 {
   type: 'solo',
   squads: [
-    ['red_hood', 'crown', 'liter', 'naga', 'modernia'],
+    [5101, 5065, 5011, 5099, 5044],
     [null, null, null, null, null],
     [null, null, null, null, null],
     [null, null, null, null, null],
@@ -104,9 +106,9 @@ console.log(deck);
 
 ---
 
-## 4. 미미르 니케 ID ➔ 캐릭터 이름 매핑표 (196개 니케 전체)
+## 4. 레거시 미미르 니케 ID ➔ 캐릭터 이름 매핑표
 
-`squads` 배열 내부의 `nikke_id` 문자열을 타 사이트의 캐릭터 DB와 매핑할 때 아래 전체 목록을 사용하세요.
+아래 목록은 규격 변경 이전에 발급된 문자열 `id` 기반 코드를 호환하기 위한 레거시 매핑표입니다. 신규 코드의 숫자 값은 `assets/nikkes.json`의 `blablaNameCode`와 매핑하세요.
 
 ```json
 {

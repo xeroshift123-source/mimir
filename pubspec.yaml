@@ -93,6 +93,7 @@ flutter:
     - assets/images/raids/
     - assets/icons/burst/
     - assets/nikke/
+    - assets/nikke_full/
     - assets/nikkes.json
     - assets/data/
   # To add assets to your application, add an assets section, like this:
