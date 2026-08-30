@@ -871,6 +871,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 12),
                       _buildMenuButton(
                         context,
+                        title: "딜량 계산기 DILDORO",
+                        icon: Icons.calculate_outlined,
+                        color: Colors.indigo,
+                        onTap: () async {
+                          final Uri url = Uri.parse('https://dildoro.com');
+                          if (!await launchUrl(url)) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('링크를 열 수 없습니다.'),
+                                    backgroundColor: Colors.orange),
+                              );
+                            }
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _buildMenuButton(
+                        context,
                         title: "전투 정보 동기화",
                         icon: Icons.sync_rounded,
                         color: Colors.blueAccent,

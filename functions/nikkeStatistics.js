@@ -76,43 +76,54 @@ function percentileFromHistogram(histogram, value) {
   return Number((((greater + equal * 0.5) / total) * 100).toFixed(1));
 }
 
-function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } = {}) {
-  const optionBuckets = new Map();
-  const skillCounts = new Map();
-  const equipmentCounts = new Map();
-  let sampleCount = 0;
+function createNikkeStatisticsAccumulator(nameCode, { minimumSample = 20 } = {}) {
+  return {
+    nameCode: Number(nameCode),
+    minimumSample,
+    optionBuckets: new Map(),
+    skillCounts: new Map(),
+    equipmentCounts: new Map(),
+    sampleCount: 0,
+  };
+}
 
-  for (const commander of commanders) {
-    if (!commander) continue;
-    const character = (Array.isArray(commander.characters) ? commander.characters : [])
-      .find(item => Number(item?.name_code) === Number(nameCode));
-    if (!character) continue;
-    sampleCount += 1;
+function addCharacterToStatistics(accumulator, character) {
+  accumulator.sampleCount += 1;
 
-    const skills = character.skills || {};
-    const preset = `${Number(skills.skill1) || 1}/${Number(skills.skill2) || 1}/${Number(skills.burst) || 1}`;
-    skillCounts.set(preset, (skillCounts.get(preset) || 0) + 1);
-    const gearPreset = equipmentPreset(character);
-    equipmentCounts.set(gearPreset, (equipmentCounts.get(gearPreset) || 0) + 1);
+  const skills = character.skills || {};
+  const preset = `${Number(skills.skill1) || 1}/${Number(skills.skill2) || 1}/${Number(skills.burst) || 1}`;
+  accumulator.skillCounts.set(preset, (accumulator.skillCounts.get(preset) || 0) + 1);
+  const gearPreset = equipmentPreset(character);
+  accumulator.equipmentCounts.set(gearPreset, (accumulator.equipmentCounts.get(gearPreset) || 0) + 1);
 
-    for (const option of characterOptionTotals(character).values()) {
-      const bucket = optionBuckets.get(option.key) || {
-        key: option.key,
-        name: option.name,
-        userCount: 0,
-        totalPercent: 0,
-        totalLines: 0,
-        histogram: {},
-      };
-      const roundedTotal = Number(option.totalPercent.toFixed(2));
-      const histogramKey = roundedTotal.toFixed(2);
-      bucket.userCount += 1;
-      bucket.totalPercent += roundedTotal;
-      bucket.totalLines += option.lineCount;
-      bucket.histogram[histogramKey] = (bucket.histogram[histogramKey] || 0) + 1;
-      optionBuckets.set(option.key, bucket);
-    }
+  for (const option of characterOptionTotals(character).values()) {
+    const bucket = accumulator.optionBuckets.get(option.key) || {
+      key: option.key,
+      name: option.name,
+      userCount: 0,
+      totalPercent: 0,
+      totalLines: 0,
+      histogram: {},
+    };
+    const roundedTotal = Number(option.totalPercent.toFixed(2));
+    const histogramKey = roundedTotal.toFixed(2);
+    bucket.userCount += 1;
+    bucket.totalPercent += roundedTotal;
+    bucket.totalLines += option.lineCount;
+    bucket.histogram[histogramKey] = (bucket.histogram[histogramKey] || 0) + 1;
+    accumulator.optionBuckets.set(option.key, bucket);
   }
+}
+
+function finalizeNikkeStatistics(accumulator) {
+  const {
+    nameCode,
+    minimumSample,
+    optionBuckets,
+    skillCounts,
+    equipmentCounts,
+    sampleCount,
+  } = accumulator;
 
   const overload = [...optionBuckets.values()]
     .map(bucket => {
@@ -162,6 +173,19 @@ function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } =
   };
 }
 
+function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } = {}) {
+  const accumulator = createNikkeStatisticsAccumulator(nameCode, { minimumSample });
+
+  for (const commander of commanders) {
+    if (!commander) continue;
+    const character = (Array.isArray(commander.characters) ? commander.characters : [])
+      .find(item => Number(item?.name_code) === Number(nameCode));
+    if (character) addCharacterToStatistics(accumulator, character);
+  }
+
+  return finalizeNikkeStatistics(accumulator);
+}
+
 function attachUserComparison(statistics, character) {
   const mine = characterOptionTotals(character);
   const skills = character?.skills || {};
@@ -185,10 +209,13 @@ function attachUserComparison(statistics, character) {
 }
 
 module.exports = {
+  addCharacterToStatistics,
   aggregateNikkeStatistics,
   attachUserComparison,
   characterOptionTotals,
+  createNikkeStatisticsAccumulator,
   equipmentPreset,
   equipmentTier,
+  finalizeNikkeStatistics,
   percentileFromHistogram,
 };

@@ -1,15 +1,13 @@
 'use strict';
 
 const {
-  aggregateNikkeStatistics,
   attachUserComparison,
 } = require('./nikkeStatistics');
 const {
   STATISTICS_SCHEMA_VERSION,
   FRESHNESS_DAYS,
-  MINIMUM_SAMPLE,
   statisticsCacheKey,
-  loadEligibleLinkedCommanders,
+  aggregateNikkeStatisticsFromStore,
   writeStatisticsSnapshots,
 } = require('./nikkeStatisticsStore');
 
@@ -121,11 +119,7 @@ function createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUi
       } else {
         // 첫 배포 직후나 신규 니케처럼 예약 집계 문서가 아직 없는 경우에만
         // 한 번 즉시 생성한다. 이후 요청은 매일 자정에 만든 문서를 그대로 읽는다.
-        const eligibleCommanders = await loadEligibleLinkedCommanders(db);
-
-        statistics = aggregateNikkeStatistics(eligibleCommanders, nameCode, {
-          minimumSample: MINIMUM_SAMPLE,
-        });
+        statistics = await aggregateNikkeStatisticsFromStore(db, nameCode);
         generatedAtMs = Date.now();
         await writeStatisticsSnapshots({
           db,

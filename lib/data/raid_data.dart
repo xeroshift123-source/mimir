@@ -107,4 +107,17 @@ final List<RaidInfo> raidHistory = [
     weakness: "작열",
     keyword: ["잡몹"],
   ),
+  const RaidInfo(
+    type: RaidType.union,
+    seasonName: "26년 9월",
+    period: "9/4(금)",
+    imagePath: "assets/images/union_raid.webp",
+    unionBosses: [
+      UnionBossInfo(element: "작열", name: "모더니아 (★)", keyword: ["파츠", "코어"]),
+      UnionBossInfo(element: "풍압", name: "애니힐리오", keyword: ["코어", "파츠"]),
+      UnionBossInfo(element: "수냉", name: "툼스톤", keyword: ["코어", "잡몹"]),
+      UnionBossInfo(element: "전격", name: "리빌드 빅 토르소", keyword: ["코어", "파츠"]),
+      UnionBossInfo(element: "철갑", name: "레이턴스", keyword: ["코어", "차지 디버프"]),
+    ],
+  ),
 ];

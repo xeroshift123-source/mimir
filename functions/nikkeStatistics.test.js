@@ -8,7 +8,11 @@ const {
   equipmentPreset,
   percentileFromHistogram,
 } = require('./nikkeStatistics');
-const { buildStatisticsSnapshots, statisticsCacheKey } = require('./nikkeStatisticsStore');
+const {
+  buildStatisticsSnapshots,
+  buildStatisticsSnapshotsFromStore,
+  statisticsCacheKey,
+} = require('./nikkeStatisticsStore');
 
 function commander(server, skills, options) {
   return {
@@ -120,4 +124,57 @@ test('장비 강화 프리셋은 머리/장갑/상의/다리 순서로 유효한
   assert.equal(aggregate.equipmentPresets[0].preset, '5/2/X/X');
   assert.equal(aggregate.equipmentPresets[0].ratio, 100);
   assert.equal(compared.myEquipmentPreset, '5/2/X/X');
+});
+
+test('예약 집계는 지휘관 문서를 작은 페이지로 읽고 필요한 필드만 요청한다', async () => {
+  const nowMs = Date.parse('2026-08-28T00:00:00+09:00');
+  const bindings = Array.from({ length: 30 }, (_, index) => ({
+    id: `open-${String(index).padStart(2, '0')}`,
+    data: () => ({ uid: `uid-${index}` }),
+  }));
+  const commanders = new Map(bindings.map((binding, index) => [
+    binding.id,
+    {
+      lastUpdatedAt: { toMillis: () => nowMs },
+      ...commander('한국', { skill1: 10, skill2: 10, burst: 10 }, index === 0 ? [7000801] : []),
+    },
+  ]));
+  const getAllCalls = [];
+
+  function bindingQuery() {
+    let limit = 25;
+    let cursor = null;
+    return {
+      orderBy() { return this; },
+      limit(value) { limit = value; return this; },
+      select() { return this; },
+      startAfter(doc) { cursor = doc; return this; },
+      async get() {
+        const start = cursor ? bindings.findIndex(binding => binding.id === cursor.id) + 1 : 0;
+        const docs = bindings.slice(start, start + limit);
+        return { docs, empty: docs.length === 0, size: docs.length };
+      },
+    };
+  }
+
+  const db = {
+    collection(name) {
+      if (name === 'open_id_bindings') return bindingQuery();
+      if (name === 'commanders') return { doc: id => ({ id }) };
+      throw new Error(`Unexpected collection: ${name}`);
+    },
+    async getAll(...args) {
+      const options = args.pop();
+      getAllCalls.push({ refs: args, options });
+      return args.map(ref => ({ exists: true, data: () => commanders.get(ref.id) }));
+    },
+  };
+
+  const result = await buildStatisticsSnapshotsFromStore(db, nowMs);
+
+  assert.equal(result.commanderCount, 30);
+  assert.equal(result.snapshots[0].data.sampleCount, 30);
+  assert.equal(getAllCalls.length, 2);
+  assert.deepEqual(getAllCalls.map(call => call.refs.length), [25, 5]);
+  assert.deepEqual(getAllCalls[0].options.fieldMask, ['lastUpdatedAt', 'characters']);
 });

@@ -1,8 +1,7 @@
 'use strict';
 
 const {
-  loadEligibleLinkedCommanders,
-  buildStatisticsSnapshots,
+  buildStatisticsSnapshotsFromStore,
   writeStatisticsSnapshots,
 } = require('./nikkeStatisticsStore');
 
@@ -28,8 +27,10 @@ async function refreshAllNikkeStatistics({ admin, db, source }) {
   });
 
   try {
-    const commanders = await loadEligibleLinkedCommanders(db, startedAt.getTime());
-    const snapshots = buildStatisticsSnapshots(commanders);
+    const { commanderCount, snapshots } = await buildStatisticsSnapshotsFromStore(
+      db,
+      startedAt.getTime(),
+    );
     const documentCount = await writeStatisticsSnapshots({
       db,
       admin,
@@ -40,14 +41,14 @@ async function refreshAllNikkeStatistics({ admin, db, source }) {
     await metaRef.set({
       status: 'success',
       source,
-      commanderCount: commanders.length,
+      commanderCount,
       documentCount,
       lastSuccessfulAt: admin.firestore.FieldValue.serverTimestamp(),
       lastError: admin.firestore.FieldValue.delete(),
     }, { merge: true });
 
-    console.log(`Nikke statistics refresh completed (${source}): ${commanders.length} commanders, ${documentCount} documents.`);
-    return { commanderCount: commanders.length, documentCount, generatedAt: startedAt.toISOString() };
+    console.log(`Nikke statistics refresh completed (${source}): ${commanderCount} commanders, ${documentCount} documents.`);
+    return { commanderCount, documentCount, generatedAt: startedAt.toISOString() };
   } catch (error) {
     console.error(`Nikke statistics refresh failed (${source}):`, error);
     await metaRef.set({
