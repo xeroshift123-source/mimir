@@ -1816,11 +1816,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           style: TextStyle(color: Colors.grey, fontSize: 13));
     }
     final int tid = favItem['tid'] as int? ?? 0;
-    final int level = favItem['level'] as int? ?? 0;
     final bool isFavorite = tid >= 200000;
+    final String displayText = _formatFavoriteItemShort(favItem);
 
     if (isFavorite) {
-      final increasedLevel = level + 1;
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
@@ -1829,7 +1828,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
-          "♥$increasedLevel",
+          displayText,
           style: const TextStyle(
             color: Colors.orange,
             fontSize: 12,
@@ -1845,7 +1844,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
-          "SR$level",
+          displayText,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 12,
