@@ -440,12 +440,14 @@ class _BadgeCircle extends StatelessWidget {
       );
     }
     if (!unlocked && !previewLocked) {
-      image = ColorFiltered(
-        colorFilter: const ColorFilter.mode(
-          Color(0xFF202126),
-          BlendMode.srcATop,
+      image = const DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(-0.2, -0.25),
+            radius: 0.9,
+            colors: [Color(0xFF77787C), Color(0xFF34353A)],
+          ),
         ),
-        child: Opacity(opacity: 0.38, child: image),
       );
     }
 
