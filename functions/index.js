@@ -8,6 +8,10 @@ const { createNikkeStatisticsHandler } = require('./nikkeStatisticsEndpoint');
 const { createDailyNikkeStatisticsHandler } = require('./nikkeStatisticsSchedule');
 const { createNikkeStatisticsRefreshHandler } = require('./nikkeStatisticsRefreshEndpoint');
 const { issueGuestProfileToken, createGuestCommanderProfileHandler } = require('./guestProfileAccess');
+const {
+    createEvaluateAchievementBadgesHandler,
+    createUpdateDisplayedBadgesHandler
+} = require('./achievementBadges');
 
 admin.initializeApp();
 const db = getFirestore('mimirdb');
@@ -581,3 +585,9 @@ exports.getNikkeStatistics = createNikkeStatisticsHandler({ functions, admin, db
 exports.refreshDailyNikkeStatistics = createDailyNikkeStatisticsHandler({ functions, admin, db });
 exports.refreshNikkeStatisticsNow = createNikkeStatisticsRefreshHandler({ functions, admin, db, getAuthenticatedUid });
 exports.getGuestCommanderProfile = createGuestCommanderProfileHandler({ functions, db });
+exports.evaluateAchievementBadges = functions.https.onRequest(
+    createEvaluateAchievementBadgesHandler({ db, getAuthenticatedUid })
+);
+exports.updateDisplayedBadges = functions.https.onRequest(
+    createUpdateDisplayedBadgesHandler({ db, getAuthenticatedUid })
+);

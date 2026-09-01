@@ -7,6 +7,13 @@ import 'package:mimir/services/database_service.dart';
 import 'package:mimir/utils/safe_network_image_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../data/achievement_badges.dart';
+import '../models/achievement_badge.dart';
+import '../models/nikke.dart';
+import '../repository/nikke_repository.dart';
+import '../services/achievement_service.dart';
+import '../widgets/achievement_badge_showcase.dart';
+
 class AccountSettingsScreen extends StatefulWidget {
   static const routeName = '/account';
 
@@ -19,6 +26,7 @@ class AccountSettingsScreen extends StatefulWidget {
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   final TextEditingController _nicknameController = TextEditingController();
   final DatabaseService _database = DatabaseService();
+  final AchievementService _achievements = AchievementService();
 
   bool _initialized = false;
   bool _saving = false;
@@ -28,6 +36,15 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   String? _selectingOpenId;
   String? _selectedOpenId;
   String? _linkError;
+  bool _loadingBadges = true;
+  bool _savingBadges = false;
+  bool _badgesExpanded = false;
+  bool _previewLockedBadges = false;
+  String? _badgeError;
+  Map<String, AchievementBadgeUnlock> _badgeUnlocks = const {};
+  List<String> _displayedBadgeIds = const [];
+  List<String> _savedDisplayedBadgeIds = const [];
+  Map<int, Nikke> _nikkesByCode = const {};
 
   @override
   void didChangeDependencies() {
@@ -38,6 +55,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         context.read<AuthProvider>().nickname?.trim() ?? '';
     _initialized = true;
     _loadLinkedCommanders();
+    _loadBadges();
   }
 
   @override
@@ -73,6 +91,96 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         _loadingLink = false;
         _linkError = '연동 정보를 불러오지 못했습니다.';
       });
+    }
+  }
+
+  Future<void> _loadBadges() async {
+    setState(() {
+      _loadingBadges = true;
+      _badgeError = null;
+    });
+    try {
+      final results = await Future.wait([
+        _achievements.evaluate(),
+        NikkeRepository.loadNikkes(),
+      ]);
+      if (!mounted) return;
+      final state = results[0] as AchievementBadgeState;
+      final nikkes = results[1] as List<Nikke>;
+      setState(() {
+        _badgeUnlocks = state.unlocks;
+        _displayedBadgeIds = state.displayedBadgeIds;
+        _savedDisplayedBadgeIds = List<String>.from(state.displayedBadgeIds);
+        _nikkesByCode = {
+          for (final nikke in nikkes)
+            if (nikke.blablaNameCode != null) nikke.blablaNameCode!: nikke,
+        };
+        _loadingBadges = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loadingBadges = false;
+        _badgeError = '뱃지 정보를 불러오지 못했습니다.';
+      });
+    }
+  }
+
+  List<AchievementBadgeDefinition> get _badgeDefinitions {
+    final dynamicBadges = _badgeUnlocks.values
+        .where((unlock) => unlock.id.startsWith('ultimate_'))
+        .map((unlock) => buildUltimateBadge(unlock, _nikkesByCode))
+        .whereType<AchievementBadgeDefinition>()
+        .toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
+    return [...staticAchievementBadges, ...dynamicBadges];
+  }
+
+  bool get _hasBadgeChanges {
+    if (_displayedBadgeIds.length != _savedDisplayedBadgeIds.length) {
+      return true;
+    }
+    for (var index = 0; index < _displayedBadgeIds.length; index++) {
+      if (_displayedBadgeIds[index] != _savedDisplayedBadgeIds[index]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void _toggleDisplayedBadge(String badgeId) {
+    if (_savingBadges || !_badgeUnlocks.containsKey(badgeId)) return;
+    final next = List<String>.from(_displayedBadgeIds);
+    if (next.contains(badgeId)) {
+      next.remove(badgeId);
+    } else {
+      if (next.length >= 4) {
+        _showMessage('뱃지는 최대 4개까지 전시할 수 있습니다.', isError: true);
+        return;
+      }
+      next.add(badgeId);
+    }
+
+    setState(() => _displayedBadgeIds = next);
+  }
+
+  Future<void> _saveDisplayedBadges() async {
+    if (_savingBadges || !_hasBadgeChanges) return;
+    final requested = List<String>.from(_displayedBadgeIds);
+    setState(() => _savingBadges = true);
+    try {
+      final saved = await _achievements.updateDisplayedBadges(requested);
+      if (!mounted) return;
+      setState(() {
+        _displayedBadgeIds = saved;
+        _savedDisplayedBadgeIds = List<String>.from(saved);
+      });
+      _showMessage('전시 뱃지를 저장했습니다.');
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('전시 뱃지를 저장하지 못했습니다.', isError: true);
+    } finally {
+      if (mounted) setState(() => _savingBadges = false);
     }
   }
 
@@ -197,6 +305,28 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     children: [
                       _ProfileHeader(auth: auth, secondary: secondary),
                       const SizedBox(height: 20),
+                      AchievementBadgeShowcase(
+                        badges: _badgeDefinitions,
+                        unlocks: _badgeUnlocks,
+                        displayedBadgeIds: _displayedBadgeIds,
+                        expanded: _badgesExpanded,
+                        loading: _loadingBadges,
+                        saving: _savingBadges,
+                        hasChanges: _hasBadgeChanges,
+                        previewLockedBadges: _previewLockedBadges,
+                        secondary: secondary,
+                        error: _badgeError,
+                        onToggleExpanded: () => setState(
+                          () => _badgesExpanded = !_badgesExpanded,
+                        ),
+                        onToggleBadge: _toggleDisplayedBadge,
+                        onSave: _saveDisplayedBadges,
+                        onTogglePreview: () => setState(
+                          () => _previewLockedBadges = !_previewLockedBadges,
+                        ),
+                        onRetry: _loadBadges,
+                      ),
+                      const SizedBox(height: 16),
                       _NicknameCard(
                         controller: _nicknameController,
                         secondary: secondary,

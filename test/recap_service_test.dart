@@ -257,12 +257,12 @@ void main() {
     expect(noCoreCards.map((card) => card.order), isNot(contains(14)));
   });
 
-  test('최강 니케는 11줄·평균 10레벨 경계를 적용하고 인원에 맞게 표시한다', () {
+  test('최강 니케는 11줄·평균 11레벨 경계를 적용하고 인원에 맞게 표시한다', () {
     final singleCards = RecapService.build(
       profile: {
         'characters': [
           _ultimateCharacter(1001, optionLevel: 9, optionCount: 12),
-          _ultimateCharacter(1002, optionLevel: 10, optionCount: 11),
+          _ultimateCharacter(1002, optionLevel: 11, optionCount: 11),
         ],
       },
       nikkesByCode: nikkes,
@@ -275,7 +275,7 @@ void main() {
     final multipleCards = RecapService.build(
       profile: {
         'characters': [
-          _ultimateCharacter(1001, optionLevel: 10, optionCount: 11),
+          _ultimateCharacter(1001, optionLevel: 11, optionCount: 11),
           _ultimateCharacter(1002, optionLevel: 15, optionCount: 12),
         ],
       },
@@ -293,7 +293,7 @@ void main() {
     final consonantCards = RecapService.build(
       profile: {
         'characters': [
-          _ultimateCharacter(1003, optionLevel: 10, optionCount: 11),
+          _ultimateCharacter(1003, optionLevel: 11, optionCount: 11),
         ],
       },
       nikkesByCode: {1003: scarlet},

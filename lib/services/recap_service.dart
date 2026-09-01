@@ -593,7 +593,7 @@ class RecapService {
 
     final averageLevel =
         optionLevels.reduce((sum, level) => sum + level) / optionLevels.length;
-    return averageLevel >= 10;
+    return averageLevel >= 11;
   }
 
   static List<Map<String, dynamic>> _equipment(Map<String, dynamic> char) =>
