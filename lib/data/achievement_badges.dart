@@ -94,7 +94,7 @@ AchievementBadgeDefinition? buildUltimateBadge(
   return AchievementBadgeDefinition(
     id: unlock.id,
     name: '최강의 ${nikke.name}',
-    condition: '코어 +7 · 스킬 10/10/10 · 오버로드 11줄 · 옵션 평균 11 이상',
+    condition: '최강의 니케입니다!',
     imagePath: nikke.imageUrl,
     comment: '코멘트가 아직 등록되지 않았습니다.',
   );
