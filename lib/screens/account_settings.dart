@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuthException;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mimir/providers/auth_provider.dart';
@@ -38,6 +39,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   String? _linkError;
   bool _loadingBadges = true;
   bool _savingBadges = false;
+  bool _deletingAccount = false;
   bool _badgesExpanded = false;
   bool _previewLockedBadges = false;
   String? _badgeError;
@@ -268,6 +270,57 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     }
   }
 
+  Future<void> _deleteAccount() async {
+    if (_deletingAccount) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('MIMIR 회원 탈퇴'),
+        content: const Text(
+          'MIMIR 계정과 계정에 저장된 정보가 모두 삭제됩니다. '
+          '연동된 BLABLALINK 계정은 연동 해제되며, 삭제한 정보는 복구할 수 없습니다.\n\n'
+          '정말 탈퇴하시겠습니까?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('탈퇴하기'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _deletingAccount = true);
+    try {
+      await context.read<AuthProvider>().deleteAccount();
+      if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('MIMIR 회원 탈퇴가 완료되었습니다.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) return;
+      if (error.code != 'popup-closed-by-user' &&
+          error.code != 'cancelled-popup-request') {
+        _showMessage('Google 계정 확인에 실패했습니다. 다시 시도해 주세요.', isError: true);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해 주세요.', isError: true);
+    } finally {
+      if (mounted) setState(() => _deletingAccount = false);
+    }
+  }
+
   void _showMessage(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -355,6 +408,11 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         },
                         onRetry: _loadLinkedCommanders,
                       ),
+                      const SizedBox(height: 32),
+                      _DeleteAccountSection(
+                        deleting: _deletingAccount,
+                        onDelete: _deleteAccount,
+                      ),
                     ],
                   ),
                 ),
@@ -367,6 +425,47 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                 child: Text('로그인이 필요한 화면입니다.'),
               ),
             ),
+    );
+  }
+}
+
+class _DeleteAccountSection extends StatelessWidget {
+  const _DeleteAccountSection({
+    required this.deleting,
+    required this.onDelete,
+  });
+
+  final bool deleting;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Divider(color: Theme.of(context).dividerColor.withOpacity(0.35)),
+        const SizedBox(height: 12),
+        TextButton.icon(
+          onPressed: deleting ? null : onDelete,
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.redAccent,
+            minimumSize: const Size.fromHeight(48),
+          ),
+          icon: deleting
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.redAccent,
+                  ),
+                )
+              : const Icon(Icons.person_remove_outlined),
+          label: Text(
+            deleting ? '탈퇴 처리 중...' : 'MIMIR 탈퇴',
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
     );
   }
 }

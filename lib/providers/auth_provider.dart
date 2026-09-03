@@ -71,6 +71,8 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> logout() => _authService.signOut();
 
+  Future<void> deleteAccount() => _authService.deleteAccount();
+
   Future<void> updateNickname(String newNickname) =>
       _authService.updateNickname(newNickname);
 

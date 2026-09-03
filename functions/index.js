@@ -581,6 +581,73 @@ exports.unlinkBlablaAccount = functions.https.onRequest(async (req, res) => {
     }
 });
 
+exports.deleteMimirAccount = functions.https.onRequest(async (req, res) => {
+    const origin = req.headers.origin || '*';
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(204).send('');
+    }
+    if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Method Not Allowed' });
+    }
+
+    let decodedToken;
+    try {
+        const authorization = req.headers.authorization || '';
+        if (!authorization.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+        }
+        decodedToken = await admin.auth().verifyIdToken(authorization.slice(7));
+    } catch (authError) {
+        console.warn('Invalid Firebase ID token:', authError.message);
+        return res.status(401).json({ success: false, error: '로그인 인증이 만료되었습니다. 다시 로그인해 주세요.' });
+    }
+
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    if (!decodedToken.auth_time || nowInSeconds - decodedToken.auth_time > 5 * 60) {
+        return res.status(401).json({ success: false, error: '안전한 탈퇴를 위해 Google 계정으로 다시 인증해 주세요.' });
+    }
+
+    const uid = decodedToken.uid;
+    try {
+        await db.runTransaction(async transaction => {
+            const userRef = db.collection('users').doc(uid);
+            const userSnapshot = await transaction.get(userRef);
+            const userData = userSnapshot.data() || {};
+            const linkedOpenIds = Array.isArray(userData.linkedOpenIds)
+                ? userData.linkedOpenIds.filter(value => typeof value === 'string' && value.trim())
+                : [];
+            if (userData.openId && !linkedOpenIds.includes(userData.openId)) {
+                linkedOpenIds.push(userData.openId);
+            }
+
+            const bindingRefs = linkedOpenIds.map(openId =>
+                db.collection('open_id_bindings').doc(openId)
+            );
+            const bindingSnapshots = bindingRefs.length > 0
+                ? await transaction.getAll(...bindingRefs)
+                : [];
+
+            for (const bindingSnapshot of bindingSnapshots) {
+                if (bindingSnapshot.exists && bindingSnapshot.data()?.uid === uid) {
+                    transaction.delete(bindingSnapshot.ref);
+                }
+            }
+            if (userSnapshot.exists) transaction.delete(userRef);
+        });
+
+        await admin.auth().deleteUser(uid);
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Delete MIMIR account failed:', error);
+        return res.status(500).json({ success: false, error: '회원 탈퇴 중 서버 오류가 발생했습니다.' });
+    }
+});
+
 exports.getNikkeStatistics = createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUid });
 exports.refreshDailyNikkeStatistics = createDailyNikkeStatisticsHandler({ functions, admin, db });
 exports.refreshNikkeStatisticsNow = createNikkeStatisticsRefreshHandler({ functions, admin, db, getAuthenticatedUid });

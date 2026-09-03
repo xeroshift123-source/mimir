@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../firebase_options.dart';
 
@@ -95,6 +98,54 @@ class AuthService {
     await initialize();
     await _auth!.signOut();
     _clearProfileSyncCache();
+  }
+
+  Future<void> deleteAccount() async {
+    await initialize();
+    final user = _auth!.currentUser;
+    if (user == null) {
+      throw StateError('로그인된 사용자가 없습니다.');
+    }
+
+    final provider = GoogleAuthProvider()
+      ..addScope('email')
+      ..setCustomParameters({'prompt': 'select_account'});
+    await user.reauthenticateWithPopup(provider);
+
+    final idToken = await user.getIdToken(true);
+    if (idToken == null || idToken.isEmpty) {
+      throw StateError('로그인 인증 토큰을 발급할 수 없습니다.');
+    }
+
+    final response = await http.post(
+      Uri.parse(
+        'https://us-central1-nikke-mimir.cloudfunctions.net/deleteMimirAccount',
+      ),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: jsonEncode(const <String, dynamic>{}),
+    );
+    final decoded = jsonDecode(response.body);
+    if (decoded is! Map) {
+      throw StateError('서버 응답 형식이 올바르지 않습니다.');
+    }
+    final result = Map<String, dynamic>.from(decoded);
+    if (response.statusCode != 200 || result['success'] != true) {
+      throw StateError(result['error']?.toString() ?? '회원 탈퇴에 실패했습니다.');
+    }
+
+    await _auth!.signOut();
+    final prefs = await SharedPreferences.getInstance();
+    await Future.wait([
+      prefs.remove('last_synced_openid'),
+      prefs.remove('guest_profile_access_token'),
+      prefs.remove('saved_sync_url'),
+      prefs.remove('auth_bound_openid'),
+    ]);
+    _clearProfileSyncCache();
+    _updateUser(null);
   }
 
   Future<void> updateNickname(String newDisplayName) async {

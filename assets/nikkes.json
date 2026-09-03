@@ -3542,7 +3542,7 @@
     "squadNum": 0,
     "rank": "SSR",
     "type": "ATK",
-    "isTemporary": true,
+    "isTemporary": false,
     "blablaNameCode": 5179
   },
   {
@@ -3564,7 +3564,25 @@
     "squadNum": 0,
     "rank": "SSR",
     "type": "ATK",
-    "isTemporary": true,
+    "isTemporary": false,
     "blablaNameCode": 5180
+  },
+  {
+    "id": "drake_great_villain",
+    "name": "드레이크 : 그레이트 빌런",
+    "imageUrl": "assets/nikke/drake_great_villain.webp",
+    "burst": "3",
+    "element": "Wind",
+    "weaponType": "SG",
+    "company": "Missilis",
+    "ability": [
+      "최대체력증가"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "DEF",
+    "isTemporary": true,
+    "blablaNameCode": 5181
   }
 ]

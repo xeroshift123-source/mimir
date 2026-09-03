@@ -21,7 +21,7 @@ const List<AchievementBadgeDefinition> staticAchievementBadges = [
   ),
   AchievementBadgeDefinition(
     id: 'shoes_20',
-    name: 'Nikkes on her feet',
+    name: 'Nikkes, On her feet',
     condition: '+5 오버로드 신발 20개 이상 보유',
     imagePath: 'assets/images/badge/SHOES.png',
     comment: 'Make my love complete.',
