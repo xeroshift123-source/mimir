@@ -17,10 +17,9 @@ import 'package:mimir/models/nikke.dart';
 import 'package:mimir/models/shared_deck.dart';
 import 'package:mimir/providers/nikke_provider.dart';
 import 'package:mimir/providers/auth_provider.dart';
-import 'package:mimir/repository/mock_deck_repository.dart';
-import 'package:mimir/repository/local_file_saver.dart';
 import 'package:mimir/screens/login.dart';
 import 'package:mimir/screens/deck_library.dart';
+import 'package:mimir/screens/deck_publish.dart';
 import 'package:mimir/widgets/nikke_card.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/auth_account_button.dart';
@@ -90,6 +89,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
   bool _isSpecificRaid = false;
   List<String> _currentRaidKeywords = [];
+  RaidInfo? _soloRaid;
 
   @override
   void initState() {
@@ -134,6 +134,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
       _weaknessElement = routeArgs;
     } else if (routeArgs is RaidInfo) {
       _isSpecificRaid = true;
+      _soloRaid = routeArgs;
       _weaknessElement = routeArgs.weakness ?? '전격';
       if (routeArgs.keyword != null) {
         _currentRaidKeywords = routeArgs.keyword!;
@@ -148,6 +149,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
         if (raidInfo.weakness != null) {
           _weaknessElement = raidInfo.weakness;
         }
+        _soloRaid = raidInfo;
       } catch (_) {}
     }
 
@@ -333,247 +335,74 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     }
   }
 
-  Future<void> _publishDeckToLibrary() async {
-    final authProvider = context.read<AuthProvider>();
-    if (!authProvider.isLoggedIn) {
-      // Show login suggestion dialog
-      showDialog(
+  Future<void> _openDeckPublishScreen() async {
+    final auth = context.read<AuthProvider>();
+    if (!auth.isLoggedIn) {
+      await showDialog<void>(
         context: context,
-        builder: (context) {
-          final isDark = Theme.of(context).brightness == Brightness.dark;
-          return AlertDialog(
-            backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Row(
-              children: [
-                Icon(Icons.info_outline, color: Colors.orange),
-                SizedBox(width: 8),
-                Text("로그인 필요", style: TextStyle(fontWeight: FontWeight.bold)),
-              ],
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('로그인 필요'),
+          content: const Text('공유 덱을 게시하려면 Google 로그인이 필요합니다.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('취소'),
             ),
-            content: const Text(
-              "구성하신 5개 스쿼드 덱을 공유 라이브러리에 게시하려면 로그인이 필요합니다. 지금 소셜 로그인 화면으로 이동하시겠습니까?",
-              style: TextStyle(height: 1.5),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                Navigator.pushNamed(context, LoginScreen.routeName);
+              },
+              child: const Text('로그인'),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("취소", style: TextStyle(color: Colors.grey)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Pop AlertDialog
-                  Navigator.pushNamed(context, LoginScreen.routeName);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                ),
-                child: const Text("로그인하러 가기"),
-              ),
-            ],
-          );
-        },
+          ],
+        ),
       );
       return;
     }
 
-    // User is logged in, show elegant Publish Form Dialog
-    final titleController = TextEditingController(
-        text: "${authProvider.nickname}의 시즌 37 솔로레이드 공략 덱");
-    final descController = TextEditingController();
+    final raid = _soloRaid ??
+        raidHistory.lastWhere((item) => item.type == RaidType.solo);
+    final weakness = _weaknessElement ?? raid.weakness ?? '전격';
+    final raidKeywords = _isSpecificRaid ? _currentRaidKeywords : <String>[];
+    final squadIds = _squads
+        .map((squad) => squad.map((nikke) => nikke?.id).toList())
+        .toList();
+    final previews = List<Widget>.generate(
+      _squads.length,
+      (index) => _ShareSquadPanel(
+        title: _squadNames[index],
+        isActive: false,
+        surfaceMode: true,
+        slots: _squads[index],
+        weaknessElement: weakness,
+        raidKeywords: raidKeywords,
+      ),
+    );
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18)),
-              title: Row(
-                children: [
-                  const Icon(Icons.cloud_upload, color: Colors.orange),
-                  const SizedBox(width: 8),
-                  const Text("공유 라이브러리에 덱 등록",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const Spacer(),
-                  Text(
-                    "작성자: ${authProvider.nickname}",
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
-                  ),
-                ],
-              ),
-              content: SingleChildScrollView(
-                primary: false,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 450),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Text(
-                        "현재 구성하신 5개 스쿼드(총 25인)를 공유 덱 라이브러리에 실시간으로 업로드합니다. 보스 공략을 위한 상세한 설명을 함께 작성해 보세요!",
-                        style: TextStyle(
-                            fontSize: 12, color: Colors.grey, height: 1.5),
-                      ),
-                      const SizedBox(height: 18),
-
-                      // Title textfield
-                      const Text("덱 제목",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              color: Colors.orange)),
-                      const SizedBox(height: 6),
-                      TextField(
-                        controller: titleController,
-                        style: const TextStyle(fontSize: 14),
-                        decoration: InputDecoration(
-                          hintText: "지휘관님만의 덱 제목을 입력해 주세요",
-                          isDense: true,
-                          filled: true,
-                          fillColor: isDark
-                              ? const Color(0xFF14151B)
-                              : Colors.grey.shade50,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          focusedBorder: const OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.orange, width: 1.5),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Description textfield
-                      const Text("상세 설명 및 공략 팁",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              color: Colors.orange)),
-                      const SizedBox(height: 6),
-                      TextField(
-                        controller: descController,
-                        maxLines: 4,
-                        style: const TextStyle(fontSize: 13),
-                        decoration: InputDecoration(
-                          hintText:
-                              "크라운/클루드 등 핵심 메인 딜러 연동과 5개 스쿼드 배치 팁을 꼼꼼히 채워주시면 다른 지휘관님들께 큰 도움이 됩니다!",
-                          isDense: true,
-                          filled: true,
-                          fillColor: isDark
-                              ? const Color(0xFF14151B)
-                              : Colors.grey.shade50,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          focusedBorder: const OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.orange, width: 1.5),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("취소", style: TextStyle(color: Colors.grey)),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    final title = titleController.text.trim();
-                    if (title.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("덱 제목을 입력해 주세요.")),
-                      );
-                      return;
-                    }
-
-                    // Extract squad ids
-                    final List<List<String?>> squadIds = _squads
-                        .map((squad) => squad.map((n) => n?.id).toList())
-                        .toList();
-
-                    final newDeck = SharedDeck(
-                      id: "shared_${DateTime.now().millisecondsSinceEpoch}",
-                      authorName: authProvider.nickname!,
-                      title: title,
-                      description: descController.text.trim(),
-                      season: "SEASON 37",
-                      squadsNikkeIds: squadIds,
-                      upvotes: 0,
-                      downvotes: 0,
-                      createdAt: DateTime.now(),
-                    );
-
-                    // Add to repository
-                    MockDeckRepository.addDeck(newDeck);
-
-                    // If running on Web, automatically copy generated code to clipboard
-                    if (kIsWeb) {
-                      final code = generateDeckCode(newDeck);
-                      Clipboard.setData(ClipboardData(text: code));
-                      debugPrint("\n====================================");
-                      debugPrint(
-                          "Generated Deck Code for mock_deck_repository.dart:");
-                      debugPrint(code);
-                      debugPrint("====================================\n");
-                    }
-
-                    // Pop AlertDialog
-                    Navigator.pop(context);
-
-                    // Pop Preview Dialog as well!
-                    Navigator.pop(context);
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Row(
-                          children: [
-                            Icon(Icons.check_circle, color: Colors.white),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Text(kIsWeb
-                                  ? "공유 완료! 웹 환경이므로 덱 소스 코드(Dart)가 클립보드에 복사되었습니다. mock_deck_repository.dart의 _decks 배열 안에 붙여넣어 주세요!"
-                                  : "공유 라이브러리에 덱을 성공적으로 등록했습니다!"),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: Colors.green.shade700,
-                        duration: const Duration(seconds: kIsWeb ? 8 : 4),
-                        behavior: SnackBarBehavior.floating,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                    );
-
-                    // Redirect to Deck Library
-                    Navigator.pushNamed(context, DeckLibraryScreen.routeName);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text("등록하기"),
-                ),
-              ],
-            );
-          },
-        );
-      },
+    Navigator.of(context).pop();
+    final published = await Navigator.of(context).push<SharedDeck>(
+      MaterialPageRoute(
+        builder: (_) => DeckPublishScreen(
+          squadPreviews: previews,
+          squadsNikkeIds: squadIds,
+          squadNames: List<String>.from(_squadNames),
+          squadWeaknessElements: List<String>.filled(_squads.length, weakness),
+          season: raid.seasonName,
+          raidType: 'solo',
+          bossName: raid.bossName,
+          weaknessElement: weakness,
+        ),
+      ),
+    );
+    if (!mounted || published == null) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('공유 덱을 게시했습니다.')),
+    );
+    await Navigator.pushNamed(
+      context,
+      DeckLibraryScreen.routeName,
+      arguments: published,
     );
   }
 
@@ -604,7 +433,8 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   Widget _buildFiveSquadsShareCanvas(String weaknessElement) {
     const double w = 600;
 
-    final List<String> raidKeywordsToPass = _isSpecificRaid ? _currentRaidKeywords : [];
+    final List<String> raidKeywordsToPass =
+        _isSpecificRaid ? _currentRaidKeywords : [];
 
     return Container(
       width: w,
@@ -778,7 +608,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              onPressed: _publishDeckToLibrary,
+                              onPressed: _openDeckPublishScreen,
                             ),
                           ],
                         ],
@@ -978,12 +808,14 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF1E1F26) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Row(
             children: [
               Icon(Icons.qr_code_2, color: Colors.orange),
               SizedBox(width: 8),
-              Text("덱 코드 관리", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text("덱 코드 관리",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
           content: ConstrainedBox(
@@ -993,55 +825,64 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ElevatedButton.icon(
-                icon: const Icon(Icons.copy, color: Colors.white, size: 18),
-                label: const Text("현재 덱 코드 복사하기", style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _exportDeckCode();
-                },
-              ),
-              const SizedBox(height: 24),
-              const Text("덱 코드 불러오기", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.orange)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: importController,
-                decoration: InputDecoration(
-                  hintText: "여기에 덱 코드를 붙여넣으세요",
-                  isDense: true,
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                  icon: const Icon(Icons.copy, color: Colors.white, size: 18),
+                  label: const Text("현재 덱 코드 복사하기",
+                      style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () {
-                  final code = importController.text.trim();
-                  if (code.isNotEmpty) {
+                  onPressed: () {
                     Navigator.pop(context);
-                    _importDeckCode(code);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green.shade600,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    _exportDeckCode();
+                  },
                 ),
-                child: const Text("불러오기 적용"),
-              ),
-            ],
+                const SizedBox(height: 24),
+                const Text("덱 코드 불러오기",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Colors.orange)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: importController,
+                  decoration: InputDecoration(
+                    hintText: "여기에 덱 코드를 붙여넣으세요",
+                    isDense: true,
+                    filled: true,
+                    fillColor:
+                        isDark ? const Color(0xFF14151B) : Colors.grey.shade50,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.orange, width: 1.5),
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    final code = importController.text.trim();
+                    if (code.isNotEmpty) {
+                      Navigator.pop(context);
+                      _importDeckCode(code);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade600,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text("불러오기 적용"),
+                ),
+              ],
+            ),
           ),
-        ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -1167,77 +1008,77 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                     : Colors.white,
               ),
               child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _weaknessElement ?? '전격',
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _weaknessElement = newValue;
-                    });
-                    _saveDeckToLocal();
-                  }
-                },
-                selectedItemBuilder: (BuildContext context) {
-                  return <String>['전격', '철갑', '작열', '수냉', '풍압']
-                      .map<Widget>((String value) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          _elementIconMap[value] ??
-                              'assets/icons/elements/icon-elements-Electric.webp',
-                          width: 18,
-                          height: 18,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          value,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
+                child: DropdownButton<String>(
+                  value: _weaknessElement ?? '전격',
+                  icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _weaknessElement = newValue;
+                      });
+                      _saveDeckToLocal();
+                    }
+                  },
+                  selectedItemBuilder: (BuildContext context) {
+                    return <String>['전격', '철갑', '작열', '수냉', '풍압']
+                        .map<Widget>((String value) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            _elementIconMap[value] ??
+                                'assets/icons/elements/icon-elements-Electric.webp',
+                            width: 18,
+                            height: 18,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 6),
+                          Text(
+                            value,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList();
+                  },
+                  items: <String>['전격', '철갑', '작열', '수냉', '풍압']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            _elementIconMap[value] ??
+                                'assets/icons/elements/icon-elements-Electric.webp',
+                            width: 18,
+                            height: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            value,
+                            style: TextStyle(
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
                     );
-                  }).toList();
-                },
-                items: <String>['전격', '철갑', '작열', '수냉', '풍압']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          _elementIconMap[value] ??
-                              'assets/icons/elements/icon-elements-Electric.webp',
-                          width: 18,
-                          height: 18,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          value,
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black87,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                  }).toList(),
+                ),
               ),
             ),
-          ),
           const SizedBox(width: 8),
           IconButton(
             tooltip: '덱 코드 관리',
@@ -2349,10 +2190,10 @@ class _SquadCardState extends State<SquadCard> {
                             slotIndex: colIndex,
                             displayIndex: colIndex + 1,
                             nikke: nikke,
-                            charData: nikke != null &&
-                                    widget.syncedCharsById != null
-                                ? widget.syncedCharsById![nikke.id]
-                                : null,
+                            charData:
+                                nikke != null && widget.syncedCharsById != null
+                                    ? widget.syncedCharsById![nikke.id]
+                                    : null,
                             onTap: widget.onSlotTap == null
                                 ? null
                                 : () => widget.onSlotTap!(colIndex),
@@ -2568,6 +2409,7 @@ class _ShareSquadPanel extends StatelessWidget {
   final String weaknessElement;
   final bool isCandidate;
   final List<String> raidKeywords;
+  final bool surfaceMode;
 
   const _ShareSquadPanel({
     required this.title,
@@ -2576,6 +2418,7 @@ class _ShareSquadPanel extends StatelessWidget {
     required this.weaknessElement,
     this.isCandidate = false,
     this.raidKeywords = const [],
+    this.surfaceMode = false,
   });
 
   Widget _buildBadge({
@@ -2585,11 +2428,16 @@ class _ShareSquadPanel extends StatelessWidget {
     required Color textColor,
   }) {
     if (isActive) {
+      final effectiveTextColor =
+          surfaceMode ? Color.lerp(themeColor, Colors.black, 0.28)! : textColor;
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 2.5),
         decoration: BoxDecoration(
-          color: themeColor.withOpacity(0.12),
-          border: Border.all(color: themeColor.withOpacity(0.8), width: 1.2),
+          color: themeColor.withOpacity(surfaceMode ? 0.16 : 0.12),
+          border: Border.all(
+            color: themeColor.withOpacity(surfaceMode ? 0.65 : 0.8),
+            width: 1.2,
+          ),
           borderRadius: BorderRadius.circular(6),
         ),
         alignment: Alignment.center,
@@ -2598,16 +2446,19 @@ class _ShareSquadPanel extends StatelessWidget {
           style: TextStyle(
             fontSize: 9,
             fontWeight: FontWeight.bold,
-            color: textColor,
+            color: effectiveTextColor,
           ),
         ),
       );
     } else {
+      final inactiveColor =
+          surfaceMode ? const Color(0xFF8A8A8A) : Colors.white;
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 2.5),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.01),
-          border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.2),
+          color: inactiveColor.withOpacity(0.01),
+          border:
+              Border.all(color: inactiveColor.withOpacity(0.16), width: 1.2),
           borderRadius: BorderRadius.circular(6),
         ),
         alignment: Alignment.center,
@@ -2616,7 +2467,7 @@ class _ShareSquadPanel extends StatelessWidget {
           style: TextStyle(
             fontSize: 9,
             fontWeight: FontWeight.bold,
-            color: Colors.white.withOpacity(0.2),
+            color: inactiveColor.withOpacity(0.7),
           ),
         ),
       );
@@ -2644,15 +2495,16 @@ class _ShareSquadPanel extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
         decoration: BoxDecoration(
-          color: const Color(0xFF11141B), // Matches panel background
+          color:
+              surfaceMode ? const Color(0xFFFFFBFF) : const Color(0xFF11141B),
           borderRadius: BorderRadius.circular(4.8),
         ),
         child: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 9,
             fontWeight: FontWeight.bold,
-            color: Colors.white, // Changed to white as requested
+            color: surfaceMode ? const Color(0xFF6F2A8E) : Colors.white,
           ),
         ),
       ),
@@ -2661,19 +2513,25 @@ class _ShareSquadPanel extends StatelessWidget {
 
   Widget _buildDynamicBadge(String text) {
     const goldColor = Color(0xFFFFA000);
+    final backgroundColor =
+        surfaceMode ? const Color(0xFFFFF3D6) : goldColor.withOpacity(0.12);
+    final borderColor =
+        surfaceMode ? const Color(0xFFE59A00) : goldColor.withOpacity(0.8);
+    final textColor =
+        surfaceMode ? const Color(0xFF9A5700) : const Color(0xFFFFC107);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
       decoration: BoxDecoration(
-        color: goldColor.withOpacity(0.12),
-        border: Border.all(color: goldColor.withOpacity(0.8), width: 1.2),
+        color: backgroundColor,
+        border: Border.all(color: borderColor, width: 1.2),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 9,
           fontWeight: FontWeight.bold,
-          color: Color(0xFFFFC107),
+          color: textColor,
         ),
       ),
     );
@@ -2682,6 +2540,12 @@ class _ShareSquadPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeNikkes = slots.whereType<Nikke>().toList();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final foregroundColor =
+        surfaceMode && !isDark ? const Color(0xFF2D2D2D) : Colors.white;
+    final outlineColor = surfaceMode
+        ? (isDark ? Colors.white24 : Colors.black12)
+        : const Color(0xFF1E2330);
 
     // 1. 고정 키워드 로직
     final Map<String, ElementType> elementKoreanToEnum = {
@@ -2705,77 +2569,100 @@ class _ShareSquadPanel extends StatelessWidget {
     final List<String> dynamicTags = [];
 
     // 코어
-    if (raidKeywords.contains("코어") && activeNikkes.any((n) => n.ability.contains("코어데미지증가"))) {
+    if (raidKeywords.contains("코어") &&
+        activeNikkes.any((n) => n.ability.contains("코어데미지증가"))) {
       specialTags.add("코어");
     }
 
     // 파츠
-    if (raidKeywords.contains("파츠") && activeNikkes.any((n) => n.ability.contains("파츠"))) {
+    if (raidKeywords.contains("파츠") &&
+        activeNikkes.any((n) => n.ability.contains("파츠"))) {
       specialTags.add("파츠");
-    } else if (activeNikkes.where((n) => n.ability.contains("파츠")).length >= 2) {
+    } else if (activeNikkes.where((n) => n.ability.contains("파츠")).length >=
+        2) {
       dynamicTags.add("파츠");
     }
 
     // 힐
-    if (raidKeywords.contains("힐") && activeNikkes.any((n) => n.ability.contains("힐"))) {
+    if (raidKeywords.contains("힐") &&
+        activeNikkes.any((n) => n.ability.contains("힐"))) {
       specialTags.add("힐");
     } else if (activeNikkes.any((n) => n.ability.contains("힐"))) {
       dynamicTags.add("힐");
     }
 
     // 샷건
-    if (raidKeywords.contains("샷건") && activeNikkes.any((n) => n.name == "토브")) {
+    if (raidKeywords.contains("샷건") &&
+        activeNikkes.any((n) => n.name == "토브")) {
       specialTags.add("샷건");
     } else if (activeNikkes.any((n) => n.name == "토브")) {
       dynamicTags.add("샷건");
     }
 
     // 방무뎀
-    if ((raidKeywords.contains("방어력무시데미지") || raidKeywords.contains("방무뎀")) && activeNikkes.any((n) => n.ability.contains("방어력무시데미지"))) {
+    if ((raidKeywords.contains("방어력무시데미지") || raidKeywords.contains("방무뎀")) &&
+        activeNikkes.any((n) => n.ability.contains("방어력무시데미지"))) {
       specialTags.add("방무뎀");
-    } else if (activeNikkes.where((n) => n.ability.contains("방어력무시데미지")).length >= 2) {
+    } else if (activeNikkes
+            .where((n) => n.ability.contains("방어력무시데미지"))
+            .length >=
+        2) {
       dynamicTags.add("방무뎀");
     }
 
     // 관통뎀
-    if ((raidKeywords.contains("관통데미지") || raidKeywords.contains("관통뎀")) && activeNikkes.any((n) => n.ability.contains("관통데미지"))) {
+    if ((raidKeywords.contains("관통데미지") || raidKeywords.contains("관통뎀")) &&
+        activeNikkes.any((n) => n.ability.contains("관통데미지"))) {
       specialTags.add("관통뎀");
-    } else if (activeNikkes.where((n) => n.ability.contains("관통데미지")).length >= 2) {
+    } else if (activeNikkes.where((n) => n.ability.contains("관통데미지")).length >=
+        2) {
       dynamicTags.add("관통뎀");
     }
 
     // 지속딜
-    if ((raidKeywords.contains("지속데미지") || raidKeywords.contains("지속딜")) && activeNikkes.any((n) => n.ability.contains("지속데미지"))) {
+    if ((raidKeywords.contains("지속데미지") || raidKeywords.contains("지속딜")) &&
+        activeNikkes.any((n) => n.ability.contains("지속데미지"))) {
       specialTags.add("지속딜");
-    } else if (activeNikkes.where((n) => n.ability.contains("지속데미지")).length >= 2) {
+    } else if (activeNikkes.where((n) => n.ability.contains("지속데미지")).length >=
+        2) {
       dynamicTags.add("지속딜");
     }
 
     // 받뎀증
-    if ((raidKeywords.contains("받는데미지증가") || raidKeywords.contains("받뎀증")) && activeNikkes.any((n) => n.ability.contains("받는데미지증가"))) {
+    if ((raidKeywords.contains("받는데미지증가") || raidKeywords.contains("받뎀증")) &&
+        activeNikkes.any((n) => n.ability.contains("받는데미지증가"))) {
       specialTags.add("받뎀증");
-    } else if (activeNikkes.where((n) => n.ability.contains("받는데미지증가")).length >= 2) {
+    } else if (activeNikkes
+            .where((n) => n.ability.contains("받는데미지증가"))
+            .length >=
+        2) {
       dynamicTags.add("받뎀증");
     }
 
     // 분배뎀
-    if ((raidKeywords.contains("분배데미지") || raidKeywords.contains("분배뎀")) && activeNikkes.any((n) => n.ability.contains("분배데미지"))) {
+    if ((raidKeywords.contains("분배데미지") || raidKeywords.contains("분배뎀")) &&
+        activeNikkes.any((n) => n.ability.contains("분배데미지"))) {
       specialTags.add("분배뎀");
-    } else if (activeNikkes.where((n) => n.ability.contains("분배데미지")).length >= 2) {
+    } else if (activeNikkes.where((n) => n.ability.contains("분배데미지")).length >=
+        2) {
       dynamicTags.add("분배뎀");
     }
 
     // 재장전
-    if ((raidKeywords.contains("재장전속도증가") || raidKeywords.contains("재장전")) && activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
+    if ((raidKeywords.contains("재장전속도증가") || raidKeywords.contains("재장전")) &&
+        activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
       specialTags.add("재장전");
     } else if (activeNikkes.any((n) => n.ability.contains("재장전속도증가"))) {
       dynamicTags.add("재장전");
     }
 
     // 폭발뎀
-    final explosionCount = activeNikkes.where((n) => n.ability.contains("폭발데미지")).length;
-    final rlCount = activeNikkes.where((n) => n.weaponType == WeaponType.RL).length;
-    if ((raidKeywords.contains("폭발데미지") || raidKeywords.contains("폭발뎀")) && activeNikkes.any((n) => n.ability.contains("폭발데미지"))) {
+    final explosionCount =
+        activeNikkes.where((n) => n.ability.contains("폭발데미지")).length;
+    final rlCount =
+        activeNikkes.where((n) => n.weaponType == WeaponType.RL).length;
+    if ((raidKeywords.contains("폭발데미지") || raidKeywords.contains("폭발뎀")) &&
+        activeNikkes.any((n) => n.ability.contains("폭발데미지"))) {
       specialTags.add("폭발뎀");
     } else if (explosionCount >= 2 || (explosionCount >= 1 && rlCount >= 1)) {
       dynamicTags.add("폭발뎀");
@@ -2784,8 +2671,10 @@ class _ShareSquadPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF11141B),
-        border: Border.all(color: const Color(0xFF1E2330), width: 1),
+        color: surfaceMode
+            ? (isDark ? const Color(0xFF202228) : const Color(0xFFF7F8FA))
+            : const Color(0xFF11141B),
+        border: Border.all(color: outlineColor, width: 1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -2814,10 +2703,10 @@ class _ShareSquadPanel extends StatelessWidget {
                         title,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: Colors.white,
+                          color: foregroundColor,
                         ),
                       ),
                     ),
@@ -2838,11 +2727,14 @@ class _ShareSquadPanel extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: _buildBadge(
-                          text: (!hasCooldownReduction && hasFullBurstTimeIncrease)
+                          text: (!hasCooldownReduction &&
+                                  hasFullBurstTimeIncrease)
                               ? "풀버연장"
                               : "버쿨감",
-                          isActive: hasCooldownReduction || hasFullBurstTimeIncrease,
-                          themeColor: (!hasCooldownReduction && hasFullBurstTimeIncrease)
+                          isActive:
+                              hasCooldownReduction || hasFullBurstTimeIncrease,
+                          themeColor: (!hasCooldownReduction &&
+                                  hasFullBurstTimeIncrease)
                               ? Colors.blue
                               : const Color(0xFF4CAF50),
                           textColor: Colors.white,
@@ -2853,7 +2745,7 @@ class _ShareSquadPanel extends StatelessWidget {
                   const SizedBox(height: 5),
                   Container(
                     height: 0.8,
-                    color: Colors.white.withOpacity(0.06),
+                    color: foregroundColor.withOpacity(0.12),
                   ),
                   const SizedBox(height: 5),
                   if (dynamicTags.isNotEmpty || specialTags.isNotEmpty)
@@ -2871,9 +2763,9 @@ class _ShareSquadPanel extends StatelessWidget {
           ),
           if (!isCandidate) ...[
             const SizedBox(width: 8),
-            const _VerticalDottedLine(
+            _VerticalDottedLine(
               height: 110,
-              color: Colors.white12,
+              color: foregroundColor.withOpacity(0.18),
               dashHeight: 3,
               gap: 3,
               strokeWidth: 1,

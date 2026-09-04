@@ -100,6 +100,74 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    function isFullSquad(squad) {
+      return squad is map
+        && squad.keys().hasOnly(['nikkeIds'])
+        && squad.nikkeIds is list
+        && squad.nikkeIds.size() == 5
+        && squad.nikkeIds[0] is string
+        && squad.nikkeIds[1] is string
+        && squad.nikkeIds[2] is string
+        && squad.nikkeIds[3] is string
+        && squad.nikkeIds[4] is string;
+    }
+
+    function hasValidSquads(squads) {
+      return squads is list
+        && squads.size() >= 3
+        && squads.size() <= 5
+        && isFullSquad(squads[0])
+        && isFullSquad(squads[1])
+        && isFullSquad(squads[2])
+        && (squads.size() < 4 || isFullSquad(squads[3]))
+        && (squads.size() < 5 || isFullSquad(squads[4]));
+    }
+
+    match /shared_decks/{deckId} {
+      allow read: if true;
+
+      allow create: if isSignedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName is string
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 80
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 1200
+        && request.resource.data.season is string
+        && request.resource.data.raidType in ['solo', 'union']
+        && hasValidSquads(request.resource.data.squadsNikkeIds)
+        && request.resource.data.squadNames is list
+        && request.resource.data.squadDescriptions is list
+        && request.resource.data.squadWeaknessElements is list
+        && request.resource.data.upvotes == 0
+        && request.resource.data.downvotes == 0;
+
+      allow update: if isSignedIn()
+        && resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorUid == resource.data.authorUid
+        && request.resource.data.authorName is string
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 80
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 1200
+        && request.resource.data.season is string
+        && request.resource.data.raidType in ['solo', 'union']
+        && hasValidSquads(request.resource.data.squadsNikkeIds)
+        && request.resource.data.squadNames is list
+        && request.resource.data.squadDescriptions is list
+        && request.resource.data.squadWeaknessElements is list
+        && request.resource.data.upvotes == resource.data.upvotes
+        && request.resource.data.downvotes == resource.data.downvotes;
+
+      allow delete: if false;
+
+      match /votes/{uid} {
+        allow read, write: if false;
+      }
+    }
+
     // 아래 컬렉션은 Cloud Functions Admin SDK만 접근합니다.
     match /open_id_bindings/{document} {
       allow read, write: if false;

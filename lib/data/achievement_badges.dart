@@ -20,6 +20,21 @@ const List<AchievementBadgeDefinition> staticAchievementBadges = [
     comment: '지르는 건 언제나 즐겁지?',
   ),
   AchievementBadgeDefinition(
+    id: 'counters',
+    name: 'COUNTERS',
+    condition: '라피 : 레드 후드, 아니스 : 트윙클 스타, 네온 : 비전아이의 호감도 40',
+    imagePath: 'assets/images/badge/COUNTERS.webp',
+    comment: '명실공히 최고의 지휘관과 스쿼드로 불리기에 충분',
+    imageBackgroundColor: 0xFFFFFFFF,
+  ),
+  AchievementBadgeDefinition(
+    id: 'extreme_firepower',
+    name: '초화력',
+    condition: '화력형 콘솔을 방어형 콘솔보다 10레벨 이상 높이기',
+    imagePath: 'assets/images/badge/FIREPOWER.png',
+    comment: '화력~! 화력~!',
+  ),
+  AchievementBadgeDefinition(
     id: 'shoes_20',
     name: 'Nikkes, On her feet',
     condition: '+5 오버로드 신발 20개 이상 보유',

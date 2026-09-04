@@ -10,6 +10,8 @@ const STATIC_LEVEL_BADGES = [
   ['level_1000', 1000],
 ];
 
+const COUNTERS_NAME_CODES = [5129, 5169, 5170];
+
 function asNumber(value) {
   const converted = Number(value);
   return Number.isFinite(converted) ? converted : 0;
@@ -81,6 +83,28 @@ function highestNikkeLevel(profile) {
   );
 }
 
+function recycleRoomLevel(profile, tid) {
+  const researches = Array.isArray(profile?.recycleRoom) ? profile.recycleRoom : [];
+  const research = researches.find(item => Math.trunc(asNumber(item?.tid)) === tid);
+  return research ? Math.trunc(asNumber(research.lv)) : null;
+}
+
+function hasExtremeFirepower(profile) {
+  const attackerLevel = recycleRoomLevel(profile, 1101);
+  const defenderLevel = recycleRoomLevel(profile, 1102);
+  return attackerLevel != null
+    && defenderLevel != null
+    && attackerLevel - defenderLevel >= 10;
+}
+
+function hasMaxBondCounters(profile) {
+  const characters = Array.isArray(profile?.characters) ? profile.characters : [];
+  const maxBondNameCodes = new Set(characters
+    .filter(character => asNumber(character?.bondLevel) >= 40)
+    .map(character => Math.trunc(asNumber(character?.name_code))));
+  return COUNTERS_NAME_CODES.every(nameCode => maxBondNameCodes.has(nameCode));
+}
+
 function ultimateNameCode(character) {
   if (asNumber(character?.core) !== 7) return null;
   const skills = character?.skills || {};
@@ -128,6 +152,8 @@ function evaluateProfiles(profileEntries, now = new Date()) {
     const joinedAt = profile?.joinedAt ?? profile?.createdAt ?? profile?.created_at;
     if (ageInDays(joinedAt, now) >= 1000) earn('thousand_days', openId);
     if (asNumber(profile?.costumeCount) >= 100) earn('fashionista', openId);
+    if (hasMaxBondCounters(profile)) earn('counters', openId);
+    if (hasExtremeFirepower(profile)) earn('extreme_firepower', openId);
     if (countMasterpieceShoes(profile) >= 20) earn('shoes_20', openId);
 
     const highestLevel = highestNikkeLevel(profile);
@@ -285,8 +311,42 @@ function createUpdateDisplayedBadgesHandler({ db, getAuthenticatedUid }) {
   };
 }
 
+function createGetPublicBadgeShowcaseHandler({ db }) {
+  return async (req, res) => {
+    corsHeaders(req, res);
+    if (req.method === 'OPTIONS') return res.status(204).send('');
+    if (req.method !== 'POST') {
+      return res.status(405).json({ success: false, error: 'Method Not Allowed' });
+    }
+
+    try {
+      const uid = typeof req.body?.uid === 'string' ? req.body.uid.trim() : '';
+      if (!uid || uid.length > 128) {
+        return res.status(400).json({ success: false, error: '작성자 정보가 올바르지 않습니다.' });
+      }
+
+      const snapshot = await db.collection('users').doc(uid).get();
+      if (!snapshot.exists) {
+        return res.status(404).json({ success: false, error: '작성자 정보를 찾을 수 없습니다.' });
+      }
+
+      const state = serializeState(snapshot.data() || {});
+      const displayedIds = new Set(state.displayedBadgeIds);
+      return res.status(200).json({
+        success: true,
+        displayedBadgeIds: state.displayedBadgeIds,
+        unlocks: state.unlocks.filter(unlock => displayedIds.has(unlock.id)),
+      });
+    } catch (error) {
+      console.error('getPublicBadgeShowcase failed:', error);
+      return res.status(500).json({ success: false, error: '전시 뱃지를 불러오지 못했습니다.' });
+    }
+  };
+}
+
 module.exports = {
   evaluateProfiles,
   createEvaluateAchievementBadgesHandler,
   createUpdateDisplayedBadgesHandler,
+  createGetPublicBadgeShowcaseHandler,
 };

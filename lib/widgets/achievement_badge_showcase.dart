@@ -4,6 +4,157 @@ import 'package:intl/intl.dart';
 
 import '../models/achievement_badge.dart';
 
+class PublicAchievementBadgeShowcase extends StatelessWidget {
+  const PublicAchievementBadgeShowcase({
+    super.key,
+    required this.authorName,
+    required this.badges,
+    required this.unlocks,
+    required this.displayedBadgeIds,
+  });
+
+  final String authorName;
+  final List<AchievementBadgeDefinition> badges;
+  final Map<String, AchievementBadgeUnlock> unlocks;
+  final List<String> displayedBadgeIds;
+
+  @override
+  Widget build(BuildContext context) {
+    final byId = {for (final badge in badges) badge.id: badge};
+    final visibleIds = displayedBadgeIds.where(byId.containsKey).toList();
+    final secondary = Theme.of(context).colorScheme.onSurfaceVariant;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 500),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 22, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.workspace_premium_rounded,
+                    color: Colors.orange,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        authorName,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      Text(
+                        '전시 중인 프로필 뱃지',
+                        style: TextStyle(fontSize: 12, color: secondary),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  tooltip: '닫기',
+                  icon: const Icon(Icons.close_rounded),
+                ),
+              ],
+            ),
+            const SizedBox(height: 22),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final badgeSize =
+                    (constraints.maxWidth / 4 - 8).clamp(46.0, 72.0);
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var index = 0; index < 4; index++)
+                      Expanded(
+                        child: Column(
+                          children: [
+                            if (index < visibleIds.length)
+                              _BadgeCircle(
+                                badge: byId[visibleIds[index]]!,
+                                unlock: unlocks[visibleIds[index]],
+                                selected: true,
+                                size: badgeSize,
+                                onTap: null,
+                              )
+                            else
+                              _PublicEmptyBadgeSlot(size: badgeSize),
+                            const SizedBox(height: 7),
+                            if (index < visibleIds.length)
+                              Text(
+                                byId[visibleIds[index]]!.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
+                            else
+                              const SizedBox(height: 28),
+                          ],
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PublicEmptyBadgeSlot extends StatelessWidget {
+  const _PublicEmptyBadgeSlot({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: isDark
+              ? const [Color(0xFF3B3D43), Color(0xFF25272C)]
+              : const [Color(0xFFE4E6EA), Color(0xFFD3D6DC)],
+        ),
+        border: Border.all(
+          color: isDark ? Colors.white12 : Colors.black12,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1F000000),
+            blurRadius: 8,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class AchievementBadgeShowcase extends StatelessWidget {
   const AchievementBadgeShowcase({
     super.key,
@@ -437,6 +588,12 @@ class _BadgeCircle extends StatelessWidget {
           scale: badge.imageScale,
           child: image,
         ),
+      );
+    }
+    if (badge.imageBackgroundColor != null) {
+      image = ColoredBox(
+        color: Color(badge.imageBackgroundColor!),
+        child: image,
       );
     }
     if (!unlocked && !previewLocked) {

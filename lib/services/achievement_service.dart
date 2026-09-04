@@ -23,6 +23,14 @@ class AchievementService {
         .toList();
   }
 
+  Future<AchievementBadgeState> getPublicShowcase(String uid) async {
+    final response = await _postPublic(
+      'getPublicBadgeShowcase',
+      body: {'uid': uid},
+    );
+    return AchievementBadgeState.fromJson(response);
+  }
+
   Future<Map<String, dynamic>> _post(
     String functionName, {
     Map<String, dynamic>? body,
@@ -47,6 +55,24 @@ class AchievementService {
     final result = Map<String, dynamic>.from(decoded);
     if (response.statusCode != 200 || result['success'] != true) {
       throw StateError(result['error']?.toString() ?? '뱃지 정보를 처리하지 못했습니다.');
+    }
+    return result;
+  }
+
+  Future<Map<String, dynamic>> _postPublic(
+    String functionName, {
+    required Map<String, dynamic> body,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/$functionName'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+    final decoded = jsonDecode(response.body);
+    if (decoded is! Map) throw StateError('서버 응답 형식이 올바르지 않습니다.');
+    final result = Map<String, dynamic>.from(decoded);
+    if (response.statusCode != 200 || result['success'] != true) {
+      throw StateError(result['error']?.toString() ?? '전시 뱃지를 불러오지 못했습니다.');
     }
     return result;
   }

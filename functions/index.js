@@ -10,7 +10,8 @@ const { createNikkeStatisticsRefreshHandler } = require('./nikkeStatisticsRefres
 const { issueGuestProfileToken, createGuestCommanderProfileHandler } = require('./guestProfileAccess');
 const {
     createEvaluateAchievementBadgesHandler,
-    createUpdateDisplayedBadgesHandler
+    createUpdateDisplayedBadgesHandler,
+    createGetPublicBadgeShowcaseHandler
 } = require('./achievementBadges');
 
 admin.initializeApp();
@@ -640,11 +641,131 @@ exports.deleteMimirAccount = functions.https.onRequest(async (req, res) => {
             if (userSnapshot.exists) transaction.delete(userRef);
         });
 
+        const authoredDecks = await db.collection('shared_decks')
+            .where('authorUid', '==', uid)
+            .get();
+        await Promise.all(
+            authoredDecks.docs.map(document => db.recursiveDelete(document.ref))
+        );
+
         await admin.auth().deleteUser(uid);
         return res.status(200).json({ success: true });
     } catch (error) {
         console.error('Delete MIMIR account failed:', error);
         return res.status(500).json({ success: false, error: '회원 탈퇴 중 서버 오류가 발생했습니다.' });
+    }
+});
+
+exports.voteSharedDeck = functions.https.onRequest(async (req, res) => {
+    const origin = req.headers.origin || '*';
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') return res.status(204).send('');
+    if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Method Not Allowed' });
+    }
+
+    let uid;
+    try {
+        uid = await getAuthenticatedUid(req);
+    } catch (authError) {
+        return res.status(401).json({ success: false, error: '로그인 인증이 만료되었습니다.' });
+    }
+    if (!uid) return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+
+    const deckId = req.body?.deckId?.toString().trim();
+    const requestedVote = Number(req.body?.value);
+    if (!deckId || ![-1, 1].includes(requestedVote)) {
+        return res.status(400).json({ success: false, error: '추천 요청이 올바르지 않습니다.' });
+    }
+
+    try {
+        const deckRef = db.collection('shared_decks').doc(deckId);
+        const voteRef = deckRef.collection('votes').doc(uid);
+        const result = await db.runTransaction(async transaction => {
+            const [deckSnapshot, voteSnapshot] = await transaction.getAll(deckRef, voteRef);
+            if (!deckSnapshot.exists) {
+                const notFound = new Error('공유 덱을 찾을 수 없습니다.');
+                notFound.code = 'DECK_NOT_FOUND';
+                throw notFound;
+            }
+
+            const deckData = deckSnapshot.data() || {};
+            const previousVote = Number(voteSnapshot.data()?.value) || 0;
+            const nextVote = previousVote === requestedVote ? 0 : requestedVote;
+            let upvotes = Math.max(0, Number(deckData.upvotes) || 0);
+            let downvotes = Math.max(0, Number(deckData.downvotes) || 0);
+
+            if (previousVote === 1) upvotes = Math.max(0, upvotes - 1);
+            if (previousVote === -1) downvotes = Math.max(0, downvotes - 1);
+            if (nextVote === 1) upvotes += 1;
+            if (nextVote === -1) downvotes += 1;
+
+            transaction.update(deckRef, {
+                upvotes,
+                downvotes,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+            if (nextVote === 0) {
+                transaction.delete(voteRef);
+            } else {
+                transaction.set(voteRef, {
+                    value: nextVote,
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                });
+            }
+            return { vote: nextVote, upvotes, downvotes };
+        });
+        return res.status(200).json({ success: true, ...result });
+    } catch (error) {
+        if (error.code === 'DECK_NOT_FOUND') {
+            return res.status(404).json({ success: false, error: error.message });
+        }
+        console.error('Vote shared deck failed:', error);
+        return res.status(500).json({ success: false, error: '추천 처리 중 오류가 발생했습니다.' });
+    }
+});
+
+exports.deleteSharedDeck = functions.https.onRequest(async (req, res) => {
+    const origin = req.headers.origin || '*';
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') return res.status(204).send('');
+    if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Method Not Allowed' });
+    }
+
+    let uid;
+    try {
+        uid = await getAuthenticatedUid(req);
+    } catch (authError) {
+        return res.status(401).json({ success: false, error: '로그인 인증이 만료되었습니다.' });
+    }
+    if (!uid) return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+
+    const deckId = req.body?.deckId?.toString().trim();
+    if (!deckId) {
+        return res.status(400).json({ success: false, error: '삭제할 공유 덱이 지정되지 않았습니다.' });
+    }
+
+    try {
+        const deckRef = db.collection('shared_decks').doc(deckId);
+        const snapshot = await deckRef.get();
+        if (!snapshot.exists) {
+            return res.status(404).json({ success: false, error: '공유 덱을 찾을 수 없습니다.' });
+        }
+        if (snapshot.data()?.authorUid !== uid) {
+            return res.status(403).json({ success: false, error: '작성자만 게시글을 삭제할 수 있습니다.' });
+        }
+        await db.recursiveDelete(deckRef);
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Delete shared deck failed:', error);
+        return res.status(500).json({ success: false, error: '게시글 삭제 중 오류가 발생했습니다.' });
     }
 });
 
@@ -657,4 +778,7 @@ exports.evaluateAchievementBadges = functions.https.onRequest(
 );
 exports.updateDisplayedBadges = functions.https.onRequest(
     createUpdateDisplayedBadgesHandler({ db, getAuthenticatedUid })
+);
+exports.getPublicBadgeShowcase = functions.https.onRequest(
+    createGetPublicBadgeShowcaseHandler({ db })
 );

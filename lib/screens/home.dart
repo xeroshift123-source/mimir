@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mimir/screens/calculate_list.dart';
 import 'package:mimir/screens/deck_builder.dart';
+import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/screens/union_deck_builder.dart';
 import 'package:mimir/screens/sync_screen.dart';
 import 'package:mimir/screens/my_nikke_screen.dart';
@@ -312,13 +313,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
-                                      color: isDark
-                                          ? Colors.white
-                                          : Colors.black,
+                                      color:
+                                          isDark ? Colors.white : Colors.black,
                                     ),
                                   ),
                                 ),
-                                if (boss.keyword != null && boss.keyword!.isNotEmpty)
+                                if (boss.keyword != null &&
+                                    boss.keyword!.isNotEmpty)
                                   Wrap(
                                     spacing: 4,
                                     alignment: WrapAlignment.end,
@@ -328,7 +329,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
                                           color: Colors.orange,
-                                          borderRadius: BorderRadius.circular(16),
+                                          borderRadius:
+                                              BorderRadius.circular(16),
                                         ),
                                         child: Text(
                                           "#$kw",
@@ -344,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                       const SizedBox(height: 16),
                       SizedBox(
                         width: double.infinity,
@@ -839,11 +841,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.orange.shade700,
                         onTap: () {
                           final currentRaid = raidHistory[_currentRaidPage];
-                          final unionRaid = currentRaid.type == RaidType.union 
-                              ? currentRaid 
-                              : raidHistory.firstWhere((r) => r.type == RaidType.union);
+                          final unionRaid = currentRaid.type == RaidType.union
+                              ? currentRaid
+                              : raidHistory
+                                  .firstWhere((r) => r.type == RaidType.union);
                           Navigator.pushNamed(
-                            context, 
+                            context,
                             UnionDeckBuilderScreen.routeName,
                             arguments: unionRaid,
                           );
@@ -852,11 +855,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 12),
                       _buildMenuButton(
                         context,
+                        title: "덱 라이브러리",
+                        icon: Icons.auto_stories_rounded,
+                        color: Colors.deepOrange,
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          DeckLibraryScreen.routeName,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildMenuButton(
+                        context,
                         title: "솔레 금서고 바로가기",
                         icon: Icons.history,
                         color: Colors.deepOrange,
                         onTap: () async {
-                          final Uri url = Uri.parse('https://soloraidhistory.vercel.app/');
+                          final Uri url =
+                              Uri.parse('https://soloraidhistory.vercel.app/');
                           if (!await launchUrl(url)) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -918,8 +933,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icons.person_search,
                               color: Colors.purple,
                               onTap: () async {
-                                final uid =
-                                    context.read<AuthProvider>().userId;
+                                final uid = context.read<AuthProvider>().userId;
                                 final selectedOpenId = await DatabaseService()
                                     .getSelectedCommanderOpenId(uid);
                                 if (!context.mounted) return;
@@ -930,8 +944,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content: Text(
-                                            "먼저 BLABLALINK 계정을 연동해 주세요."),
+                                        content:
+                                            Text("먼저 BLABLALINK 계정을 연동해 주세요."),
                                         backgroundColor: Colors.orange),
                                   );
                                   Navigator.pushNamed(

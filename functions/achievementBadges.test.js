@@ -64,4 +64,53 @@ const belowAverage = evaluateProfiles([{
 }]);
 assert.equal(belowAverage.has('ultimate_9999'), false);
 
+const counterCharacters = [5129, 5169, 5170].map(nameCode => ({
+  name_code: nameCode,
+  bondLevel: 40,
+}));
+const counters = evaluateProfiles([{
+  openId: 'counters-account',
+  profile: { characters: counterCharacters },
+}]);
+assert.equal(counters.has('counters'), true);
+
+const countersBelowBond = evaluateProfiles([{
+  openId: 'counters-below-bond',
+  profile: {
+    characters: counterCharacters.map((character, index) => ({
+      ...character,
+      bondLevel: index === 2 ? 39 : 40,
+    })),
+  },
+}]);
+assert.equal(countersBelowBond.has('counters'), false);
+
+const extremeFirepower = evaluateProfiles([{
+  openId: 'extreme-firepower',
+  profile: {
+    recycleRoom: [
+      { tid: 1101, lv: 25 },
+      { tid: 1102, lv: 15 },
+    ],
+  },
+}]);
+assert.equal(extremeFirepower.has('extreme_firepower'), true);
+
+const insufficientFirepower = evaluateProfiles([{
+  openId: 'insufficient-firepower',
+  profile: {
+    recycleRoom: [
+      { tid: 1101, lv: 24 },
+      { tid: 1102, lv: 15 },
+    ],
+  },
+}]);
+assert.equal(insufficientFirepower.has('extreme_firepower'), false);
+
+const missingDefenderConsole = evaluateProfiles([{
+  openId: 'missing-defender-console',
+  profile: { recycleRoom: [{ tid: 1101, lv: 99 }] },
+}]);
+assert.equal(missingDefenderConsole.has('extreme_firepower'), false);
+
 console.log('achievementBadges tests passed');

@@ -8,6 +8,7 @@ class AchievementBadgeDefinition {
     this.imageScale = 1,
     this.focusX = 0,
     this.focusY = 0,
+    this.imageBackgroundColor,
   });
 
   final String id;
@@ -18,6 +19,7 @@ class AchievementBadgeDefinition {
   final double imageScale;
   final double focusX;
   final double focusY;
+  final int? imageBackgroundColor;
 }
 
 class AchievementBadgeUnlock {

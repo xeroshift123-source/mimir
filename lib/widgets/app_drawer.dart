@@ -23,7 +23,8 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.watch<ThemeProvider>().isDark;
     final authProvider = context.watch<AuthProvider>();
-    final scaffoldBg = isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7);
+    final scaffoldBg =
+        isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F7);
     final headerColor = isDark ? const Color(0xFF1E1E1E) : Colors.orange;
 
     return Drawer(
@@ -119,14 +120,17 @@ class AppDrawer extends StatelessWidget {
                                   },
                                   borderRadius: BorderRadius.circular(12),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 4),
                                     child: Row(
                                       children: [
-                                        _DrawerProfileAvatar(auth: authProvider),
+                                        _DrawerProfileAvatar(
+                                            auth: authProvider),
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 authProvider.nickname!,
@@ -143,7 +147,8 @@ class AppDrawer extends StatelessWidget {
                                                 '계정 정보 보기',
                                                 style: TextStyle(
                                                   fontSize: 10,
-                                                  color: Colors.white.withOpacity(0.72),
+                                                  color: Colors.white
+                                                      .withOpacity(0.72),
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
@@ -157,7 +162,8 @@ class AppDrawer extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.logout_rounded, color: Colors.white70, size: 20),
+                              icon: const Icon(Icons.logout_rounded,
+                                  color: Colors.white70, size: 20),
                               tooltip: '로그아웃',
                               onPressed: () {
                                 authProvider.logout();
@@ -187,11 +193,13 @@ class AppDrawer extends StatelessWidget {
                             child: InkWell(
                               onTap: () {
                                 Navigator.pop(context); // Close Drawer
-                                Navigator.pushNamed(context, LoginScreen.routeName);
+                                Navigator.pushNamed(
+                                    context, LoginScreen.routeName);
                               },
                               borderRadius: BorderRadius.circular(12),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
                                 child: Row(
                                   children: [
                                     const Icon(
@@ -202,7 +210,8 @@ class AppDrawer extends StatelessWidget {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           const Text(
                                             "소셜 계정 로그인",
@@ -215,7 +224,8 @@ class AppDrawer extends StatelessWidget {
                                           Text(
                                             "덱 공유 및 추천 투표 활성화",
                                             style: TextStyle(
-                                              color: Colors.white.withOpacity(0.6),
+                                              color:
+                                                  Colors.white.withOpacity(0.6),
                                               fontSize: 10,
                                             ),
                                           ),
@@ -237,7 +247,7 @@ class AppDrawer extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Drawer Navigation List
           Expanded(
             child: ListView(
@@ -253,7 +263,8 @@ class AppDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()),
                       (route) => false,
                     );
                   },
@@ -280,7 +291,8 @@ class AppDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.pop(context);
                     if (activeRoute != UnionDeckBuilderScreen.routeName) {
-                      Navigator.pushNamed(context, UnionDeckBuilderScreen.routeName);
+                      Navigator.pushNamed(
+                          context, UnionDeckBuilderScreen.routeName);
                     }
                   },
                 ),
@@ -288,7 +300,7 @@ class AppDrawer extends StatelessWidget {
                   context: context,
                   icon: Icons.auto_awesome_motion_outlined,
                   activeIcon: Icons.auto_awesome_motion,
-                  title: "공유 덱 라이브러리 (Library)",
+                  title: "덱 라이브러리 (Library)",
                   route: DeckLibraryScreen.routeName,
                   onTap: () {
                     Navigator.pop(context);
@@ -319,7 +331,8 @@ class AppDrawer extends StatelessWidget {
                   onTap: () {
                     Navigator.pop(context);
                     if (activeRoute != CalculateListScreen.routeName) {
-                      Navigator.pushNamed(context, CalculateListScreen.routeName);
+                      Navigator.pushNamed(
+                          context, CalculateListScreen.routeName);
                     }
                   },
                 ),
@@ -358,7 +371,7 @@ class AppDrawer extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Theme switch at footer
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -377,7 +390,8 @@ class AppDrawer extends StatelessWidget {
                   children: [
                     Text(
                       isDark ? "다크 모드 활성" : "라이트 모드 활성",
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     const SizedBox(width: 4),
                     Switch(
@@ -403,7 +417,7 @@ class AppDrawer extends StatelessWidget {
       builder: (BuildContext dialogContext) {
         String tempWeakness = '수냉';
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        
+
         final Map<String, String> elementIconMap = {
           '전격': 'assets/icons/elements/icon-elements-Electric.webp',
           '철갑': 'assets/icons/elements/icon-elements-Iron.webp',
@@ -416,18 +430,22 @@ class AppDrawer extends StatelessWidget {
           builder: (context, setStateDialog) {
             return AlertDialog(
               backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-              title: const Text("공략 약점 속성 선택", style: TextStyle(fontWeight: FontWeight.bold)),
+              title: const Text("공략 약점 속성 선택",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               content: DropdownButtonHideUnderline(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.orange.shade300, width: 1.5),
+                    border:
+                        Border.all(color: Colors.orange.shade300, width: 1.5),
                   ),
                   child: DropdownButton<String>(
                     value: tempWeakness,
                     isExpanded: true,
-                    dropdownColor: isDark ? const Color(0xFF2D2D2D) : Colors.white,
+                    dropdownColor:
+                        isDark ? const Color(0xFF2D2D2D) : Colors.white,
                     onChanged: (String? newValue) {
                       if (newValue != null) {
                         setStateDialog(() {
@@ -441,9 +459,14 @@ class AppDrawer extends StatelessWidget {
                         value: value,
                         child: Row(
                           children: [
-                            Image.asset(elementIconMap[value]!, width: 20, height: 20),
+                            Image.asset(elementIconMap[value]!,
+                                width: 20, height: 20),
                             const SizedBox(width: 10),
-                            Text(value, style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                            Text(value,
+                                style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87)),
                           ],
                         ),
                       );
@@ -457,7 +480,9 @@ class AppDrawer extends StatelessWidget {
                   child: const Text("취소", style: TextStyle(color: Colors.grey)),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white),
                   onPressed: () {
                     Navigator.pop(dialogContext);
                     Navigator.pushNamed(
@@ -490,8 +515,10 @@ class AppDrawer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: isSelected 
-            ? (isDark ? Colors.orange.withOpacity(0.2) : Colors.orange.withOpacity(0.12))
+        color: isSelected
+            ? (isDark
+                ? Colors.orange.withOpacity(0.2)
+                : Colors.orange.withOpacity(0.12))
             : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
@@ -502,15 +529,17 @@ class AppDrawer extends StatelessWidget {
       child: ListTile(
         leading: Icon(
           isSelected ? activeIcon : icon,
-          color: isSelected ? Colors.orange : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+          color: isSelected
+              ? Colors.orange
+              : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
         ),
         title: Text(
           title,
           style: TextStyle(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 14,
-            color: isSelected 
-                ? (isDark ? Colors.white : Colors.black) 
+            color: isSelected
+                ? (isDark ? Colors.white : Colors.black)
                 : (isDark ? Colors.grey.shade300 : Colors.grey.shade800),
           ),
         ),
