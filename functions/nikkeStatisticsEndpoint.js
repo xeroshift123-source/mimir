@@ -4,11 +4,8 @@ const {
   attachUserComparison,
 } = require('./nikkeStatistics');
 const {
-  STATISTICS_SCHEMA_VERSION,
   FRESHNESS_DAYS,
   statisticsCacheKey,
-  aggregateNikkeStatisticsFromStore,
-  writeStatisticsSnapshots,
 } = require('./nikkeStatisticsStore');
 
 function createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUid }) {
@@ -107,31 +104,29 @@ function createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUi
       const cacheRef = db.collection('nikke_statistics').doc(cacheKey);
       const cacheSnapshot = await cacheRef.get();
       const cacheData = cacheSnapshot.data();
-      const cacheIsUsable = cacheSnapshot.exists
-        && cacheData?.schemaVersion === STATISTICS_SCHEMA_VERSION;
+      const cacheIsReadable = cacheSnapshot.exists
+        && Number(cacheData?.schemaVersion) >= 7;
 
-      let statistics;
-      let generatedAtMs = cacheData?.generatedAt?.toMillis?.()
-        || cacheData?.cachedAt?.toMillis?.()
-        || 0;
-      if (cacheIsUsable) {
-        statistics = cacheData;
-      } else {
-        // 첫 배포 직후나 신규 니케처럼 예약 집계 문서가 아직 없는 경우에만
-        // 한 번 즉시 생성한다. 이후 요청은 매일 자정에 만든 문서를 그대로 읽는다.
-        statistics = await aggregateNikkeStatisticsFromStore(db, nameCode);
-        generatedAtMs = Date.now();
-        await writeStatisticsSnapshots({
-          db,
-          admin,
-          snapshots: [{ id: cacheKey, data: statistics }],
-          generatedAt: new Date(generatedAtMs),
+      if (!cacheIsReadable) {
+        return res.status(503).json({
+          success: false,
+          error: '선택한 니케의 통계를 준비 중입니다. 다음 통계 갱신 후 다시 시도해 주세요.',
         });
       }
 
+      const statistics = cacheData;
+      let generatedAtMs = cacheData?.generatedAt?.toMillis?.()
+        || cacheData?.cachedAt?.toMillis?.()
+        || 0;
+
       const comparison = attachUserComparison(statistics, character);
       const overload = comparison.overload.map(({ histogram, ...option }) => option);
-      const { histogram: _combinedHistogram, ...combinedOffense } = comparison.combinedOffense;
+      let combinedOffense = null;
+      if (comparison.combinedOffense) {
+        const { histogram: _combinedHistogram, ...publicCombinedOffense }
+          = comparison.combinedOffense;
+        combinedOffense = publicCombinedOffense;
+      }
       return res.status(200).json({
         success: true,
         data: {

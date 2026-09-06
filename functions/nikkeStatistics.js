@@ -214,18 +214,21 @@ function attachUserComparison(statistics, character) {
   ).toFixed(2));
   const skills = character?.skills || {};
   const mySkillPreset = `${Number(skills.skill1) || 1}/${Number(skills.skill2) || 1}/${Number(skills.burst) || 1}`;
+  const combinedOffense = statistics.combinedOffense
+    ? {
+      ...statistics.combinedOffense,
+      myTotalPercent: myCombinedOffensePercent,
+      topPercent: percentileFromHistogram(
+        statistics.combinedOffense.histogram,
+        myCombinedOffensePercent,
+      ),
+    }
+    : null;
   return {
     ...statistics,
     mySkillPreset,
     myEquipmentPreset: equipmentPreset(character),
-    combinedOffense: {
-      ...statistics.combinedOffense,
-      myTotalPercent: myCombinedOffensePercent,
-      topPercent: percentileFromHistogram(
-        statistics.combinedOffense?.histogram,
-        myCombinedOffensePercent,
-      ),
-    },
+    combinedOffense,
     overload: statistics.overload.map(option => {
       const myOption = mine.get(option.key);
       if (!myOption) return { ...option, myTotalPercent: null, myLineCount: 0, topPercent: null };

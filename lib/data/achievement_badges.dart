@@ -56,6 +56,13 @@ const List<AchievementBadgeDefinition> staticAchievementBadges = [
     comment: '이쁘잖아요',
   ),
   AchievementBadgeDefinition(
+    id: 'battle_data',
+    name: '배틀 데이터',
+    condition: '덱 라이브러리에 덱 공유하기',
+    imagePath: 'assets/images/badge/BATTLEDATA.png',
+    comment: '감사합니다',
+  ),
+  AchievementBadgeDefinition(
     id: 'shoes_20',
     name: 'Nikkes, On her feet',
     condition: '+5 오버로드 신발 20개 이상 보유',

@@ -185,4 +185,10 @@ const unrelatedLimitBrokenNikke = evaluateProfiles([{
 }]);
 assert.equal(unrelatedLimitBrokenNikke.has('union_leader_tears'), false);
 
+const battleData = evaluateProfiles([], new Date(), { hasSharedDeck: true });
+assert.equal(battleData.has('battle_data'), true);
+
+const noBattleData = evaluateProfiles([], new Date(), { hasSharedDeck: false });
+assert.equal(noBattleData.has('battle_data'), false);
+
 console.log('achievementBadges tests passed');

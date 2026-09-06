@@ -9,7 +9,8 @@ const {
 const STATISTICS_SCHEMA_VERSION = 8;
 const FRESHNESS_DAYS = 30;
 const MINIMUM_SAMPLE = 20;
-const READ_PAGE_SIZE = 25;
+const READ_PAGE_SIZE = 100;
+const READ_CONCURRENCY = 4;
 
 function statisticsCacheKey(nameCode) {
   return `all_${Number(nameCode)}`;
@@ -25,6 +26,26 @@ async function forEachEligibleLinkedCommander(db, nowMs, visit, pageSize = READ_
   const freshnessLimitMs = nowMs - FRESHNESS_DAYS * 24 * 60 * 60 * 1000;
   let lastBinding = null;
   let commanderCount = 0;
+  let pendingCommanderRefs = [];
+
+  const flushCommanderRefs = async () => {
+    if (pendingCommanderRefs.length === 0) return;
+    const refBatches = pendingCommanderRefs;
+    pendingCommanderRefs = [];
+    const snapshotBatches = await Promise.all(refBatches.map(refs => db.getAll(
+      ...refs,
+      { fieldMask: ['lastUpdatedAt', 'characters'] },
+    )));
+    for (const snapshots of snapshotBatches) {
+      for (const snapshot of snapshots) {
+        if (!snapshot.exists) continue;
+        const commander = snapshot.data();
+        if (timestampMillis(commander.lastUpdatedAt) < freshnessLimitMs) continue;
+        visit(commander);
+        commanderCount += 1;
+      }
+    }
+  };
 
   while (true) {
     let query = db.collection('open_id_bindings')
@@ -40,22 +61,17 @@ async function forEachEligibleLinkedCommander(db, nowMs, visit, pageSize = READ_
       .filter(doc => typeof doc.data()?.uid === 'string' && doc.data().uid.trim())
       .map(doc => db.collection('commanders').doc(doc.id));
     if (commanderRefs.length > 0) {
-      const commanderSnapshots = await db.getAll(
-        ...commanderRefs,
-        { fieldMask: ['lastUpdatedAt', 'characters'] },
-      );
-      for (const snapshot of commanderSnapshots) {
-        if (!snapshot.exists) continue;
-        const commander = snapshot.data();
-        if (timestampMillis(commander.lastUpdatedAt) < freshnessLimitMs) continue;
-        visit(commander);
-        commanderCount += 1;
+      pendingCommanderRefs.push(commanderRefs);
+      if (pendingCommanderRefs.length >= READ_CONCURRENCY) {
+        await flushCommanderRefs();
       }
     }
 
     lastBinding = bindings.docs[bindings.docs.length - 1];
     if (bindings.size < pageSize) break;
   }
+
+  await flushCommanderRefs();
 
   return commanderCount;
 }

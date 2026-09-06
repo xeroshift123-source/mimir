@@ -173,7 +173,11 @@ function ultimateNameCode(character) {
   return nameCode > 0 ? nameCode : null;
 }
 
-function evaluateProfiles(profileEntries, now = new Date()) {
+function evaluateProfiles(
+  profileEntries,
+  now = new Date(),
+  { hasSharedDeck = false } = {},
+) {
   const earned = new Map();
   const earn = (id, openId, extra = {}) => {
     if (!earned.has(id)) earned.set(id, { sourceOpenId: openId, ...extra });
@@ -203,6 +207,7 @@ function evaluateProfiles(profileEntries, now = new Date()) {
       }
     }
   }
+  if (hasSharedDeck) earn('battle_data', null);
   return earned;
 }
 
@@ -258,7 +263,13 @@ function createEvaluateAchievementBadgesHandler({ db, getAuthenticatedUid }) {
       const profileEntries = snapshots
         .filter(snapshot => snapshot.exists)
         .map(snapshot => ({ openId: snapshot.id, profile: snapshot.data() }));
-      const earned = evaluateProfiles(profileEntries);
+      const authoredDecks = await db.collection('shared_decks')
+        .where('authorUid', '==', uid)
+        .limit(1)
+        .get();
+      const earned = evaluateProfiles(profileEntries, new Date(), {
+        hasSharedDeck: !authoredDecks.empty,
+      });
       const now = admin.firestore.Timestamp.now();
 
       await db.runTransaction(async transaction => {
@@ -272,7 +283,7 @@ function createEvaluateAchievementBadgesHandler({ db, getAuthenticatedUid }) {
           if (unlocks[id]) continue;
           unlocks[id] = {
             acquiredAt: now,
-            sourceOpenId: evidence.sourceOpenId,
+            ...(evidence.sourceOpenId ? { sourceOpenId: evidence.sourceOpenId } : {}),
             ...(evidence.nameCode ? { nameCode: evidence.nameCode } : {}),
           };
           changed = true;

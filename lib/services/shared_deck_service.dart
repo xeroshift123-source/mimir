@@ -45,6 +45,11 @@ class SharedDeckService {
       ..['createdAt'] = FieldValue.serverTimestamp()
       ..['updatedAt'] = FieldValue.serverTimestamp();
     await document.set(data);
+    try {
+      await _postFunction('evaluateAchievementBadges', const {});
+    } catch (_) {
+      // 게시글은 이미 저장되었으며, 계정 정보 조회 시 뱃지를 다시 평가한다.
+    }
     return deck.copyWith(id: document.id);
   }
 

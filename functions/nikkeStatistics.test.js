@@ -65,6 +65,17 @@ test('내 옵션 합계를 동률 보정 백분위로 비교한다', () => {
   assert.equal(percentileFromHistogram({ '10.00': 2, '20.00': 1 }, 10), 66.7);
 });
 
+test('이전 스키마 캐시는 우공 통계 없이도 기존 비교 결과를 반환한다', () => {
+  const profile = commander('한국', { skill1: 10, skill2: 10, burst: 10 }, [7000801]);
+  const legacyStatistics = aggregateNikkeStatistics([profile], 1001);
+  delete legacyStatistics.combinedOffense;
+
+  const compared = attachUserComparison(legacyStatistics, profile.characters[0]);
+
+  assert.equal(compared.combinedOffense, null);
+  assert.equal(compared.overload[0].myTotalPercent, 4.77);
+});
+
 test('예약 집계는 모든 서버를 통합한 니케별 스냅샷을 만든다', () => {
   const commanders = [
     commander('한국', { skill1: 10, skill2: 10, burst: 10 }, [7000801]),
@@ -136,7 +147,7 @@ test('장비 강화 프리셋은 머리/장갑/상의/다리 순서로 유효한
 
 test('예약 집계는 지휘관 문서를 작은 페이지로 읽고 필요한 필드만 요청한다', async () => {
   const nowMs = Date.parse('2026-08-28T00:00:00+09:00');
-  const bindings = Array.from({ length: 30 }, (_, index) => ({
+  const bindings = Array.from({ length: 130 }, (_, index) => ({
     id: `open-${String(index).padStart(2, '0')}`,
     data: () => ({ uid: `uid-${index}` }),
   }));
@@ -180,9 +191,9 @@ test('예약 집계는 지휘관 문서를 작은 페이지로 읽고 필요한 
 
   const result = await buildStatisticsSnapshotsFromStore(db, nowMs);
 
-  assert.equal(result.commanderCount, 30);
-  assert.equal(result.snapshots[0].data.sampleCount, 30);
+  assert.equal(result.commanderCount, 130);
+  assert.equal(result.snapshots[0].data.sampleCount, 130);
   assert.equal(getAllCalls.length, 2);
-  assert.deepEqual(getAllCalls.map(call => call.refs.length), [25, 5]);
+  assert.deepEqual(getAllCalls.map(call => call.refs.length), [100, 30]);
   assert.deepEqual(getAllCalls[0].options.fieldMask, ['lastUpdatedAt', 'characters']);
 });
