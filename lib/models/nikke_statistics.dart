@@ -74,6 +74,27 @@ class NikkeEquipmentPresetStatistic {
   final double ratio;
 }
 
+class NikkeCombinedOffenseStatistic {
+  const NikkeCombinedOffenseStatistic({
+    required this.averageTotalPercent,
+    required this.myTotalPercent,
+    required this.topPercent,
+  });
+
+  factory NikkeCombinedOffenseStatistic.fromJson(Map<String, dynamic> json) {
+    return NikkeCombinedOffenseStatistic(
+      averageTotalPercent:
+          (json['averageTotalPercent'] as num?)?.toDouble() ?? 0,
+      myTotalPercent: (json['myTotalPercent'] as num?)?.toDouble(),
+      topPercent: (json['topPercent'] as num?)?.toDouble(),
+    );
+  }
+
+  final double averageTotalPercent;
+  final double? myTotalPercent;
+  final double? topPercent;
+}
+
 class NikkeStatistics {
   const NikkeStatistics({
     required this.server,
@@ -86,6 +107,7 @@ class NikkeStatistics {
     required this.mySkillPreset,
     required this.myEquipmentPreset,
     required this.overload,
+    required this.combinedOffense,
     required this.skillPresets,
     required this.equipmentPresets,
   });
@@ -95,6 +117,7 @@ class NikkeStatistics {
     final skillJson = json['skillPresets'] as List<dynamic>? ?? const [];
     final equipmentJson =
         json['equipmentPresets'] as List<dynamic>? ?? const [];
+    final combinedOffenseJson = json['combinedOffense'];
     return NikkeStatistics(
       server: json['server']?.toString() ?? '알 수 없음',
       sampleCount: (json['sampleCount'] as num?)?.toInt() ?? 0,
@@ -110,6 +133,10 @@ class NikkeStatistics {
           .map((item) =>
               NikkeOverloadStatistic.fromJson(Map<String, dynamic>.from(item)))
           .toList(),
+      combinedOffense: combinedOffenseJson is Map
+          ? NikkeCombinedOffenseStatistic.fromJson(
+              Map<String, dynamic>.from(combinedOffenseJson))
+          : null,
       skillPresets: skillJson
           .whereType<Map>()
           .map((item) => NikkeSkillPresetStatistic.fromJson(
@@ -133,6 +160,7 @@ class NikkeStatistics {
   final String mySkillPreset;
   final String myEquipmentPreset;
   final List<NikkeOverloadStatistic> overload;
+  final NikkeCombinedOffenseStatistic? combinedOffense;
   final List<NikkeSkillPresetStatistic> skillPresets;
   final List<NikkeEquipmentPresetStatistic> equipmentPresets;
 }

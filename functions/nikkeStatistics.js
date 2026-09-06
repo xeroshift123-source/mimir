@@ -81,6 +81,8 @@ function createNikkeStatisticsAccumulator(nameCode, { minimumSample = 20 } = {})
     nameCode: Number(nameCode),
     minimumSample,
     optionBuckets: new Map(),
+    combinedOffenseTotalPercent: 0,
+    combinedOffenseHistogram: {},
     skillCounts: new Map(),
     equipmentCounts: new Map(),
     sampleCount: 0,
@@ -96,7 +98,17 @@ function addCharacterToStatistics(accumulator, character) {
   const gearPreset = equipmentPreset(character);
   accumulator.equipmentCounts.set(gearPreset, (accumulator.equipmentCounts.get(gearPreset) || 0) + 1);
 
-  for (const option of characterOptionTotals(character).values()) {
+  const optionTotals = characterOptionTotals(character);
+  const combinedOffensePercent = Number((
+    (optionTotals.get('elementDamage')?.totalPercent || 0)
+    + (optionTotals.get('attack')?.totalPercent || 0)
+  ).toFixed(2));
+  const combinedOffenseKey = combinedOffensePercent.toFixed(2);
+  accumulator.combinedOffenseTotalPercent += combinedOffensePercent;
+  accumulator.combinedOffenseHistogram[combinedOffenseKey]
+    = (accumulator.combinedOffenseHistogram[combinedOffenseKey] || 0) + 1;
+
+  for (const option of optionTotals.values()) {
     const bucket = accumulator.optionBuckets.get(option.key) || {
       key: option.key,
       name: option.name,
@@ -120,6 +132,8 @@ function finalizeNikkeStatistics(accumulator) {
     nameCode,
     minimumSample,
     optionBuckets,
+    combinedOffenseTotalPercent,
+    combinedOffenseHistogram,
     skillCounts,
     equipmentCounts,
     sampleCount,
@@ -161,13 +175,19 @@ function finalizeNikkeStatistics(accumulator) {
     .slice(0, 4);
 
   return {
-    schemaVersion: 7,
+    schemaVersion: 8,
     nameCode: Number(nameCode),
     server: '전체',
     sampleCount,
     minimumSample,
     isSufficient: sampleCount >= minimumSample,
     overload,
+    combinedOffense: {
+      averageTotalPercent: sampleCount === 0
+        ? 0
+        : Number((combinedOffenseTotalPercent / sampleCount).toFixed(2)),
+      histogram: { ...combinedOffenseHistogram },
+    },
     skillPresets,
     equipmentPresets,
   };
@@ -188,12 +208,24 @@ function aggregateNikkeStatistics(commanders, nameCode, { minimumSample = 20 } =
 
 function attachUserComparison(statistics, character) {
   const mine = characterOptionTotals(character);
+  const myCombinedOffensePercent = Number((
+    (mine.get('elementDamage')?.totalPercent || 0)
+    + (mine.get('attack')?.totalPercent || 0)
+  ).toFixed(2));
   const skills = character?.skills || {};
   const mySkillPreset = `${Number(skills.skill1) || 1}/${Number(skills.skill2) || 1}/${Number(skills.burst) || 1}`;
   return {
     ...statistics,
     mySkillPreset,
     myEquipmentPreset: equipmentPreset(character),
+    combinedOffense: {
+      ...statistics.combinedOffense,
+      myTotalPercent: myCombinedOffensePercent,
+      topPercent: percentileFromHistogram(
+        statistics.combinedOffense?.histogram,
+        myCombinedOffensePercent,
+      ),
+    },
     overload: statistics.overload.map(option => {
       const myOption = mine.get(option.key);
       if (!myOption) return { ...option, myTotalPercent: null, myLineCount: 0, topPercent: null };

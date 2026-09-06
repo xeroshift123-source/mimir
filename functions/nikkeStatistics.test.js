@@ -41,6 +41,12 @@ test('모든 서버의 최신 계정을 하나의 표본으로 집계한다', ()
   assert.equal(result.overload[0].averageLineCount, 1);
   assert.equal(result.overload[0].adoptionRate, 66.7);
   assert.equal(result.overload[0].averageTotalPercent, 8.29);
+  assert.equal(result.combinedOffense.averageTotalPercent, 11.47);
+  assert.deepEqual(result.combinedOffense.histogram, {
+    '19.78': 1,
+    '14.63': 1,
+    '0.00': 1,
+  });
   assert.deepEqual(new Set(result.skillPresets.map(item => item.preset)), new Set(['10/10/10', '7/10/7', '1/1/1']));
   assert.deepEqual(result.skillPresets.map(item => item.ratio), [33.3, 33.3, 33.3]);
 });
@@ -53,6 +59,8 @@ test('내 옵션 합계를 동률 보정 백분위로 비교한다', () => {
 
   assert.equal(compared.overload[0].myTotalPercent, 10.24);
   assert.equal(compared.overload[0].topPercent, 75);
+  assert.equal(compared.combinedOffense.myTotalPercent, 10.24);
+  assert.equal(compared.combinedOffense.topPercent, 75);
   assert.equal(compared.mySkillPreset, '10/10/10');
   assert.equal(percentileFromHistogram({ '10.00': 2, '20.00': 1 }, 10), 66.7);
 });

@@ -1453,11 +1453,9 @@ class _NikkeListPanelState extends State<NikkeListPanel>
 
     // 속성 필터
     if (widget.elementFilters.isNotEmpty) {
-      filtered = filtered.where((n) {
-        if (n.id == 'rapi_red_hood' &&
-            widget.elementFilters.contains(ElementType.Iron)) return true;
-        return widget.elementFilters.contains(n.element);
-      }).toList();
+      filtered = filtered
+          .where((n) => n.matchesElementFilters(widget.elementFilters))
+          .toList();
     }
 
     // 무기 필터

@@ -113,4 +113,76 @@ const missingDefenderConsole = evaluateProfiles([{
 }]);
 assert.equal(missingDefenderConsole.has('extreme_firepower'), false);
 
+const reliableCompanion = evaluateProfiles([{
+  openId: 'reliable-companion',
+  profile: {
+    characters: [
+      { name_code: 1, harmonyCube: { tid: 101, level: 14 } },
+      { name_code: 2, harmonyCube: { tid: 102, level: 15 } },
+    ],
+  },
+}]);
+assert.equal(reliableCompanion.has('reliable_companion'), true);
+
+const cubeBelowLevel15 = evaluateProfiles([{
+  openId: 'cube-below-level-15',
+  profile: {
+    characters: [{ name_code: 1, harmonyCube: { tid: 101, level: 14 } }],
+  },
+}]);
+assert.equal(cubeBelowLevel15.has('reliable_companion'), false);
+
+const cubeNotEquipped = evaluateProfiles([{
+  openId: 'cube-not-equipped',
+  profile: { characters: [{ name_code: 1, harmonyCube: null }] },
+}]);
+assert.equal(cubeNotEquipped.has('reliable_companion'), false);
+
+function overloadedCharacter(nameCode, slots = ['head', 'torso', 'arm', 'leg']) {
+  return {
+    name_code: nameCode,
+    equipment: slots.map(slot => ({ slot, tier: 10, level: 0 })),
+  };
+}
+
+const noDistinction = evaluateProfiles([{
+  openId: 'no-distinction',
+  profile: { characters: [overloadedCharacter(3001)] },
+}]);
+assert.equal(noDistinction.has('no_distinction'), true);
+
+const lowRarityWithThreeOverloads = evaluateProfiles([{
+  openId: 'low-rarity-three-overloads',
+  profile: {
+    characters: [overloadedCharacter(1013, ['head', 'torso', 'arm'])],
+  },
+}]);
+assert.equal(lowRarityWithThreeOverloads.has('no_distinction'), false);
+
+const ssrWithFourOverloads = evaluateProfiles([{
+  openId: 'ssr-four-overloads',
+  profile: { characters: [overloadedCharacter(5001)] },
+}]);
+assert.equal(ssrWithFourOverloads.has('no_distinction'), false);
+
+for (const nameCode of [5055, 5056, 5059, 5078]) {
+  const unionLeaderTears = evaluateProfiles([{
+    openId: `union-leader-tears-${nameCode}`,
+    profile: { characters: [{ name_code: nameCode, grade: 3 }] },
+  }]);
+  assert.equal(unionLeaderTears.has('union_leader_tears'), true);
+}
+
+const rehabilitationNikkeBelowLimitBreak = evaluateProfiles([{
+  openId: 'rehabilitation-nikke-below-limit-break',
+  profile: { characters: [{ name_code: 5055, grade: 2 }] },
+}]);
+assert.equal(rehabilitationNikkeBelowLimitBreak.has('union_leader_tears'), false);
+
+const unrelatedLimitBrokenNikke = evaluateProfiles([{
+  openId: 'unrelated-limit-broken-nikke',
+  profile: { characters: [{ name_code: 5001, grade: 3 }] },
+}]);
+assert.equal(unrelatedLimitBrokenNikke.has('union_leader_tears'), false);
+
 console.log('achievementBadges tests passed');

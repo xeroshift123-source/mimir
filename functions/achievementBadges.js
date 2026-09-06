@@ -11,6 +11,12 @@ const STATIC_LEVEL_BADGES = [
 ];
 
 const COUNTERS_NAME_CODES = [5129, 5169, 5170];
+const R_AND_SR_NAME_CODES = new Set([
+  1013, 1014, 1015, 1016, 1017, 1018, 1023, 1024, 1025,
+  3001, 3002, 3003, 3005, 3006, 3007, 3008, 3009, 3010, 3011,
+  3012, 3013, 3014, 3015, 3016, 3018, 3019, 5063, 5096,
+]);
+const UNION_LEADER_TEARS_NAME_CODES = new Set([5055, 5056, 5059, 5078]);
 
 function asNumber(value) {
   const converted = Number(value);
@@ -105,6 +111,31 @@ function hasMaxBondCounters(profile) {
   return COUNTERS_NAME_CODES.every(nameCode => maxBondNameCodes.has(nameCode));
 }
 
+function hasLevel15CubeEquipped(profile) {
+  const characters = Array.isArray(profile?.characters) ? profile.characters : [];
+  return characters.some(character => asNumber(character?.harmonyCube?.level) >= 15);
+}
+
+function hasFourOverloadsOnLowRarityNikke(profile) {
+  const characters = Array.isArray(profile?.characters) ? profile.characters : [];
+  const requiredSlots = ['head', 'torso', 'arm', 'leg'];
+  return characters.some(character => {
+    const nameCode = Math.trunc(asNumber(character?.name_code));
+    if (!R_AND_SR_NAME_CODES.has(nameCode)) return false;
+    const overloadedSlots = new Set(equipmentFor(character)
+      .filter(isOverloaded)
+      .map(equipment => equipment?.slot?.toString()));
+    return requiredSlots.every(slot => overloadedSlots.has(slot));
+  });
+}
+
+function hasLimitBrokenRehabilitationNikke(profile) {
+  const characters = Array.isArray(profile?.characters) ? profile.characters : [];
+  return characters.some(character =>
+    UNION_LEADER_TEARS_NAME_CODES.has(Math.trunc(asNumber(character?.name_code)))
+      && asNumber(character?.grade) >= 3);
+}
+
 function ultimateNameCode(character) {
   if (asNumber(character?.core) !== 7) return null;
   const skills = character?.skills || {};
@@ -154,6 +185,9 @@ function evaluateProfiles(profileEntries, now = new Date()) {
     if (asNumber(profile?.costumeCount) >= 100) earn('fashionista', openId);
     if (hasMaxBondCounters(profile)) earn('counters', openId);
     if (hasExtremeFirepower(profile)) earn('extreme_firepower', openId);
+    if (hasLevel15CubeEquipped(profile)) earn('reliable_companion', openId);
+    if (hasFourOverloadsOnLowRarityNikke(profile)) earn('no_distinction', openId);
+    if (hasLimitBrokenRehabilitationNikke(profile)) earn('union_leader_tears', openId);
     if (countMasterpieceShoes(profile) >= 20) earn('shoes_20', openId);
 
     const highestLevel = highestNikkeLevel(profile);

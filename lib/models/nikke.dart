@@ -36,6 +36,15 @@ class Nikke {
     this.isTemporary = false,
   });
 
+  Set<ElementType> get searchableElements => {
+        element,
+        if (id == 'rapi_red_hood') ElementType.Iron,
+        if (id == 'sugar') ElementType.Water,
+      };
+
+  bool matchesElementFilters(Set<ElementType> filters) =>
+      filters.isEmpty || searchableElements.any(filters.contains);
+
   /// JSON → Nikke
   factory Nikke.fromJson(Map<String, dynamic> json) {
     // 1) burst: "1"/"2"/"3" or "burst1" → BurstType

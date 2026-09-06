@@ -210,6 +210,16 @@ class _NikkeStatisticsCardState extends State<NikkeStatisticsCard>
                   ),
                 ),
               const SizedBox(height: 18),
+              _SectionTitle(title: '우월코드 + 공격력 합산', isDark: widget.isDark),
+              const SizedBox(height: 8),
+              if (statistics.combinedOffense == null)
+                const _EmptyText('집계할 우월코드·공격력 정보가 없습니다.')
+              else
+                _CombinedOffenseRow(
+                  statistic: statistics.combinedOffense!,
+                  isDark: widget.isDark,
+                ),
+              const SizedBox(height: 18),
               _SectionTitle(title: '스킬 프리셋 TOP 4', isDark: widget.isDark),
               const SizedBox(height: 10),
               if (statistics.skillPresets.isEmpty)
@@ -385,6 +395,108 @@ class _OverloadRow extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CombinedOffenseRow extends StatelessWidget {
+  const _CombinedOffenseRow({
+    required this.statistic,
+    required this.isDark,
+  });
+
+  final NikkeCombinedOffenseStatistic statistic;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final mine = statistic.myTotalPercent;
+    final topPercent = statistic.topPercent;
+    final rankingScore =
+        topPercent == null ? null : (100.0 - topPercent).clamp(0.0, 100.0);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 11),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(.04) : Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.add_chart_rounded,
+                  size: 19, color: Colors.orange),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '우월코드 대미지 + 공격력',
+                      style: TextStyle(
+                          fontSize: 12.5, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '전체 평균 +${statistic.averageTotalPercent.toStringAsFixed(2)}%',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                mine == null ? '내 정보 없음' : '+${mine.toStringAsFixed(2)}%',
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: mine == null
+                      ? Colors.grey
+                      : _rankingColor(rankingScore ?? 0),
+                ),
+              ),
+            ],
+          ),
+          if (rankingScore != null) ...[
+            const SizedBox(height: 9),
+            Row(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: LinearProgressIndicator(
+                      value: rankingScore / 100,
+                      minHeight: 8,
+                      color: _rankingColor(rankingScore),
+                      backgroundColor:
+                          isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 9),
+                SizedBox(
+                  width: 62,
+                  child: Text(
+                    '상위 ${topPercent!.toStringAsFixed(1)}%',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      color: _rankingColor(rankingScore),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ],

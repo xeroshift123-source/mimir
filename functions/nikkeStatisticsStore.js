@@ -6,7 +6,7 @@ const {
   finalizeNikkeStatistics,
 } = require('./nikkeStatistics');
 
-const STATISTICS_SCHEMA_VERSION = 7;
+const STATISTICS_SCHEMA_VERSION = 8;
 const FRESHNESS_DAYS = 30;
 const MINIMUM_SAMPLE = 20;
 const READ_PAGE_SIZE = 25;

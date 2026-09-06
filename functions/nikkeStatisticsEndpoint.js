@@ -131,11 +131,13 @@ function createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUi
 
       const comparison = attachUserComparison(statistics, character);
       const overload = comparison.overload.map(({ histogram, ...option }) => option);
+      const { histogram: _combinedHistogram, ...combinedOffense } = comparison.combinedOffense;
       return res.status(200).json({
         success: true,
         data: {
           ...comparison,
           overload,
+          combinedOffense,
           freshnessDays: FRESHNESS_DAYS,
           generatedAt: new Date(generatedAtMs || Date.now()).toISOString(),
           canRefreshStatistics: userData.isAdmin === true,

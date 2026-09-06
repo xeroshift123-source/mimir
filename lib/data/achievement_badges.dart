@@ -35,6 +35,27 @@ const List<AchievementBadgeDefinition> staticAchievementBadges = [
     comment: '화력~! 화력~!',
   ),
   AchievementBadgeDefinition(
+    id: 'reliable_companion',
+    name: '믿음직한 동반자',
+    condition: '15레벨 큐브를 하나 이상 장착',
+    imagePath: 'assets/images/badge/CUBE.png',
+    comment: '말은 할 수 없습니다.',
+  ),
+  AchievementBadgeDefinition(
+    id: 'no_distinction',
+    name: '귀천은 없다',
+    condition: '등급이 SR 또는 R인 니케의 장비 4부위를 오버로드',
+    imagePath: 'assets/nikke/rapi.webp',
+    comment: '강한 니케, 약한 니케, 그런 건 지휘관이 멋대로 정하는 것.',
+  ),
+  AchievementBadgeDefinition(
+    id: 'union_leader_tears',
+    name: '유니온 장의 눈물',
+    condition: '길티, 신, 퀀시, 니힐리스타 중 한 명 이상을 3돌파 이상 달성',
+    imagePath: 'assets/images/badge/TEAR.webp',
+    comment: '이쁘잖아요',
+  ),
+  AchievementBadgeDefinition(
     id: 'shoes_20',
     name: 'Nikkes, On her feet',
     condition: '+5 오버로드 신발 20개 이상 보유',

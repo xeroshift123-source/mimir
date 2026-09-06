@@ -380,12 +380,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         return false;
       }
       if (_elementFilters.isNotEmpty) {
-        bool elementMatch = _elementFilters.contains(localNikke.element);
-        if (localNikke.id == 'rapi_red_hood' &&
-            _elementFilters.contains(ElementType.Iron)) {
-          elementMatch = true;
-        }
-        if (!elementMatch) return false;
+        if (!localNikke.matchesElementFilters(_elementFilters)) return false;
       }
       if (_weaponFilters.isNotEmpty &&
           !_weaponFilters.contains(localNikke.weaponType)) return false;
