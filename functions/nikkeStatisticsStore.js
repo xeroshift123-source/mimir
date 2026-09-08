@@ -1,8 +1,11 @@
 'use strict';
 
 const {
+  addCommanderToAccountElementDamage,
   addCharacterToStatistics,
+  createAccountElementDamageAccumulator,
   createNikkeStatisticsAccumulator,
+  finalizeAccountElementDamageStatistics,
   finalizeNikkeStatistics,
 } = require('./nikkeStatistics');
 
@@ -11,6 +14,7 @@ const FRESHNESS_DAYS = 30;
 const MINIMUM_SAMPLE = 20;
 const READ_PAGE_SIZE = 100;
 const READ_CONCURRENCY = 4;
+const ACCOUNT_ELEMENT_DAMAGE_CACHE_ID = 'account_element_damage';
 
 function statisticsCacheKey(nameCode) {
   return `all_${Number(nameCode)}`;
@@ -78,17 +82,26 @@ async function forEachEligibleLinkedCommander(db, nowMs, visit, pageSize = READ_
 
 function buildStatisticsSnapshots(commanders) {
   const accumulators = new Map();
+  const accountElementDamageAccumulator = createAccountElementDamageAccumulator();
   for (const commander of commanders) {
     addCommanderToAccumulators(accumulators, commander);
+    addCommanderToAccountElementDamage(accountElementDamageAccumulator, commander);
   }
-  return finalizeStatisticsSnapshots(accumulators);
+  return finalizeStatisticsSnapshots(accumulators, accountElementDamageAccumulator);
 }
 
-function finalizeStatisticsSnapshots(accumulators) {
-  return [...accumulators.entries()].map(([nameCode, accumulator]) => ({
+function finalizeStatisticsSnapshots(accumulators, accountElementDamageAccumulator) {
+  const snapshots = [...accumulators.entries()].map(([nameCode, accumulator]) => ({
     id: statisticsCacheKey(nameCode),
     data: finalizeNikkeStatistics(accumulator),
   }));
+  if (accountElementDamageAccumulator) {
+    snapshots.push({
+      id: ACCOUNT_ELEMENT_DAMAGE_CACHE_ID,
+      data: finalizeAccountElementDamageStatistics(accountElementDamageAccumulator),
+    });
+  }
+  return snapshots;
 }
 
 function addCommanderToAccumulators(accumulators, commander) {
@@ -108,12 +121,19 @@ function addCommanderToAccumulators(accumulators, commander) {
 
 async function buildStatisticsSnapshotsFromStore(db, nowMs = Date.now()) {
   const accumulators = new Map();
+  const accountElementDamageAccumulator = createAccountElementDamageAccumulator();
   const commanderCount = await forEachEligibleLinkedCommander(
     db,
     nowMs,
-    commander => addCommanderToAccumulators(accumulators, commander),
+    commander => {
+      addCommanderToAccumulators(accumulators, commander);
+      addCommanderToAccountElementDamage(accountElementDamageAccumulator, commander);
+    },
   );
-  const snapshots = finalizeStatisticsSnapshots(accumulators);
+  const snapshots = finalizeStatisticsSnapshots(
+    accumulators,
+    accountElementDamageAccumulator,
+  );
   return { commanderCount, snapshots };
 }
 
@@ -152,6 +172,7 @@ async function writeStatisticsSnapshots({ db, admin, snapshots, generatedAt = ne
 }
 
 module.exports = {
+  ACCOUNT_ELEMENT_DAMAGE_CACHE_ID,
   STATISTICS_SCHEMA_VERSION,
   FRESHNESS_DAYS,
   MINIMUM_SAMPLE,

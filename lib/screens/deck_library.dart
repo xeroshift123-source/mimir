@@ -894,7 +894,11 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
                       children: [
                         _buildFilterHeader(nikkeMap, isDark),
                         const SizedBox(height: 12),
-                        _buildCharacterGridSelector(nikkeList, isDark),
+                        SizedBox(
+                          height: (MediaQuery.sizeOf(context).height * .55)
+                              .clamp(360.0, 520.0),
+                          child: _buildCharacterGridSelector(nikkeList, isDark),
+                        ),
                       ],
                     ),
                   )

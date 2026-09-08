@@ -8,10 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:pasteboard/pasteboard.dart';
-
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/models/nikke.dart';
 import 'package:mimir/models/shared_deck.dart';
@@ -23,6 +19,7 @@ import 'package:mimir/screens/login.dart';
 import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/screens/deck_publish.dart';
 import 'package:mimir/widgets/nikke_card.dart';
+import 'package:mimir/utils/image_export.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/auth_account_button.dart';
 import 'package:mimir/services/database_service.dart';
@@ -328,18 +325,14 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
       return;
     }
 
-    if (kIsWeb) {
-      final blob = html.Blob([bytes], 'image/png');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      html.AnchorElement(href: url)
-        ..setAttribute('download',
-            'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png')
-        ..click();
-      html.Url.revokeObjectUrl(url);
-    } else {
-      await ImageGallerySaver.saveImage(bytes,
-          name: "mimir_deck_${DateTime.now().millisecondsSinceEpoch}");
-      if (mounted) {}
+    final filename = 'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png';
+    await exportPng(bytes, filename);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(kIsWeb ? '이미지를 저장했습니다.' : '이미지 공유 화면을 열었습니다.'),
+        ),
+      );
     }
   }
 
@@ -432,10 +425,14 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
     }
 
     try {
-      await Pasteboard.writeImage(bytes);
+      final filename =
+          'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png';
+      final copied = await copyPng(bytes, filename);
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('클립보드에 복사되었습니다!')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text(copied ? '클립보드에 복사되었습니다!' : '이미지 복사를 지원하지 않아 저장으로 전환했습니다.'),
+        ));
       }
     } catch (e) {
       if (mounted) {

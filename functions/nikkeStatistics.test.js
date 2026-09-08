@@ -3,12 +3,15 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
+  aggregateAccountElementDamageStatistics,
   aggregateNikkeStatistics,
+  attachAccountElementDamageComparison,
   attachUserComparison,
   equipmentPreset,
   percentileFromHistogram,
 } = require('./nikkeStatistics');
 const {
+  ACCOUNT_ELEMENT_DAMAGE_CACHE_ID,
   buildStatisticsSnapshots,
   buildStatisticsSnapshotsFromStore,
   statisticsCacheKey,
@@ -92,11 +95,66 @@ test('예약 집계는 모든 서버를 통합한 니케별 스냅샷을 만든�
   assert.deepEqual(
     snapshots.map(snapshot => snapshot.id).sort(),
     [
+      ACCOUNT_ELEMENT_DAMAGE_CACHE_ID,
       statisticsCacheKey(1001),
       statisticsCacheKey(1002),
     ].sort(),
   );
   assert.equal(snapshots.find(item => item.id === statisticsCacheKey(1001)).data.sampleCount, 2);
+});
+
+test('계정 전체 니케의 우월코드를 속성별로 합산하고 백분위를 계산한다', () => {
+  const first = {
+    characters: [
+      {
+        name_code: 5129,
+        equipment: [{ overloadOptions: [7000515] }],
+      },
+      {
+        name_code: 5002,
+        equipment: [{ overloadOptions: [7000502] }],
+      },
+    ],
+  };
+  const second = {
+    characters: [{
+      name_code: 5129,
+      equipment: [{ overloadOptions: [7000501] }],
+    }],
+  };
+
+  const aggregate = aggregateAccountElementDamageStatistics([first, second]);
+  const compared = attachAccountElementDamageComparison(aggregate, first);
+  const byKey = Object.fromEntries(
+    compared.elements.map(element => [element.key, element]),
+  );
+
+  assert.equal(compared.sampleCount, 2);
+  assert.equal(byKey.Fire.averageTotalPercent, 19.35);
+  assert.equal(byKey.Fire.myTotalPercent, 29.16);
+  assert.equal(byKey.Fire.topPercent, 25);
+  assert.equal(byKey.Iron.averageTotalPercent, 24.82);
+  assert.equal(byKey.Iron.myTotalPercent, 40.1);
+  assert.equal(byKey.Iron.topPercent, 25);
+  assert.equal(byKey.Water.averageTotalPercent, 5.47);
+  assert.equal(byKey.Water.myTotalPercent, 10.94);
+  assert.equal(byKey.Water.topPercent, 25);
+  assert.equal(byKey.Wind.myTotalPercent, 0);
+  assert.equal(byKey.Electric.topPercent, 50);
+});
+
+test('서버용 속성 맵은 니케 데이터와 이중 속성을 반영한다', () => {
+  const nikkes = require('../assets/nikkes.json');
+  const elementMap = require('./nikkeElements.json');
+
+  for (const nikke of nikkes) {
+    assert.ok(
+      elementMap[String(nikke.blablaNameCode)]?.includes(nikke.element),
+      `${nikke.id}의 기본 속성이 서버 맵에 없습니다.`,
+    );
+  }
+  assert.deepEqual(elementMap['5129'], ['Fire', 'Iron']);
+  assert.deepEqual(elementMap['5002'], ['Iron', 'Water']);
 });
 
 test('희귀 옵션의 평균과 백분위는 미채택자를 0으로 포함한다', () => {

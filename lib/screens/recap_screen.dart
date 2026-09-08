@@ -4,12 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
-import 'package:pasteboard/pasteboard.dart';
 import 'package:provider/provider.dart';
 
 import '../models/recap_card.dart';
 import '../providers/nikke_provider.dart';
 import '../services/database_service.dart';
+import '../services/nikke_statistics_service.dart';
 import '../services/recap_service.dart';
 import '../utils/image_export.dart';
 import '../web/capture_marker.dart';
@@ -27,6 +27,7 @@ class RecapScreen extends StatefulWidget {
 
 class _RecapScreenState extends State<RecapScreen> {
   final DatabaseService _database = DatabaseService();
+  final NikkeStatisticsService _statisticsService = NikkeStatisticsService();
   final PageController _pageController = PageController();
 
   bool _started = false;
@@ -40,6 +41,10 @@ class _RecapScreenState extends State<RecapScreen> {
   List<String> _captureViewTypes = const [];
 
   bool get _busy => _saving || _copying;
+  bool get _useDomWebCapture =>
+      kIsWeb &&
+      defaultTargetPlatform != TargetPlatform.android &&
+      defaultTargetPlatform != TargetPlatform.iOS;
 
   @override
   void didChangeDependencies() {
@@ -64,9 +69,20 @@ class _RecapScreenState extends State<RecapScreen> {
     }
     try {
       final profileFuture = _database.getCommanderProfile(openId);
+      final elementDamageFuture = () async {
+        try {
+          return await _statisticsService.getAccountElementDamageStatistics(
+            openId: openId,
+          );
+        } catch (error) {
+          debugPrint('Recap element damage statistics error: $error');
+          return null;
+        }
+      }();
       final provider = context.read<NikkeProvider>();
       if (provider.nikkeByBlablaCode.isEmpty) await provider.loadNikkes();
       final profile = await profileFuture;
+      final elementDamageStatistics = await elementDamageFuture;
       if (profile == null) throw StateError('프로필 정보가 없습니다.');
       if (kDebugMode &&
           profile['joinedAt'] == null &&
@@ -80,6 +96,7 @@ class _RecapScreenState extends State<RecapScreen> {
         profile: profile,
         nikkesByCode: provider.nikkeByBlablaCode,
         accountSeed: openId,
+        elementDamageStatistics: elementDamageStatistics,
       );
       if (!mounted) return;
       final captureToken = DateTime.now().microsecondsSinceEpoch;
@@ -129,7 +146,7 @@ class _RecapScreenState extends State<RecapScreen> {
           _cards![_currentIndex].order.toString().padLeft(2, '0');
       final stamp = DateFormat('yyyyMMdd').format(DateTime.now());
       final filename = 'mimir_recap_${stamp}_$cardNumber.png';
-      if (kIsWeb) {
+      if (_useDomWebCapture) {
         await web_capture.captureByElementId(
           elementId: _captureElementIds[_currentIndex],
           fileName: filename,
@@ -166,19 +183,27 @@ class _RecapScreenState extends State<RecapScreen> {
     if (_busy || _cards == null) return;
     setState(() => _copying = true);
     try {
-      if (kIsWeb) {
+      var copied = true;
+      if (_useDomWebCapture) {
         await web_capture.copyElementById(
           elementId: _captureElementIds[_currentIndex],
         );
       } else {
         final bytes = await _captureCurrentCard();
         if (bytes == null) throw StateError('카드 캡처에 실패했습니다.');
-        await Pasteboard.writeImage(bytes);
+        final cardNumber =
+            _cards![_currentIndex].order.toString().padLeft(2, '0');
+        final stamp = DateFormat('yyyyMMdd').format(DateTime.now());
+        copied = await copyPng(
+          bytes,
+          'mimir_recap_${stamp}_$cardNumber.png',
+        );
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('리캡 카드를 클립보드에 복사했습니다.'),
+        SnackBar(
+          content: Text(
+              copied ? '리캡 카드를 클립보드에 복사했습니다.' : '이미지 복사를 지원하지 않아 저장으로 전환했습니다.'),
           behavior: SnackBarBehavior.floating,
         ),
       );

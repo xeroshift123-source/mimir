@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:share_plus/share_plus.dart';
 
 Future<void> exportPng(Uint8List bytes, String filename) async {
@@ -16,4 +17,14 @@ Future<void> exportPng(Uint8List bytes, String filename) async {
     [XFile(file.path, mimeType: 'image/png', name: safeName)],
     text: '덱 공유',
   );
+}
+
+Future<bool> copyPng(Uint8List bytes, String filename) async {
+  try {
+    await Pasteboard.writeImage(bytes);
+    return true;
+  } catch (_) {
+    await exportPng(bytes, filename);
+    return false;
+  }
 }

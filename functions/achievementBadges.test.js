@@ -191,4 +191,39 @@ assert.equal(battleData.has('battle_data'), true);
 const noBattleData = evaluateProfiles([], new Date(), { hasSharedDeck: false });
 assert.equal(noBattleData.has('battle_data'), false);
 
+const elementDamageStatistics = {
+  sampleCount: 100,
+  elements: [
+    { key: 'Fire', histogram: { '10.00': 100 } },
+    { key: 'Water', histogram: { '10.00': 100 } },
+    { key: 'Wind', histogram: { '10.00': 100 } },
+    { key: 'Electric', histogram: { '10.00': 100 } },
+    { key: 'Iron', histogram: { '10.00': 100 } },
+  ],
+};
+const firstClass = evaluateProfiles([{
+  openId: 'first-class-account',
+  profile: {
+    characters: [1012, 1018, 1007, 1013, 1010].map(nameCode => ({
+      name_code: nameCode,
+      equipment: [{ overloadOptions: [7000515] }],
+    })),
+  },
+}], new Date(), { accountElementDamageStatistics: elementDamageStatistics });
+for (const id of [
+  'first_class_fire',
+  'first_class_water',
+  'first_class_wind',
+  'first_class_electric',
+  'first_class_iron',
+]) {
+  assert.equal(firstClass.has(id), true, `${id} should be earned`);
+}
+
+const noElementOptions = evaluateProfiles([{
+  openId: 'no-element-options',
+  profile: { characters: [{ name_code: 1012, equipment: [] }] },
+}], new Date(), { accountElementDamageStatistics: elementDamageStatistics });
+assert.equal(noElementOptions.has('first_class_fire'), false);
+
 console.log('achievementBadges tests passed');

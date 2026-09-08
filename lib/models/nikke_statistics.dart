@@ -95,6 +95,61 @@ class NikkeCombinedOffenseStatistic {
   final double? topPercent;
 }
 
+class AccountElementDamageStatistic {
+  const AccountElementDamageStatistic({
+    required this.key,
+    required this.name,
+    required this.averageTotalPercent,
+    required this.myTotalPercent,
+    required this.topPercent,
+  });
+
+  factory AccountElementDamageStatistic.fromJson(Map<String, dynamic> json) {
+    return AccountElementDamageStatistic(
+      key: json['key']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      averageTotalPercent:
+          (json['averageTotalPercent'] as num?)?.toDouble() ?? 0,
+      myTotalPercent: (json['myTotalPercent'] as num?)?.toDouble() ?? 0,
+      topPercent: (json['topPercent'] as num?)?.toDouble(),
+    );
+  }
+
+  final String key;
+  final String name;
+  final double averageTotalPercent;
+  final double myTotalPercent;
+  final double? topPercent;
+}
+
+class AccountElementDamageStatistics {
+  const AccountElementDamageStatistics({
+    required this.sampleCount,
+    required this.freshnessDays,
+    required this.generatedAt,
+    required this.elements,
+  });
+
+  factory AccountElementDamageStatistics.fromJson(Map<String, dynamic> json) {
+    final elementsJson = json['elements'] as List<dynamic>? ?? const [];
+    return AccountElementDamageStatistics(
+      sampleCount: (json['sampleCount'] as num?)?.toInt() ?? 0,
+      freshnessDays: (json['freshnessDays'] as num?)?.toInt() ?? 30,
+      generatedAt: DateTime.tryParse(json['generatedAt']?.toString() ?? ''),
+      elements: elementsJson
+          .whereType<Map>()
+          .map((item) => AccountElementDamageStatistic.fromJson(
+              Map<String, dynamic>.from(item)))
+          .toList(),
+    );
+  }
+
+  final int sampleCount;
+  final int freshnessDays;
+  final DateTime? generatedAt;
+  final List<AccountElementDamageStatistic> elements;
+}
+
 class NikkeStatistics {
   const NikkeStatistics({
     required this.server,

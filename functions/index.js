@@ -5,6 +5,7 @@ const axios = require('axios');
 const cors = require('cors')({ origin: true });
 const { fetchCDNJson } = require('./cdnDecrypt');
 const { createNikkeStatisticsHandler } = require('./nikkeStatisticsEndpoint');
+const { createAccountElementDamageHandler } = require('./accountElementDamageEndpoint');
 const { createDailyNikkeStatisticsHandler } = require('./nikkeStatisticsSchedule');
 const { createNikkeStatisticsRefreshHandler } = require('./nikkeStatisticsRefreshEndpoint');
 const { issueGuestProfileToken, createGuestCommanderProfileHandler } = require('./guestProfileAccess');
@@ -770,6 +771,7 @@ exports.deleteSharedDeck = functions.https.onRequest(async (req, res) => {
 });
 
 exports.getNikkeStatistics = createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUid });
+exports.getAccountElementDamageStatistics = createAccountElementDamageHandler({ functions, db, getAuthenticatedUid });
 exports.refreshDailyNikkeStatistics = createDailyNikkeStatisticsHandler({ functions, admin, db });
 exports.refreshNikkeStatisticsNow = createNikkeStatisticsRefreshHandler({ functions, admin, db, getAuthenticatedUid });
 exports.getGuestCommanderProfile = createGuestCommanderProfileHandler({ functions, db });

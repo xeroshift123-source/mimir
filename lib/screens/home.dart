@@ -138,6 +138,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _openDeckLibrary(BuildContext context) {
+    Navigator.pushNamed(context, DeckLibraryScreen.routeName);
+  }
+
   Widget _buildMenuButton(BuildContext context,
       {required String title,
       required IconData icon,
@@ -858,10 +862,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: "덱 라이브러리",
                         icon: Icons.auto_stories_rounded,
                         color: Colors.deepOrange,
-                        onTap: () => Navigator.pushNamed(
-                          context,
-                          DeckLibraryScreen.routeName,
-                        ),
+                        onTap: () => _openDeckLibrary(context),
                       ),
                       const SizedBox(height: 12),
                       _buildMenuButton(

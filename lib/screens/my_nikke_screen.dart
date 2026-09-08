@@ -8,18 +8,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:pasteboard/pasteboard.dart';
-
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:mimir/providers/nikke_provider.dart';
 import 'package:mimir/models/nikke.dart';
+import 'package:mimir/models/nikke_statistics.dart';
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/services/database_service.dart';
+import 'package:mimir/services/nikke_statistics_service.dart';
 import 'package:mimir/utils/cp_calculator.dart';
+import 'package:mimir/utils/image_export.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/nikke_statistics_card.dart';
 import 'deck_builder.dart';
@@ -33,12 +32,139 @@ class MyNikkeScreen extends StatefulWidget {
   State<MyNikkeScreen> createState() => _MyNikkeScreenState();
 }
 
+class _AccountElementDamageBar extends StatelessWidget {
+  const _AccountElementDamageBar({
+    required this.statistic,
+    required this.isDark,
+  });
+
+  final AccountElementDamageStatistic statistic;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final topPercent = statistic.topPercent;
+    final rankingScore =
+        topPercent == null ? 0.0 : (100.0 - topPercent).clamp(0.0, 100.0);
+    final rankingColor = _elementRankingColor(rankingScore);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(.04) : Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Image.asset(
+                'assets/icons/elements/icon-elements-${statistic.key}.webp',
+                width: 18,
+                height: 18,
+                errorBuilder: (_, __, ___) => const SizedBox.square(
+                  dimension: 18,
+                  child:
+                      Icon(Icons.bolt_rounded, size: 16, color: Colors.orange),
+                ),
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  statistic.name,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Text(
+                '+${statistic.myTotalPercent.toStringAsFixed(2)}%',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: rankingColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: rankingScore / 100,
+              minHeight: 6,
+              color: rankingColor,
+              backgroundColor:
+                  isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '평균 +${statistic.averageTotalPercent.toStringAsFixed(2)}%',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                  ),
+                ),
+              ),
+              Text(
+                topPercent == null
+                    ? '비교 불가'
+                    : '상위 ${topPercent.toStringAsFixed(1)}%',
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  color: topPercent == null ? Colors.grey : rankingColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Color _elementRankingColor(double score) {
+  final normalized = score.clamp(0.0, 100.0);
+  if (normalized <= 33.3) {
+    return Color.lerp(
+      Colors.red.shade500,
+      Colors.amber.shade600,
+      normalized / 33.3,
+    )!;
+  }
+  if (normalized <= 66.6) {
+    return Color.lerp(
+      Colors.amber.shade600,
+      Colors.green.shade500,
+      (normalized - 33.3) / 33.3,
+    )!;
+  }
+  return Color.lerp(
+    Colors.green.shade500,
+    Colors.blue.shade600,
+    (normalized - 66.6) / 33.4,
+  )!;
+}
+
 class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final DatabaseService _dbService = DatabaseService();
+  final NikkeStatisticsService _statisticsService = NikkeStatisticsService();
   bool _isLoading = true;
   String? _errorMessage;
   Map<String, dynamic>? _profileData;
   String? _openId;
+  Future<AccountElementDamageStatistics>? _accountElementDamageFuture;
   bool _isRefreshing = false;
   int _refreshCooldownSeconds = 0;
   Timer? _refreshCooldownTimer;
@@ -100,6 +226,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       if (data != null) {
         setState(() {
           _profileData = data;
+          _accountElementDamageFuture = _statisticsService
+              .getAccountElementDamageStatistics(openId: openId);
           _isLoading = false;
         });
         _restoreRefreshCooldown(data);
@@ -205,7 +333,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         throw StateError('갱신된 지휘관 정보를 불러오지 못했습니다.');
       }
       if (!mounted) return;
-      setState(() => _profileData = refreshedProfile);
+      setState(() {
+        _profileData = refreshedProfile;
+        _accountElementDamageFuture = _statisticsService
+            .getAccountElementDamageStatistics(openId: openId);
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('최신 니케 정보로 갱신했습니다.'),
@@ -696,9 +828,102 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               const SizedBox(height: 12),
               _buildRecycleRoomSection(recycleRoom, infraCoreLevel, isDark),
             ],
+            const SizedBox(height: 12),
+            Divider(
+                height: 1,
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+            const SizedBox(height: 10),
+            _buildAccountElementDamageSection(isDark),
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildAccountElementDamageSection(bool isDark) {
+    final future = _accountElementDamageFuture;
+    if (future == null) return const SizedBox.shrink();
+
+    return FutureBuilder<AccountElementDamageStatistics>(
+      future: future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            height: 34,
+            child: Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.orange,
+              ),
+            ),
+          );
+        }
+        if (snapshot.hasError || snapshot.data == null) {
+          return Text(
+            '속성별 우월코드 통계는 다음 통계 갱신 후 표시됩니다.',
+            style: TextStyle(
+              fontSize: 11,
+              color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+            ),
+          );
+        }
+
+        final statistics = snapshot.data!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.query_stats_rounded,
+                    size: 15, color: Colors.orange),
+                const SizedBox(width: 5),
+                Text(
+                  '속성별 우월코드 합산',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: isDark ? Colors.grey.shade200 : Colors.grey.shade800,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '표본 ${statistics.sampleCount}명',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 7),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final columns = constraints.maxWidth >= 760
+                    ? 5
+                    : constraints.maxWidth >= 430
+                        ? 2
+                        : 1;
+                const gap = 7.0;
+                final itemWidth =
+                    (constraints.maxWidth - gap * (columns - 1)) / columns;
+                return Wrap(
+                  spacing: gap,
+                  runSpacing: gap,
+                  children: statistics.elements
+                      .map((element) => SizedBox(
+                            width: itemWidth,
+                            child: _AccountElementDamageBar(
+                              statistic: element,
+                              isDark: isDark,
+                            ),
+                          ))
+                      .toList(),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -3058,15 +3283,23 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                   await _captureKeyToBytes(captureKey);
                               if (bytes != null) {
                                 try {
-                                  await Pasteboard.writeImage(bytes);
-                                  if (mounted)
+                                  final filename =
+                                      'license_${DateTime.now().millisecondsSinceEpoch}.png';
+                                  final copied = await copyPng(bytes, filename);
+                                  if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text('클립보드에 복사되었습니다!')));
+                                      SnackBar(
+                                        content: Text(copied
+                                            ? '클립보드에 복사되었습니다!'
+                                            : '이미지 복사를 지원하지 않아 저장으로 전환했습니다.'),
+                                      ),
+                                    );
+                                  }
                                 } catch (e) {
-                                  if (mounted)
+                                  if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(content: Text('복사 실패: $e')));
+                                  }
                                 }
                               }
                             },
@@ -3085,23 +3318,17 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                               final bytes =
                                   await _captureKeyToBytes(captureKey);
                               if (bytes != null) {
-                                if (kIsWeb) {
-                                  final blob = html.Blob([bytes], 'image/png');
-                                  final url =
-                                      html.Url.createObjectUrlFromBlob(blob);
-                                  html.AnchorElement(href: url)
-                                    ..setAttribute('download',
-                                        'license_${DateTime.now().millisecondsSinceEpoch}.png')
-                                    ..click();
-                                  html.Url.revokeObjectUrl(url);
-                                } else {
-                                  await ImageGallerySaver.saveImage(bytes,
-                                      name:
-                                          "license_${DateTime.now().millisecondsSinceEpoch}");
-                                  if (mounted)
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text('저장되었습니다!')));
+                                final filename =
+                                    'license_${DateTime.now().millisecondsSinceEpoch}.png';
+                                await exportPng(bytes, filename);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(kIsWeb
+                                          ? '이미지를 저장했습니다.'
+                                          : '이미지 공유 화면을 열었습니다.'),
+                                    ),
+                                  );
                                 }
                               }
                             },

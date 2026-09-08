@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/models/nikke.dart';
+import 'package:mimir/models/nikke_statistics.dart';
 import 'package:mimir/services/recap_service.dart';
 import 'package:mimir/screens/recap_screen.dart';
 
@@ -45,6 +46,9 @@ void main() {
       profile: profile,
       nikkesByCode: nikkes,
       accountSeed: 'commander-1',
+      elementDamageStatistics: _elementStatistics([
+        _elementStatistic('Water', '수냉', total: 116.64, top: 2.4),
+      ]),
       now: DateTime(2026, 1, 11),
     );
 
@@ -66,7 +70,8 @@ void main() {
     expect(cards.firstWhere((card) => card.order == 6).title, startsWith('수냉'));
     expect(cards.firstWhere((card) => card.order == 6).imageAsset,
         waterNikke.imageUrl);
-    expect(cards.firstWhere((card) => card.order == 7).title, contains('수냉에서'));
+    expect(cards.firstWhere((card) => card.order == 7).title,
+        '수냉 속성 우월코드 합산은\n상위 2.4%예요!');
     expect(cards.firstWhere((card) => card.order == 7).details,
         ['우월코드 데미지 증가 총합 116.64%']);
     expect(
@@ -161,15 +166,19 @@ void main() {
       },
       nikkesByCode: {3001: fire, 3002: waterTop, 3003: waterSecond},
       accountSeed: 'superior-code-element',
+      elementDamageStatistics: _elementStatistics([
+        _elementStatistic('Fire', '작열', total: 29.16, top: 1.2),
+        _elementStatistic('Water', '수냉', total: 42.90, top: 4.5),
+      ]),
     );
 
     final card = cards.firstWhere((card) => card.order == 7);
     expect(
       card.title,
-      '우월코드 데미지 증가 옵션은\n수냉에서 제일 높았어요!',
+      '작열 속성 우월코드 합산은\n상위 1.2%예요!',
     );
-    expect(card.details, ['우월코드 데미지 증가 총합 42.90%']);
-    expect(card.imageAsset, waterTop.imageUrl);
+    expect(card.details, ['우월코드 데미지 증가 총합 29.16%']);
+    expect(card.imageAsset, fire.imageUrl);
   });
 
   test('에반게리온 니케를 3돌파하면 해당 목록과 이미지를 표시한다', () {
@@ -458,4 +467,30 @@ Map<String, dynamic> _superiorCodeCharacter(int code, List<int> levels) {
       },
     ],
   };
+}
+
+AccountElementDamageStatistics _elementStatistics(
+  List<AccountElementDamageStatistic> elements,
+) {
+  return AccountElementDamageStatistics(
+    sampleCount: 100,
+    freshnessDays: 30,
+    generatedAt: DateTime(2026, 9, 8),
+    elements: elements,
+  );
+}
+
+AccountElementDamageStatistic _elementStatistic(
+  String key,
+  String name, {
+  required double total,
+  required double top,
+}) {
+  return AccountElementDamageStatistic(
+    key: key,
+    name: name,
+    averageTotalPercent: 0,
+    myTotalPercent: total,
+    topPercent: top,
+  );
 }

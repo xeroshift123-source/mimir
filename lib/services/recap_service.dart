@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../models/enums.dart';
 import '../models/nikke.dart';
+import '../models/nikke_statistics.dart';
 import '../models/recap_card.dart';
 import '../utils/blabla_map.dart';
 
@@ -25,6 +26,7 @@ class RecapService {
     required Map<String, dynamic> profile,
     required Map<int, Nikke> nikkesByCode,
     required String accountSeed,
+    AccountElementDamageStatistics? elementDamageStatistics,
     DateTime? now,
   }) {
     final today = now ?? DateTime.now();
@@ -149,7 +151,6 @@ class RecapService {
       details: ['속성 칩 ${_number(elementChips)}개'],
     ));
 
-    final superiorCodeByElement = <ElementType, double>{};
     final superiorCodeByCharacter = <int, double>{};
     final topCharacterByElement = <ElementType, Map<String, dynamic>>{};
     for (final char in chars) {
@@ -169,55 +170,62 @@ class RecapService {
           );
       if (superiorCode <= 0) continue;
       superiorCodeByCharacter[nameCode] = superiorCode;
-      superiorCodeByElement.update(
-        nikke.element,
-        (value) => value + superiorCode,
-        ifAbsent: () => superiorCode,
-      );
-
-      final current = topCharacterByElement[nikke.element];
-      if (current == null) {
-        topCharacterByElement[nikke.element] = char;
-        continue;
-      }
-      final currentCode = _asInt(current['name_code'])!;
-      final currentSuperiorCode = superiorCodeByCharacter[currentCode]!;
-      final combat = _asInt(char['combat']) ?? 0;
-      final currentCombat = _asInt(current['combat']) ?? 0;
-      if (superiorCode > currentSuperiorCode ||
-          (superiorCode == currentSuperiorCode && combat > currentCombat) ||
-          (superiorCode == currentSuperiorCode &&
-              combat == currentCombat &&
-              nameCode < currentCode)) {
-        topCharacterByElement[nikke.element] = char;
+      for (final element in nikke.searchableElements) {
+        final current = topCharacterByElement[element];
+        if (current == null) {
+          topCharacterByElement[element] = char;
+          continue;
+        }
+        final currentCode = _asInt(current['name_code'])!;
+        final currentSuperiorCode = superiorCodeByCharacter[currentCode]!;
+        final combat = _asInt(char['combat']) ?? 0;
+        final currentCombat = _asInt(current['combat']) ?? 0;
+        if (superiorCode > currentSuperiorCode ||
+            (superiorCode == currentSuperiorCode && combat > currentCombat) ||
+            (superiorCode == currentSuperiorCode &&
+                combat == currentCombat &&
+                nameCode < currentCode)) {
+          topCharacterByElement[element] = char;
+        }
       }
     }
-    if (superiorCodeByElement.isNotEmpty) {
-      final rankedElements = superiorCodeByElement.entries.toList()
-        ..sort((a, b) {
-          final total = b.value.compareTo(a.value);
-          return total != 0 ? total : a.key.index.compareTo(b.key.index);
-        });
-      final topSuperiorElement = rankedElements.first;
-      final representative = topCharacterByElement[topSuperiorElement.key]!;
-      final representativeNikke =
-          nikkesByCode[_asInt(representative['name_code'])]!;
-      final theme = _elementTheme(topSuperiorElement.key);
+    final rankedStatistics = elementDamageStatistics?.elements
+            .where((statistic) =>
+                statistic.myTotalPercent > 0 &&
+                statistic.topPercent != null &&
+                statistic.topPercent!.isFinite &&
+                _elementFromStatisticsKey(statistic.key) != null)
+            .toList() ??
+        const <AccountElementDamageStatistic>[];
+    if (rankedStatistics.isNotEmpty) {
+      rankedStatistics.sort((a, b) {
+        final rank = a.topPercent!.compareTo(b.topPercent!);
+        if (rank != 0) return rank;
+        final total = b.myTotalPercent.compareTo(a.myTotalPercent);
+        if (total != 0) return total;
+        return a.key.compareTo(b.key);
+      });
+      final topStatistic = rankedStatistics.first;
+      final topElement = _elementFromStatisticsKey(topStatistic.key)!;
+      final representative = topCharacterByElement[topElement];
+      final representativeNikke = representative == null
+          ? null
+          : nikkesByCode[_asInt(representative['name_code'])];
+      final theme = _elementTheme(topElement);
       cards.add(RecapCardData(
         order: 7,
         eyebrow: 'SUPERIOR CODE',
         title:
-            '우월코드 데미지 증가 옵션은\n${_elementName(topSuperiorElement.key)}에서 제일 높았어요!',
-        imageAsset: representativeNikke.imageUrl,
+            '${_elementName(topElement)} 속성 우월코드 합산은\n상위 ${topStatistic.topPercent!.toStringAsFixed(1)}%예요!',
+        imageAsset: representativeNikke?.imageUrl,
         colors: theme.colors,
         textColor: Colors.white,
         accentColor: theme.accent,
         details: [
-          '우월코드 데미지 증가 총합 ${topSuperiorElement.value.toStringAsFixed(2)}%',
+          '우월코드 데미지 증가 총합 ${topStatistic.myTotalPercent.toStringAsFixed(2)}%',
         ],
       ));
     }
-
     final overloadCount = chars.fold<int>(
       0,
       (sum, c) => sum + _equipment(c).where(_isOverloaded).length,
@@ -722,6 +730,13 @@ class RecapService {
         ElementType.Electric => '전격',
         ElementType.Iron => '철갑',
       };
+
+  static ElementType? _elementFromStatisticsKey(String key) {
+    for (final element in ElementType.values) {
+      if (element.name.toLowerCase() == key.toLowerCase()) return element;
+    }
+    return null;
+  }
 
   static _ElementTheme _elementTheme(ElementType value) => switch (value) {
         ElementType.Fire => const _ElementTheme(

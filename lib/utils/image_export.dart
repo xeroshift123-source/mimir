@@ -9,3 +9,9 @@ import 'image_export_stub.dart'
 Future<void> exportPng(Uint8List bytes, String filename) {
   return impl.exportPng(bytes, filename);
 }
+
+/// 이미지 클립보드를 지원하면 복사하고, 미지원 환경에서는 저장/공유로
+/// 전환한다. 실제 복사 여부를 반환한다.
+Future<bool> copyPng(Uint8List bytes, String filename) {
+  return impl.copyPng(bytes, filename);
+}

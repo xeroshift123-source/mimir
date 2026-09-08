@@ -1,4 +1,6 @@
 const admin = require('firebase-admin');
+const { attachAccountElementDamageComparison } = require('./nikkeStatistics');
+const { ACCOUNT_ELEMENT_DAMAGE_CACHE_ID } = require('./nikkeStatisticsStore');
 
 const STATIC_LEVEL_BADGES = [
   ['level_400', 400],
@@ -17,6 +19,13 @@ const R_AND_SR_NAME_CODES = new Set([
   3012, 3013, 3014, 3015, 3016, 3018, 3019, 5063, 5096,
 ]);
 const UNION_LEADER_TEARS_NAME_CODES = new Set([5055, 5056, 5059, 5078]);
+const FIRST_CLASS_ELEMENT_BADGES = {
+  Fire: 'first_class_fire',
+  Water: 'first_class_water',
+  Wind: 'first_class_wind',
+  Electric: 'first_class_electric',
+  Iron: 'first_class_iron',
+};
 
 function asNumber(value) {
   const converted = Number(value);
@@ -176,7 +185,7 @@ function ultimateNameCode(character) {
 function evaluateProfiles(
   profileEntries,
   now = new Date(),
-  { hasSharedDeck = false } = {},
+  { hasSharedDeck = false, accountElementDamageStatistics = null } = {},
 ) {
   const earned = new Map();
   const earn = (id, openId, extra = {}) => {
@@ -193,6 +202,22 @@ function evaluateProfiles(
     if (hasFourOverloadsOnLowRarityNikke(profile)) earn('no_distinction', openId);
     if (hasLimitBrokenRehabilitationNikke(profile)) earn('union_leader_tears', openId);
     if (countMasterpieceShoes(profile) >= 20) earn('shoes_20', openId);
+
+    if (accountElementDamageStatistics) {
+      const comparison = attachAccountElementDamageComparison(
+        accountElementDamageStatistics,
+        profile,
+      );
+      for (const element of comparison.elements || []) {
+        const badgeId = FIRST_CLASS_ELEMENT_BADGES[element.key];
+        if (badgeId
+          && asNumber(element.myTotalPercent) > 0
+          && element.topPercent != null
+          && asNumber(element.topPercent) <= 4) {
+          earn(badgeId, openId);
+        }
+      }
+    }
 
     const highestLevel = highestNikkeLevel(profile);
     for (const [id, threshold] of STATIC_LEVEL_BADGES) {
@@ -263,12 +288,20 @@ function createEvaluateAchievementBadgesHandler({ db, getAuthenticatedUid }) {
       const profileEntries = snapshots
         .filter(snapshot => snapshot.exists)
         .map(snapshot => ({ openId: snapshot.id, profile: snapshot.data() }));
-      const authoredDecks = await db.collection('shared_decks')
-        .where('authorUid', '==', uid)
-        .limit(1)
-        .get();
+      const [authoredDecks, elementDamageCache] = await Promise.all([
+        db.collection('shared_decks')
+          .where('authorUid', '==', uid)
+          .limit(1)
+          .get(),
+        db.collection('nikke_statistics')
+          .doc(ACCOUNT_ELEMENT_DAMAGE_CACHE_ID)
+          .get(),
+      ]);
       const earned = evaluateProfiles(profileEntries, new Date(), {
         hasSharedDeck: !authoredDecks.empty,
+        accountElementDamageStatistics: elementDamageCache.exists
+          ? elementDamageCache.data()
+          : null,
       });
       const now = admin.firestore.Timestamp.now();
 

@@ -1,5 +1,15 @@
 'use strict';
 
+const NIKKE_ELEMENTS_BY_NAME_CODE = require('./nikkeElements.json');
+
+const ELEMENT_DEFINITIONS = [
+  { key: 'Fire', name: '작열' },
+  { key: 'Water', name: '수냉' },
+  { key: 'Wind', name: '풍압' },
+  { key: 'Electric', name: '전격' },
+  { key: 'Iron', name: '철갑' },
+];
+
 const OPTION_DEFINITIONS = [
   { min: 7000501, max: 7000515, key: 'elementDamage', name: '우월코드 대미지', values: [9.54, 10.94, 12.34, 13.75, 15.15, 16.55, 17.95, 19.35, 20.75, 22.15, 23.56, 24.96, 26.36, 27.76, 29.16] },
   { min: 7000601, max: 7000615, key: 'hitRate', name: '명중률', values: [4.77, 5.47, 6.18, 6.88, 7.59, 8.29, 9.00, 9.70, 10.40, 11.11, 11.81, 12.52, 13.22, 13.93, 14.63] },
@@ -36,6 +46,88 @@ function characterOptionTotals(character) {
     }
   }
   return totals;
+}
+
+function accountElementDamageTotals(commander) {
+  const totals = Object.fromEntries(ELEMENT_DEFINITIONS.map(({ key }) => [key, 0]));
+  for (const character of Array.isArray(commander?.characters) ? commander.characters : []) {
+    const nameCode = String(Number(character?.name_code) || 0);
+    const elements = NIKKE_ELEMENTS_BY_NAME_CODE[nameCode] || [];
+    const elementDamage = characterOptionTotals(character)
+      .get('elementDamage')?.totalPercent || 0;
+    for (const element of elements) {
+      if (Object.hasOwn(totals, element)) totals[element] += elementDamage;
+    }
+  }
+  return Object.fromEntries(Object.entries(totals)
+    .map(([key, value]) => [key, Number(value.toFixed(2))]));
+}
+
+function createAccountElementDamageAccumulator() {
+  return {
+    sampleCount: 0,
+    buckets: Object.fromEntries(ELEMENT_DEFINITIONS.map(({ key, name }) => [key, {
+      key,
+      name,
+      totalPercent: 0,
+      histogram: {},
+    }])),
+  };
+}
+
+function addCommanderToAccountElementDamage(accumulator, commander) {
+  const totals = accountElementDamageTotals(commander);
+  accumulator.sampleCount += 1;
+  for (const { key } of ELEMENT_DEFINITIONS) {
+    const value = totals[key];
+    const histogramKey = value.toFixed(2);
+    const bucket = accumulator.buckets[key];
+    bucket.totalPercent += value;
+    bucket.histogram[histogramKey] = (bucket.histogram[histogramKey] || 0) + 1;
+  }
+}
+
+function finalizeAccountElementDamageStatistics(accumulator) {
+  return {
+    schemaVersion: 8,
+    server: '전체',
+    sampleCount: accumulator.sampleCount,
+    elements: ELEMENT_DEFINITIONS.map(({ key }) => {
+      const bucket = accumulator.buckets[key];
+      return {
+        key: bucket.key,
+        name: bucket.name,
+        averageTotalPercent: accumulator.sampleCount === 0
+          ? 0
+          : Number((bucket.totalPercent / accumulator.sampleCount).toFixed(2)),
+        histogram: { ...bucket.histogram },
+      };
+    }),
+  };
+}
+
+function aggregateAccountElementDamageStatistics(commanders) {
+  const accumulator = createAccountElementDamageAccumulator();
+  for (const commander of commanders) {
+    if (commander) addCommanderToAccountElementDamage(accumulator, commander);
+  }
+  return finalizeAccountElementDamageStatistics(accumulator);
+}
+
+function attachAccountElementDamageComparison(statistics, commander) {
+  const mine = accountElementDamageTotals(commander);
+  return {
+    ...statistics,
+    elements: (Array.isArray(statistics?.elements) ? statistics.elements : [])
+      .map(element => ({
+        ...element,
+        myTotalPercent: mine[element.key] || 0,
+        topPercent: percentileFromHistogram(
+          element.histogram,
+          mine[element.key] || 0,
+        ),
+      })),
+  };
 }
 
 const EQUIPMENT_PRESET_SLOTS = ['head', 'arm', 'torso', 'leg'];
@@ -244,13 +336,19 @@ function attachUserComparison(statistics, character) {
 }
 
 module.exports = {
+  addCommanderToAccountElementDamage,
   addCharacterToStatistics,
+  aggregateAccountElementDamageStatistics,
   aggregateNikkeStatistics,
+  attachAccountElementDamageComparison,
   attachUserComparison,
+  accountElementDamageTotals,
   characterOptionTotals,
+  createAccountElementDamageAccumulator,
   createNikkeStatisticsAccumulator,
   equipmentPreset,
   equipmentTier,
+  finalizeAccountElementDamageStatistics,
   finalizeNikkeStatistics,
   percentileFromHistogram,
 };

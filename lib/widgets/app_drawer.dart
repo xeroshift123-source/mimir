@@ -303,9 +303,14 @@ class AppDrawer extends StatelessWidget {
                   title: "덱 라이브러리 (Library)",
                   route: DeckLibraryScreen.routeName,
                   onTap: () {
-                    Navigator.pop(context);
+                    final navigator = Navigator.of(context);
+                    navigator.pop();
                     if (activeRoute != DeckLibraryScreen.routeName) {
-                      Navigator.pushNamed(context, DeckLibraryScreen.routeName);
+                      Future<void>.delayed(Duration.zero, () {
+                        if (navigator.mounted) {
+                          navigator.pushNamed(DeckLibraryScreen.routeName);
+                        }
+                      });
                     }
                   },
                 ),
