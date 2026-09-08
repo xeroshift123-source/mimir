@@ -222,7 +222,7 @@ class RecapService {
         textColor: Colors.white,
         accentColor: theme.accent,
         details: [
-          '우월코드 데미지 증가 총합 ${topStatistic.myTotalPercent.toStringAsFixed(2)}%',
+          '${_elementName(topElement)} 우코합 상위 ${topStatistic.topPercent!.toStringAsFixed(1)}%',
         ],
       ));
     }

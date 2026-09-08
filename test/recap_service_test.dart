@@ -73,7 +73,7 @@ void main() {
     expect(cards.firstWhere((card) => card.order == 7).title,
         '수냉 속성 우월코드 합산은\n상위 2.4%예요!');
     expect(cards.firstWhere((card) => card.order == 7).details,
-        ['우월코드 데미지 증가 총합 116.64%']);
+        ['수냉 우코합 상위 2.4%']);
     expect(
         cards.firstWhere((card) => card.order == 8).title, startsWith('4개의'));
     expect(cards.firstWhere((card) => card.order == 9).title, contains('1개의'));
@@ -177,7 +177,7 @@ void main() {
       card.title,
       '작열 속성 우월코드 합산은\n상위 1.2%예요!',
     );
-    expect(card.details, ['우월코드 데미지 증가 총합 29.16%']);
+    expect(card.details, ['작열 우코합 상위 1.2%']);
     expect(card.imageAsset, fire.imageUrl);
   });
 
