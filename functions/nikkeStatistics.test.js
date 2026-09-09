@@ -95,6 +95,7 @@ test('예약 집계는 모든 서버를 통합한 니케별 스냅샷을 만든�
   assert.deepEqual(
     snapshots.map(snapshot => snapshot.id).sort(),
     [
+      'account_element_adjusted',
       ACCOUNT_ELEMENT_DAMAGE_CACHE_ID,
       statisticsCacheKey(1001),
       statisticsCacheKey(1002),

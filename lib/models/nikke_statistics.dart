@@ -102,6 +102,9 @@ class AccountElementDamageStatistic {
     required this.averageTotalPercent,
     required this.myTotalPercent,
     required this.topPercent,
+    this.adjustedScore,
+    this.adjustedAverage,
+    this.adjustedTopPercent,
   });
 
   factory AccountElementDamageStatistic.fromJson(Map<String, dynamic> json) {
@@ -112,6 +115,9 @@ class AccountElementDamageStatistic {
           (json['averageTotalPercent'] as num?)?.toDouble() ?? 0,
       myTotalPercent: (json['myTotalPercent'] as num?)?.toDouble() ?? 0,
       topPercent: (json['topPercent'] as num?)?.toDouble(),
+      adjustedScore: (json['adjustedScore'] as num?)?.toDouble(),
+      adjustedAverage: (json['adjustedAverage'] as num?)?.toDouble(),
+      adjustedTopPercent: (json['adjustedTopPercent'] as num?)?.toDouble(),
     );
   }
 
@@ -120,6 +126,9 @@ class AccountElementDamageStatistic {
   final double averageTotalPercent;
   final double myTotalPercent;
   final double? topPercent;
+  final double? adjustedScore;
+  final double? adjustedAverage;
+  final double? adjustedTopPercent;
 }
 
 class AccountElementDamageStatistics {

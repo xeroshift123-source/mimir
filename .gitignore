@@ -55,3 +55,6 @@ firestore-debug.log
 
 # Firebase Functions local secrets
 /functions/.env
+
+# Local aggregate statistics exports
+/nikke_statistics_export*.json

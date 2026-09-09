@@ -32,18 +32,32 @@ class MyNikkeScreen extends StatefulWidget {
   State<MyNikkeScreen> createState() => _MyNikkeScreenState();
 }
 
+enum ElementDamageDisplayMode { raw, adjusted }
+
 class _AccountElementDamageBar extends StatelessWidget {
   const _AccountElementDamageBar({
     required this.statistic,
     required this.isDark,
+    required this.mode,
   });
 
+  final ElementDamageDisplayMode mode;
   final AccountElementDamageStatistic statistic;
   final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    final topPercent = statistic.topPercent;
+    final adjusted = mode == ElementDamageDisplayMode.adjusted;
+    final topPercent =
+        adjusted ? statistic.adjustedTopPercent : statistic.topPercent;
+    final score = adjusted ? statistic.adjustedScore : statistic.myTotalPercent;
+    final average =
+        adjusted ? statistic.adjustedAverage : statistic.averageTotalPercent;
+    String formatValue(double? value) => value == null
+        ? '갱신 대기'
+        : adjusted
+            ? value.toStringAsFixed(2)
+            : '+${value.toStringAsFixed(2)}%';
     final rankingScore =
         topPercent == null ? 0.0 : (100.0 - topPercent).clamp(0.0, 100.0);
     final rankingColor = _elementRankingColor(rankingScore);
@@ -83,7 +97,7 @@ class _AccountElementDamageBar extends StatelessWidget {
                 ),
               ),
               Text(
-                '+${statistic.myTotalPercent.toStringAsFixed(2)}%',
+                formatValue(score),
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
@@ -108,7 +122,7 @@ class _AccountElementDamageBar extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '평균 +${statistic.averageTotalPercent.toStringAsFixed(2)}%',
+                  '평균 ${formatValue(average)}',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 9,
@@ -160,6 +174,7 @@ Color _elementRankingColor(double score) {
 class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final DatabaseService _dbService = DatabaseService();
   final NikkeStatisticsService _statisticsService = NikkeStatisticsService();
+  ElementDamageDisplayMode _elementDamageMode = ElementDamageDisplayMode.raw;
   bool _isLoading = true;
   String? _errorMessage;
   Map<String, dynamic>? _profileData;
@@ -874,27 +889,76 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.query_stats_rounded,
-                    size: 15, color: Colors.orange),
-                const SizedBox(width: 5),
-                Text(
-                  '속성별 우월코드 합산',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: isDark ? Colors.grey.shade200 : Colors.grey.shade800,
+                Expanded(
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 3,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.query_stats_rounded,
+                              size: 15, color: Colors.orange),
+                          const SizedBox(width: 5),
+                          Text(
+                            '속성별 우월코드 통계',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: isDark
+                                  ? Colors.grey.shade200
+                                  : Colors.grey.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '표본 ${statistics.sampleCount}명',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isDark
+                              ? Colors.grey.shade500
+                              : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  '표본 ${statistics.sampleCount}명',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                const SizedBox(width: 8),
+                const Text('보정점수', style: TextStyle(fontSize: 11)),
+                SizedBox(
+                  width: 44,
+                  height: 32,
+                  child: FittedBox(
+                    child: Switch(
+                      value: _elementDamageMode ==
+                          ElementDamageDisplayMode.adjusted,
+                      activeColor: Colors.orange,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      onChanged: (enabled) => setState(() {
+                        _elementDamageMode = enabled
+                            ? ElementDamageDisplayMode.adjusted
+                            : ElementDamageDisplayMode.raw;
+                      }),
+                    ),
                   ),
+                ),
+                const Tooltip(
+                  triggerMode: TooltipTriggerMode.tap,
+                  message: '니케별 우월코드 보유자의 평균 수치와 평균 옵션 줄 수, 채택률을 반영한 가중 점수입니다.',
+                  child: Icon(Icons.info_outline, size: 16),
                 ),
               ],
             ),
+            if (_elementDamageMode == ElementDamageDisplayMode.adjusted &&
+                statistics.elements
+                    .any((element) => element.adjustedScore == null))
+              const Padding(
+                padding: EdgeInsets.only(top: 6),
+                child: Text('보정점수는 다음 통계 갱신 후 표시됩니다.',
+                    style: TextStyle(fontSize: 11)),
+              ),
             const SizedBox(height: 7),
             LayoutBuilder(
               builder: (context, constraints) {
@@ -914,6 +978,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                             width: itemWidth,
                             child: _AccountElementDamageBar(
                               statistic: element,
+                              mode: _elementDamageMode,
                               isDark: isDark,
                             ),
                           ))

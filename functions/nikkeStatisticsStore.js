@@ -15,6 +15,8 @@ const MINIMUM_SAMPLE = 20;
 const READ_PAGE_SIZE = 100;
 const READ_CONCURRENCY = 4;
 const ACCOUNT_ELEMENT_DAMAGE_CACHE_ID = 'account_element_damage';
+const { ACCOUNT_ELEMENT_ADJUSTED_CACHE_ID, compactElementInvestment,
+  buildAdjustedStatistics } = require('./accountElementAdjusted');
 
 function statisticsCacheKey(nameCode) {
   return `all_${Number(nameCode)}`;
@@ -82,15 +84,17 @@ async function forEachEligibleLinkedCommander(db, nowMs, visit, pageSize = READ_
 
 function buildStatisticsSnapshots(commanders) {
   const accumulators = new Map();
+  const investments = [];
   const accountElementDamageAccumulator = createAccountElementDamageAccumulator();
   for (const commander of commanders) {
+    investments.push(compactElementInvestment(commander));
     addCommanderToAccumulators(accumulators, commander);
     addCommanderToAccountElementDamage(accountElementDamageAccumulator, commander);
   }
-  return finalizeStatisticsSnapshots(accumulators, accountElementDamageAccumulator);
+  return finalizeStatisticsSnapshots(accumulators, accountElementDamageAccumulator, investments);
 }
 
-function finalizeStatisticsSnapshots(accumulators, accountElementDamageAccumulator) {
+function finalizeStatisticsSnapshots(accumulators, accountElementDamageAccumulator, investments) {
   const snapshots = [...accumulators.entries()].map(([nameCode, accumulator]) => ({
     id: statisticsCacheKey(nameCode),
     data: finalizeNikkeStatistics(accumulator),
@@ -101,6 +105,8 @@ function finalizeStatisticsSnapshots(accumulators, accountElementDamageAccumulat
       data: finalizeAccountElementDamageStatistics(accountElementDamageAccumulator),
     });
   }
+  snapshots.push({ id: ACCOUNT_ELEMENT_ADJUSTED_CACHE_ID,
+    data: buildAdjustedStatistics(snapshots, investments) });
   return snapshots;
 }
 
@@ -121,11 +127,13 @@ function addCommanderToAccumulators(accumulators, commander) {
 
 async function buildStatisticsSnapshotsFromStore(db, nowMs = Date.now()) {
   const accumulators = new Map();
+  const investments = [];
   const accountElementDamageAccumulator = createAccountElementDamageAccumulator();
   const commanderCount = await forEachEligibleLinkedCommander(
     db,
     nowMs,
     commander => {
+      investments.push(compactElementInvestment(commander));
       addCommanderToAccumulators(accumulators, commander);
       addCommanderToAccountElementDamage(accountElementDamageAccumulator, commander);
     },
@@ -133,6 +141,7 @@ async function buildStatisticsSnapshotsFromStore(db, nowMs = Date.now()) {
   const snapshots = finalizeStatisticsSnapshots(
     accumulators,
     accountElementDamageAccumulator,
+    investments,
   );
   return { commanderCount, snapshots };
 }

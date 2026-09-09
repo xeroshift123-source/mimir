@@ -1,6 +1,7 @@
 'use strict';
 
 const { attachAccountElementDamageComparison } = require('./nikkeStatistics');
+const { ACCOUNT_ELEMENT_ADJUSTED_CACHE_ID, attachAdjustedComparison } = require('./accountElementAdjusted');
 const {
   ACCOUNT_ELEMENT_DAMAGE_CACHE_ID,
   FRESHNESS_DAYS,
@@ -35,11 +36,12 @@ function createAccountElementDamageHandler({ functions, db, getAuthenticatedUid 
       }
 
       try {
-        const [bindingSnapshot, commanderSnapshot, userSnapshot, cacheSnapshot] = await Promise.all([
+        const [bindingSnapshot, commanderSnapshot, userSnapshot, cacheSnapshot, adjustedSnapshot] = await Promise.all([
           db.collection('open_id_bindings').doc(openId).get(),
           db.collection('commanders').doc(openId).get(),
           db.collection('users').doc(uid).get(),
           db.collection('nikke_statistics').doc(ACCOUNT_ELEMENT_DAMAGE_CACHE_ID).get(),
+          db.collection('nikke_statistics').doc(ACCOUNT_ELEMENT_ADJUSTED_CACHE_ID).get(),
         ]);
         const userData = userSnapshot.data() || {};
         const linkedOpenIds = Array.isArray(userData.linkedOpenIds)
@@ -67,7 +69,16 @@ function createAccountElementDamageHandler({ functions, db, getAuthenticatedUid 
           cacheData,
           commanderSnapshot.data(),
         );
-        const elements = comparison.elements.map(({ histogram, ...element }) => element);
+        const adjustedData = adjustedSnapshot.data();
+        // Only combine generations with the same population and timestamp.
+        const sameGeneration = adjustedData?.sampleCount === cacheData.sampleCount
+          && adjustedData?.generatedAt?.toMillis?.() != null
+          && adjustedData.generatedAt.toMillis() === cacheData.generatedAt?.toMillis?.();
+        const elements = attachAdjustedComparison(
+          comparison.elements.map(({ histogram, ...element }) => element),
+          sameGeneration ? adjustedData : null,
+          commanderSnapshot.data(),
+        );
         const generatedAtMs = cacheData?.generatedAt?.toMillis?.()
           || cacheData?.cachedAt?.toMillis?.()
           || Date.now();
