@@ -71,7 +71,7 @@ void main() {
     expect(cards.firstWhere((card) => card.order == 6).imageAsset,
         waterNikke.imageUrl);
     expect(cards.firstWhere((card) => card.order == 7).title,
-        '수냉 속성 우월코드 합산은\n상위 2.4%예요!');
+        '수냉 속성 우월코드 합이\n상위 2.4%로 가장 높아요!');
     expect(cards.firstWhere((card) => card.order == 7).details,
         ['수냉 우코합 상위 2.4%']);
     expect(
@@ -175,7 +175,7 @@ void main() {
     final card = cards.firstWhere((card) => card.order == 7);
     expect(
       card.title,
-      '작열 속성 우월코드 합산은\n상위 1.2%예요!',
+      '작열 속성 우월코드 합이\n상위 1.2%로 가장 높아요!',
     );
     expect(card.details, ['작열 우코합 상위 1.2%']);
     expect(card.imageAsset, fire.imageUrl);

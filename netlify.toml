@@ -2,6 +2,94 @@
 publish = "build/web"
 command = "bash ./netlify/build.sh"
 
+# Flutter publishes source assets under /assets/assets/, not /assets/nikke/.
+# These image URLs are permanent: when replacing an image, use a new filename
+# and update its references. A deploy cannot invalidate a browser's immutable cache.
+# Do NOT broaden these rules to /assets/*: JSON and generated manifests change.
+[[headers]]
+for = "/assets/assets/nikke/*"
+  [headers.values]
+  Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/assets/assets/images/*"
+  [headers.values]
+  Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/assets/assets/icons/*"
+  [headers.values]
+  Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+for = "/assets/assets/logo.png"
+  [headers.values]
+  Cache-Control = "public, max-age=31536000, immutable"
+
+# Generated fonts (e.g. tree-shaken MaterialIcons) can change at the same URL.
+[[headers]]
+for = "/assets/fonts/*"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/assets/packages/*"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+# Flutter 3.19.6 loads versioned CanvasKit from gstatic by default. Keep the
+# unversioned local fallback revalidatable across Flutter engine upgrades.
+[[headers]]
+for = "/canvaskit/*"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/assets/assets/data/*"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/assets/assets/nikkes.json"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/assets/AssetManifest.*"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/assets/FontManifest.json"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/"
+  [headers.values]
+  Cache-Control = "no-cache"
+
+[[headers]]
+for = "/index.html"
+  [headers.values]
+  Cache-Control = "no-cache"
+
+# Includes main.dart.js, flutter.js, bootstrap, deferred JS and service worker.
+[[headers]]
+for = "/*.js"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/version.json"
+  [headers.values]
+  Cache-Control = "no-cache"
+
+[[headers]]
+for = "/manifest.json"
+  [headers.values]
+  Cache-Control = "no-cache"
+
 [[redirects]]
 from = "/*"
 to = "/index.html"

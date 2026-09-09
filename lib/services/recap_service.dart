@@ -216,7 +216,7 @@ class RecapService {
         order: 7,
         eyebrow: 'SUPERIOR CODE',
         title:
-            '${_elementName(topElement)} 속성 우월코드 합산은\n상위 ${topStatistic.topPercent!.toStringAsFixed(1)}%예요!',
+            '${_elementName(topElement)} 속성 우월코드 합이\n상위 ${topStatistic.topPercent!.toStringAsFixed(1)}%로 가장 높아요!',
         imageAsset: representativeNikke?.imageUrl,
         colors: theme.colors,
         textColor: Colors.white,

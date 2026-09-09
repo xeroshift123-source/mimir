@@ -1,0 +1,130 @@
+[
+  {
+    "path": "assets/images/badge/600.png",
+    "before": 1101923,
+    "after": 1025366,
+    "saved": 76557,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/badge/911.png",
+    "before": 1918056,
+    "after": 1841483,
+    "saved": 76573,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/badge/CUBE.png",
+    "before": 103597,
+    "after": 93533,
+    "saved": 10064,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/badge/DAWN.png",
+    "before": 2146315,
+    "after": 2062585,
+    "saved": 83730,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/badge/FIREPOWER.png",
+    "before": 121933,
+    "after": 114854,
+    "saved": 7079,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/badge/LUCHE.png",
+    "before": 92192,
+    "after": 85347,
+    "saved": 6845,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/badge/NIKKE500.png",
+    "before": 1027519,
+    "after": 960175,
+    "saved": 67344,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/badge/SHOES.png",
+    "before": 133923,
+    "after": 122979,
+    "saved": 10944,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/dorodojang.png",
+    "before": 1011036,
+    "after": 876605,
+    "saved": 134431,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/only_one.png",
+    "before": 2841360,
+    "after": 2792224,
+    "saved": 49136,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/raids/annihilio.png",
+    "before": 216375,
+    "after": 210398,
+    "saved": 5977,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/raids/ddugi.png",
+    "before": 410917,
+    "after": 347849,
+    "saved": 63068,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/images/raids/luxury_spider.png",
+    "before": 105932,
+    "after": 90129,
+    "saved": 15803,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/icons/google_g_logo.png",
+    "before": 33661,
+    "after": 26302,
+    "saved": 7359,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/icons/lockkey.png",
+    "before": 142249,
+    "after": 123879,
+    "saved": 18370,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  },
+  {
+    "path": "assets/icons/module.png",
+    "before": 163946,
+    "after": 141565,
+    "saved": 22381,
+    "rgba_pixels_identical": true,
+    "non_idat_chunks_identical": true
+  }
+]

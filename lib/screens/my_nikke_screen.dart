@@ -174,7 +174,8 @@ Color _elementRankingColor(double score) {
 class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final DatabaseService _dbService = DatabaseService();
   final NikkeStatisticsService _statisticsService = NikkeStatisticsService();
-  ElementDamageDisplayMode _elementDamageMode = ElementDamageDisplayMode.raw;
+  ElementDamageDisplayMode _elementDamageMode =
+      ElementDamageDisplayMode.adjusted;
   bool _isLoading = true;
   String? _errorMessage;
   Map<String, dynamic>? _profileData;
@@ -926,7 +927,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text('보정점수', style: TextStyle(fontSize: 11)),
+                const Text('미미르 스코어', style: TextStyle(fontSize: 11)),
                 SizedBox(
                   width: 44,
                   height: 32,
@@ -956,7 +957,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                     .any((element) => element.adjustedScore == null))
               const Padding(
                 padding: EdgeInsets.only(top: 6),
-                child: Text('보정점수는 다음 통계 갱신 후 표시됩니다.',
+                child: Text('미미르 스코어는 다음 통계 갱신 후 표시됩니다.',
                     style: TextStyle(fontSize: 11)),
               ),
             const SizedBox(height: 7),

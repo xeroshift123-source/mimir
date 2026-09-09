@@ -844,79 +844,88 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
     List<SharedDeck> filteredDecks,
     bool isDark,
   ) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // 모바일 필터 카드 (접고 펼치기 가능하도록 구현하여 활용성 증대)
-          Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: Card(
-              elevation: 0,
-              margin: EdgeInsets.zero,
-              color: isDark ? const Color(0xFF1B1D21) : Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(
-                  color: isDark
-                      ? const Color(0xFF30333A)
-                      : const Color(0xFFE4E7EC),
-                ),
-              ),
-              child: ExpansionTile(
-                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-                childrenPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.tune_rounded,
-                      size: 18, color: Colors.orange),
-                ),
-                title: const Text(
-                  "덱 필터",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
-                ),
-                subtitle: Text(
-                  '포함·제외 니케와 조건을 설정하세요',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  ),
-                ),
-                initiallyExpanded: true,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                    child: Column(
-                      children: [
-                        _buildFilterHeader(nikkeMap, isDark),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: (MediaQuery.sizeOf(context).height * .55)
-                              .clamp(360.0, 520.0),
-                          child: _buildCharacterGridSelector(nikkeList, isDark),
-                        ),
-                      ],
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              // 모바일 필터 카드 (접고 펼치기 가능하도록 구현하여 활용성 증대)
+              Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: Card(
+                  elevation: 0,
+                  margin: EdgeInsets.zero,
+                  color: isDark ? const Color(0xFF1B1D21) : Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF30333A)
+                          : const Color(0xFFE4E7EC),
                     ),
-                  )
-                ],
+                  ),
+                  child: ExpansionTile(
+                    tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                    childrenPadding: EdgeInsets.zero,
+                    leading: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.tune_rounded,
+                          size: 18, color: Colors.orange),
+                    ),
+                    title: const Text(
+                      "덱 필터",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                    ),
+                    subtitle: Text(
+                      '포함·제외 니케와 조건을 설정하세요',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                      ),
+                    ),
+                    initiallyExpanded: true,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                        child: Column(
+                          children: [
+                            _buildFilterHeader(nikkeMap, isDark),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              height: (MediaQuery.sizeOf(context).height * .55)
+                                  .clamp(360.0, 520.0),
+                              child: _buildCharacterGridSelector(
+                                  nikkeList, isDark),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(height: 12),
+              _buildSortBar(isDark, filteredDecks.length),
+              const SizedBox(height: 12),
+            ],
           ),
-          const SizedBox(height: 12),
-          _buildSortBar(isDark, filteredDecks.length),
-          const SizedBox(height: 12),
-          _buildDeckList(
-            filteredDecks,
-            nikkeMap,
-            isDark,
-            shrinkWrap: true,
-          ),
-        ],
-      ),
+        ),
+        _buildDeckList(
+          filteredDecks,
+          nikkeMap,
+          isDark,
+          asSliver: true,
+        ),
+      ],
     );
   }
 
@@ -1532,10 +1541,10 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
     List<SharedDeck> decks,
     Map<String, Nikke> nikkeMap,
     bool isDark, {
-    bool shrinkWrap = false,
+    bool asSliver = false,
   }) {
     if (decks.isEmpty) {
-      return Center(
+      final empty = Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1553,13 +1562,12 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           ],
         ),
       );
+      return asSliver ? SliverToBoxAdapter(child: empty) : empty;
     }
 
-    return ListView.builder(
-      shrinkWrap: shrinkWrap,
-      physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
-      itemCount: decks.length,
-      itemBuilder: (context, index) {
+    // Share the same cards between the bounded desktop list and mobile sliver.
+    final delegate = SliverChildBuilderDelegate(
+      (context, index) {
         final deck = decks[index];
         final bool isExpanded = _expandedDeckIds.contains(deck.id);
         final canManage = deck.authorUid != null &&
@@ -1967,7 +1975,14 @@ class _DeckLibraryScreenState extends State<DeckLibraryScreen> {
           ),
         );
       },
+      childCount: decks.length,
     );
+    return asSliver
+        ? SliverList(delegate: delegate)
+        : ListView.custom(
+            childrenDelegate: delegate,
+            semanticChildCount: decks.length,
+          );
   }
 
   Widget _buildActionIconButton({

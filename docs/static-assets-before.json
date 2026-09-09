@@ -1,0 +1,3927 @@
+{
+  "files": [
+    {
+      "path": "assets/bond_stats_parsed.json",
+      "bytes": 9356,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/collection_stats.json",
+      "bytes": 2008,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/data/nikke_base_stats.json",
+      "bytes": 386656,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/data/nikke_bond_stats.json",
+      "bytes": 11387,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/data/nikke_calculator_db.json",
+      "bytes": 455978,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/data/nikke_collection_stats.json",
+      "bytes": 4211,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/data/nikke_cube_stats.json",
+      "bytes": 1928,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/data/nikke_equipment_stats.json",
+      "bytes": 5433,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/equip_stats_parsed.json",
+      "bytes": 3623,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/equipment_stats_db.json",
+      "bytes": 19054,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/favorite_rare_map.json",
+      "bytes": 392,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/icons/burst/icon-burst-0.webp",
+      "bytes": 570,
+      "extension": ".webp",
+      "dimensions": [
+        128,
+        128
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/icons/burst/icon-burst-1.webp",
+      "bytes": 194,
+      "extension": ".webp",
+      "dimensions": [
+        128,
+        128
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/icons/burst/icon-burst-2.webp",
+      "bytes": 196,
+      "extension": ".webp",
+      "dimensions": [
+        128,
+        128
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/icons/burst/icon-burst-3.webp",
+      "bytes": 214,
+      "extension": ".webp",
+      "dimensions": [
+        128,
+        128
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/icons/elements/icon-elements-Electric.webp",
+      "bytes": 1194,
+      "extension": ".webp",
+      "dimensions": [
+        63,
+        73
+      ],
+      "path_refs": [
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart",
+        "lib/screens/calculate_list.dart"
+      ],
+      "filename_refs": [
+        "lib/widgets/nikke_card.dart",
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart",
+        "lib/screens/calculate_list.dart"
+      ]
+    },
+    {
+      "path": "assets/icons/elements/icon-elements-Fire.webp",
+      "bytes": 984,
+      "extension": ".webp",
+      "dimensions": [
+        63,
+        73
+      ],
+      "path_refs": [
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart"
+      ],
+      "filename_refs": [
+        "lib/widgets/nikke_card.dart",
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart"
+      ]
+    },
+    {
+      "path": "assets/icons/elements/icon-elements-Iron.webp",
+      "bytes": 1570,
+      "extension": ".webp",
+      "dimensions": [
+        63,
+        73
+      ],
+      "path_refs": [
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart"
+      ],
+      "filename_refs": [
+        "lib/widgets/nikke_card.dart",
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart"
+      ]
+    },
+    {
+      "path": "assets/icons/elements/icon-elements-Water.webp",
+      "bytes": 1162,
+      "extension": ".webp",
+      "dimensions": [
+        63,
+        73
+      ],
+      "path_refs": [
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart"
+      ],
+      "filename_refs": [
+        "lib/widgets/nikke_card.dart",
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart"
+      ]
+    },
+    {
+      "path": "assets/icons/elements/icon-elements-Wind.webp",
+      "bytes": 1580,
+      "extension": ".webp",
+      "dimensions": [
+        63,
+        73
+      ],
+      "path_refs": [
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart",
+        "lib/screens/calculate_list.dart"
+      ],
+      "filename_refs": [
+        "lib/widgets/nikke_card.dart",
+        "lib/widgets/app_drawer.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart",
+        "lib/screens/calculate_list.dart"
+      ]
+    },
+    {
+      "path": "assets/icons/google_g_logo.png",
+      "bytes": 33661,
+      "extension": ".png",
+      "dimensions": [
+        200,
+        204
+      ],
+      "path_refs": [
+        "lib/screens/login.dart"
+      ],
+      "filename_refs": [
+        "lib/screens/login.dart"
+      ]
+    },
+    {
+      "path": "assets/icons/lockkey.png",
+      "bytes": 142249,
+      "extension": ".png",
+      "dimensions": [
+        508,
+        491
+      ],
+      "path_refs": [
+        "lib/screens/overload_simulator_screen.dart"
+      ],
+      "filename_refs": [
+        "lib/screens/overload_simulator_screen.dart"
+      ]
+    },
+    {
+      "path": "assets/icons/module.png",
+      "bytes": 163946,
+      "extension": ".png",
+      "dimensions": [
+        508,
+        492
+      ],
+      "path_refs": [
+        "lib/screens/overload_simulator_screen.dart"
+      ],
+      "filename_refs": [
+        "lib/screens/overload_simulator_screen.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/1000.webp",
+      "bytes": 58066,
+      "extension": ".webp",
+      "dimensions": [
+        1000,
+        1031
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/1000DAYS.png",
+      "bytes": 140913,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        256
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/600.png",
+      "bytes": 1101923,
+      "extension": ".png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/700.png",
+      "bytes": 14973,
+      "extension": ".png",
+      "dimensions": [
+        98,
+        98
+      ],
+      "path_refs": [
+        "test/achievement_badge_showcase_test.dart",
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "test/achievement_badge_showcase_test.dart",
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/911.png",
+      "bytes": 1918056,
+      "extension": ".png",
+      "dimensions": [
+        1402,
+        1122
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/BATTLEDATA.png",
+      "bytes": 14721,
+      "extension": ".png",
+      "dimensions": [
+        84,
+        84
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/CD.webp",
+      "bytes": 50054,
+      "extension": ".webp",
+      "dimensions": [
+        1000,
+        1000
+      ],
+      "path_refs": [
+        "test/achievement_badge_showcase_test.dart",
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "test/achievement_badge_showcase_test.dart",
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/COUNTERS.webp",
+      "bytes": 7184,
+      "extension": ".webp",
+      "dimensions": [
+        414,
+        348
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/CUBE.png",
+      "bytes": 103597,
+      "extension": ".png",
+      "dimensions": [
+        597,
+        596
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/DAWN.png",
+      "bytes": 2146315,
+      "extension": ".png",
+      "dimensions": [
+        1233,
+        1275
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/FIREPOWER.png",
+      "bytes": 121933,
+      "extension": ".png",
+      "dimensions": [
+        265,
+        261
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/LUCHE.png",
+      "bytes": 92192,
+      "extension": ".png",
+      "dimensions": [
+        242,
+        230
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/NIKKE500.png",
+      "bytes": 1027519,
+      "extension": ".png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/SHOES.png",
+      "bytes": 133923,
+      "extension": ".png",
+      "dimensions": [
+        337,
+        335
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/badge/TEAR.webp",
+      "bytes": 11088,
+      "extension": ".webp",
+      "dimensions": [
+        512,
+        512
+      ],
+      "path_refs": [
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/images/dorodojang.png",
+      "bytes": 1011036,
+      "extension": ".png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "path_refs": [
+        "lib/screens/my_nikke_screen.dart"
+      ],
+      "filename_refs": [
+        "lib/screens/my_nikke_screen.dart"
+      ]
+    },
+    {
+      "path": "assets/images/dororong.png",
+      "bytes": 36294,
+      "extension": ".png",
+      "dimensions": [
+        800,
+        800
+      ],
+      "path_refs": [
+        "lib/data/raid_data.dart"
+      ],
+      "filename_refs": [
+        "lib/data/raid_data.dart"
+      ]
+    },
+    {
+      "path": "assets/images/only_one.png",
+      "bytes": 2841360,
+      "extension": ".png",
+      "dimensions": [
+        5760,
+        5760
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/images/raids/altruia.webp",
+      "bytes": 120424,
+      "extension": ".webp",
+      "dimensions": [
+        848,
+        1024
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/images/raids/annihilio.png",
+      "bytes": 216375,
+      "extension": ".png",
+      "dimensions": [
+        320,
+        313
+      ],
+      "path_refs": [
+        "lib/data/raid_data.dart"
+      ],
+      "filename_refs": [
+        "lib/data/raid_data.dart"
+      ]
+    },
+    {
+      "path": "assets/images/raids/crystalchamber.webp",
+      "bytes": 103562,
+      "extension": ".webp",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/images/raids/ddugi.png",
+      "bytes": 410917,
+      "extension": ".png",
+      "dimensions": [
+        734,
+        853
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/images/raids/island_eater.png",
+      "bytes": 5338,
+      "extension": ".png",
+      "dimensions": [
+        230,
+        190
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/images/raids/island_eater2.png",
+      "bytes": 5476,
+      "extension": ".png",
+      "dimensions": [
+        230,
+        190
+      ],
+      "path_refs": [
+        "lib/data/raid_data.dart"
+      ],
+      "filename_refs": [
+        "lib/data/raid_data.dart"
+      ]
+    },
+    {
+      "path": "assets/images/raids/luxury_spider.png",
+      "bytes": 105932,
+      "extension": ".png",
+      "dimensions": [
+        392,
+        300
+      ],
+      "path_refs": [
+        "lib/data/raid_data.dart"
+      ],
+      "filename_refs": [
+        "lib/data/raid_data.dart"
+      ]
+    },
+    {
+      "path": "assets/images/raids/only_one.webp",
+      "bytes": 21790,
+      "extension": ".webp",
+      "dimensions": [
+        500,
+        500
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/images/raids/ultra.webp",
+      "bytes": 19738,
+      "extension": ".webp",
+      "dimensions": [
+        319,
+        243
+      ],
+      "path_refs": [
+        "lib/data/raid_data.dart"
+      ],
+      "filename_refs": [
+        "lib/data/raid_data.dart"
+      ]
+    },
+    {
+      "path": "assets/images/raids/wigobi.png",
+      "bytes": 8222,
+      "extension": ".png",
+      "dimensions": [
+        137,
+        168
+      ],
+      "path_refs": [
+        "lib/data/raid_data.dart"
+      ],
+      "filename_refs": [
+        "lib/data/raid_data.dart"
+      ]
+    },
+    {
+      "path": "assets/images/union_raid.webp",
+      "bytes": 3736,
+      "extension": ".webp",
+      "dimensions": [
+        200,
+        200
+      ],
+      "path_refs": [
+        "lib/data/raid_data.dart"
+      ],
+      "filename_refs": [
+        "lib/data/raid_data.dart"
+      ]
+    },
+    {
+      "path": "assets/logo.png",
+      "bytes": 66653,
+      "extension": ".png",
+      "dimensions": [
+        461,
+        410
+      ],
+      "path_refs": [
+        "pubspec.yaml",
+        "backup_auth_fixes/pubspec.yaml",
+        "backup_auth_fixes/login.dart",
+        "lib/screens/login.dart"
+      ],
+      "filename_refs": [
+        "pubspec.yaml",
+        "backup_auth_fixes/pubspec.yaml",
+        "backup_auth_fixes/login.dart",
+        "lib/screens/login.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/2b.webp",
+      "bytes": 20816,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/a2.webp",
+      "bytes": 23586,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/ada.webp",
+      "bytes": 18496,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/ein_ada_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/ein_ada_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/ade.webp",
+      "bytes": 31724,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/ade_agent_bunny.webp",
+      "bytes": 30560,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/admi.webp",
+      "bytes": 29852,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/aegis.png",
+      "bytes": 137499,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/nikke/aegis.webp",
+      "bytes": 27140,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/alice.webp",
+      "bytes": 33438,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/alice_wonderland_bunny.webp",
+      "bytes": 33086,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/anchor.webp",
+      "bytes": 28908,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/anchor_innocent_maid.webp",
+      "bytes": 32354,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/anis.webp",
+      "bytes": 24530,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/anis_sparkling_summer.webp",
+      "bytes": 21306,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/anis_star.webp",
+      "bytes": 30598,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/anne_miracle_fairy.webp",
+      "bytes": 33334,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/arcana.webp",
+      "bytes": 20134,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/arcana_fortune_mate.webp",
+      "bytes": 23204,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/aria.webp",
+      "bytes": 22784,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/ark_ranger_black.png",
+      "bytes": 211315,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/nikke/ark_ranger_black.webp",
+      "bytes": 21446,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/asuka.webp",
+      "bytes": 28866,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/asuka_wille.webp",
+      "bytes": 19652,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/avista.webp",
+      "bytes": 26972,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/bay.webp",
+      "bytes": 34352,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/belorta.webp",
+      "bytes": 28018,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/biscuit.webp",
+      "bytes": 33998,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/blanc.webp",
+      "bytes": 22756,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/bready.webp",
+      "bytes": 17474,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/brid.webp",
+      "bytes": 25442,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/brid_silent_track.webp",
+      "bytes": 24928,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/centi.webp",
+      "bytes": 25772,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/chime.webp",
+      "bytes": 30792,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/chisato.webp",
+      "bytes": 25564,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/cinderella.webp",
+      "bytes": 21618,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/cinderella_crystal_wave.png",
+      "bytes": 218839,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/nikke/cinderella_crystal_wave.webp",
+      "bytes": 27532,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/claire.webp",
+      "bytes": 19442,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/clay.webp",
+      "bytes": 30740,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/cocoa.webp",
+      "bytes": 30796,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/crow.webp",
+      "bytes": 28632,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/crown.webp",
+      "bytes": 34164,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/scarlet_lib_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/scarlet_lib_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/crust.webp",
+      "bytes": 34998,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/d.webp",
+      "bytes": 17872,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "test/recap_service_test.dart",
+        "test/nikke_element_filter_test.dart",
+        "assets/nikkes.json",
+        "lib/widgets/nikke_card.dart",
+        "lib/widgets/app_drawer.dart",
+        "lib/data/raid_data.dart",
+        "lib/data/achievement_badges.dart",
+        "lib/screens/union_deck_builder.dart",
+        "lib/screens/home.dart",
+        "lib/screens/deck_builder.dart",
+        "lib/screens/calculate_list.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/d_killer_wife.webp",
+      "bytes": 23574,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/delta.webp",
+      "bytes": 30514,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/delta_ninja_thief.webp",
+      "bytes": 18104,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/diesel.webp",
+      "bytes": 27838,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/diesel_winter_sweets.webp",
+      "bytes": 24294,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart",
+        "lib/widgets/matcha_gakseol_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart",
+        "lib/widgets/matcha_gakseol_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/dolla.webp",
+      "bytes": 22210,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/dorothy.webp",
+      "bytes": 31984,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/dorothy_serendipity.webp",
+      "bytes": 37562,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/drake.webp",
+      "bytes": 23894,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/drake_great_villain.webp",
+      "bytes": 28274,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/eh.webp",
+      "bytes": 20190,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/ein.webp",
+      "bytes": 24392,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/ein_ada_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/ein_ada_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/elegg.webp",
+      "bytes": 17954,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nikke_card.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nikke_card.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/elegg_boom_and_shock.webp",
+      "bytes": 23804,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/emilia.webp",
+      "bytes": 27372,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/emma.webp",
+      "bytes": 24188,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/emma_tactical_upgrade.webp",
+      "bytes": 27536,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/epinel.webp",
+      "bytes": 32656,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/ether.webp",
+      "bytes": 31200,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/eunhwa.webp",
+      "bytes": 18944,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/eunhwa_tactical_upgrade.webp",
+      "bytes": 25030,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/eve.webp",
+      "bytes": 28206,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/exia.webp",
+      "bytes": 24824,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/flora.webp",
+      "bytes": 29304,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/folkwang.webp",
+      "bytes": 24910,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/frima.webp",
+      "bytes": 23538,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/grave.webp",
+      "bytes": 21326,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/guilotine.webp",
+      "bytes": 23508,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/guilotine_winter_slayer.webp",
+      "bytes": 32204,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/guilty.webp",
+      "bytes": 32804,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/harran.webp",
+      "bytes": 25814,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/helm.webp",
+      "bytes": 34410,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/helm_aquamarine.webp",
+      "bytes": 30644,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/himeno.webp",
+      "bytes": 15800,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/idollflower.webp",
+      "bytes": 28996,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/idollocean.webp",
+      "bytes": 23694,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/idollsun.webp",
+      "bytes": 28502,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/isabel.webp",
+      "bytes": 28334,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/jackal.webp",
+      "bytes": 30144,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/jill.webp",
+      "bytes": 18768,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/julia.webp",
+      "bytes": 28212,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/k.webp",
+      "bytes": 26962,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/kilo.webp",
+      "bytes": 16066,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/kurumi.webp",
+      "bytes": 22368,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/label.webp",
+      "bytes": 21522,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/laplace.webp",
+      "bytes": 31248,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/laplace_ultimate_hero.webp",
+      "bytes": 31112,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/leona.webp",
+      "bytes": 29812,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/liberalio.webp",
+      "bytes": 35608,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/scarlet_lib_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/scarlet_lib_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/lily.webp",
+      "bytes": 22584,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/liter.webp",
+      "bytes": 30424,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/scarlet_lib_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/scarlet_lib_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/little_mermaid.webp",
+      "bytes": 33488,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/ludmilla.webp",
+      "bytes": 29474,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/ludmilla_winter_owner.webp",
+      "bytes": 31622,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/maiden.webp",
+      "bytes": 27604,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/maiden_ice_rose.webp",
+      "bytes": 30434,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/makima.webp",
+      "bytes": 17894,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/makoto.png",
+      "bytes": 181285,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/nikke/makoto.webp",
+      "bytes": 20534,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mana.webp",
+      "bytes": 20426,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/marciana.webp",
+      "bytes": 20956,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/marciana_marine_study.png",
+      "bytes": 305545,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/nikke/marciana_marine_study.webp",
+      "bytes": 25998,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "process_matcha.py",
+        "generate.py",
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "process_matcha.py",
+        "generate.py",
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mari.webp",
+      "bytes": 27536,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mary.webp",
+      "bytes": 19650,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mary_bay_goddess.webp",
+      "bytes": 24286,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mast.webp",
+      "bytes": 25180,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mast_romantic_maid.webp",
+      "bytes": 29872,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/maxwell.webp",
+      "bytes": 29444,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/maxwell_ordinary_mechanic.webp",
+      "bytes": 25904,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mica.webp",
+      "bytes": 28082,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mica_snow_buddy.webp",
+      "bytes": 20124,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mihara.webp",
+      "bytes": 25056,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mihara_bonding_chain.webp",
+      "bytes": 23246,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/milk.webp",
+      "bytes": 26208,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/milk_blooming_bunny.webp",
+      "bytes": 30232,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mint.png",
+      "bytes": 77345,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/nikke/mint.webp",
+      "bytes": 23774,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/miranda.webp",
+      "bytes": 32660,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/screens/calculate_list.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/screens/calculate_list.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/misato.webp",
+      "bytes": 19016,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/modernia.webp",
+      "bytes": 24114,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/moran.webp",
+      "bytes": 21184,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/mori.webp",
+      "bytes": 26038,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/n102.webp",
+      "bytes": 26490,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/naga.webp",
+      "bytes": 27798,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/nayuta.webp",
+      "bytes": 36872,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "process_nayuta.py",
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart",
+        "lib/widgets/matcha_gakseol_form.dart"
+      ],
+      "filename_refs": [
+        "process_nayuta.py",
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart",
+        "lib/widgets/matcha_gakseol_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/neon.webp",
+      "bytes": 31706,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/neon_blue_ocean.webp",
+      "bytes": 25116,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/neon_vision_eye.webp",
+      "bytes": 26820,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/nero.webp",
+      "bytes": 28188,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/neve.webp",
+      "bytes": 24494,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/nihilister.webp",
+      "bytes": 26790,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/noah.webp",
+      "bytes": 24828,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/noir.webp",
+      "bytes": 25658,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/noise.webp",
+      "bytes": 30742,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/novel.webp",
+      "bytes": 35820,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/pascal.webp",
+      "bytes": 15860,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/pepper.webp",
+      "bytes": 24718,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/phantom.webp",
+      "bytes": 30138,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/poli.webp",
+      "bytes": 27618,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/power.webp",
+      "bytes": 22156,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/prika.png",
+      "bytes": 163532,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/nikke/prika.webp",
+      "bytes": 26668,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/privaty.webp",
+      "bytes": 29844,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/privaty_unkind_maid.webp",
+      "bytes": 32262,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/product08.webp",
+      "bytes": 23066,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/product12.webp",
+      "bytes": 20132,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/product23.webp",
+      "bytes": 27712,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/quency.webp",
+      "bytes": 30570,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/quency_escape_queen.webp",
+      "bytes": 27248,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/quiry.webp",
+      "bytes": 27660,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/ram.webp",
+      "bytes": 23240,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rapi.webp",
+      "bytes": 25926,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/data/achievement_badges.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/data/achievement_badges.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/rapi_red_hood.webp",
+      "bytes": 32058,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rapunzel.webp",
+      "bytes": 26414,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rapunzel_pure_grace.webp",
+      "bytes": 24162,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/raven.webp",
+      "bytes": 24118,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/red_hood.webp",
+      "bytes": 22400,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rei(eva).webp",
+      "bytes": 22106,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rei.webp",
+      "bytes": 26070,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rei_tentative_name.webp",
+      "bytes": 18008,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rem.webp",
+      "bytes": 22712,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rosanna.webp",
+      "bytes": 24306,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rosanna_chic_ocean.webp",
+      "bytes": 24720,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rouge.webp",
+      "bytes": 20126,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rumani.webp",
+      "bytes": 20964,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rupee.webp",
+      "bytes": 29462,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/rupee_winter_shopper.webp",
+      "bytes": 29596,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/sakura(eva).webp",
+      "bytes": 23222,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/sakura.webp",
+      "bytes": 32344,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/sakura_bloom_in_summer.webp",
+      "bytes": 28738,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/scarlet.webp",
+      "bytes": 27698,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/scarlet_black_shadow.webp",
+      "bytes": 34536,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/scarlet_lib_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/scarlet_lib_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/signal.webp",
+      "bytes": 30198,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/sin.webp",
+      "bytes": 24886,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/snow_crane.webp",
+      "bytes": 22934,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/snow_white.webp",
+      "bytes": 21964,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/snow_white_heavy_arms.webp",
+      "bytes": 21910,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "process_matcha.py",
+        "generate.py",
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "process_matcha.py",
+        "generate.py",
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/snow_white_innocent_days.webp",
+      "bytes": 23542,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/soda.webp",
+      "bytes": 28222,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/soda_twinkling_buny.webp",
+      "bytes": 28286,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/soldiereg.webp",
+      "bytes": 30462,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/nayuta_helm_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/soldierfa.webp",
+      "bytes": 33924,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/soldierow.webp",
+      "bytes": 23330,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/soline.webp",
+      "bytes": 29642,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/soline_frost_ticket.webp",
+      "bytes": 22424,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/sora.webp",
+      "bytes": 19574,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/sugar.webp",
+      "bytes": 28014,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/takina.webp",
+      "bytes": 19634,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/ein_ada_form.dart"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json",
+        "lib/widgets/ein_ada_form.dart"
+      ]
+    },
+    {
+      "path": "assets/nikke/tia.webp",
+      "bytes": 20098,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/tove.webp",
+      "bytes": 26968,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/trina.webp",
+      "bytes": 27802,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/trony.webp",
+      "bytes": 14656,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/velvet.webp",
+      "bytes": 23942,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/vesti.webp",
+      "bytes": 27750,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/vesti_tactical_upgrade.webp",
+      "bytes": 20956,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/viper.webp",
+      "bytes": 26986,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/volume.webp",
+      "bytes": 27340,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/yan.webp",
+      "bytes": 26294,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/yukiko.png",
+      "bytes": 212829,
+      "extension": ".png",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [],
+      "filename_refs": []
+    },
+    {
+      "path": "assets/nikke/yukiko.webp",
+      "bytes": 21846,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/yulha.webp",
+      "bytes": 23320,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/yuni.webp",
+      "bytes": 20496,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke/zwei.webp",
+      "bytes": 24078,
+      "extension": ".webp",
+      "dimensions": [
+        256,
+        512
+      ],
+      "path_refs": [
+        "assets/nikkes.json"
+      ],
+      "filename_refs": [
+        "assets/nikkes.json"
+      ]
+    },
+    {
+      "path": "assets/nikke_stats.json",
+      "bytes": 394138,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/nikke_stats_parsed.json",
+      "bytes": 661030,
+      "extension": ".json"
+    },
+    {
+      "path": "assets/nikkes.json",
+      "bytes": 75441,
+      "extension": ".json"
+    }
+  ],
+  "png_webp_pairs": [
+    [
+      "assets/nikke/aegis.png",
+      "assets/nikke/aegis.webp"
+    ],
+    [
+      "assets/nikke/ark_ranger_black.png",
+      "assets/nikke/ark_ranger_black.webp"
+    ],
+    [
+      "assets/nikke/cinderella_crystal_wave.png",
+      "assets/nikke/cinderella_crystal_wave.webp"
+    ],
+    [
+      "assets/nikke/makoto.png",
+      "assets/nikke/makoto.webp"
+    ],
+    [
+      "assets/nikke/marciana_marine_study.png",
+      "assets/nikke/marciana_marine_study.webp"
+    ],
+    [
+      "assets/nikke/mint.png",
+      "assets/nikke/mint.webp"
+    ],
+    [
+      "assets/nikke/prika.png",
+      "assets/nikke/prika.webp"
+    ],
+    [
+      "assets/nikke/yukiko.png",
+      "assets/nikke/yukiko.webp"
+    ]
+  ],
+  "exact_duplicates": [],
+  "pixel_duplicates": [],
+  "near_duplicates_dhash_le_4": [],
+  "searched_text_files": 285,
+  "search_command": [
+    "rg",
+    "--files",
+    "--hidden",
+    "--no-ignore",
+    "-g",
+    "!.git/**",
+    "-g",
+    "!**/node_modules/**",
+    "-g",
+    "!**/build/**",
+    "-g",
+    "!**/.dart_tool/**",
+    "-g",
+    "!flutter/**",
+    "-g",
+    "!scratch/**",
+    "-g",
+    "!docs/static-assets*",
+    "-g",
+    "!tool/audit_static_assets.py",
+    "-g",
+    "!**/__pycache__/**"
+  ]
+}

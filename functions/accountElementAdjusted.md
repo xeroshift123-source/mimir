@@ -8,6 +8,6 @@
 
 조회 API는 보정 캐시 문서 1개를 추가로 읽고 현재 계정에 그 캐시의 가중치를 적용한다. 기존 캐시와 표본 수·생성 시각이 일치할 때만 adjustedScore/adjustedAverage/adjustedTopPercent를 반환한다. 히스토그램과 가중치는 응답에 포함하지 않는다. 옛 캐시와 구 서버 응답에서는 새 필드가 없으므로 UI가 갱신 대기를 표시한다.
 
-`my_nikke_screen.dart`는 기본 raw enum 상태로 시작하고 같은 카드를 전환한다. 보정점수에는 +/%를 붙이지 않으며 순위 %와 막대의 (100 - topPercent)/100 정의는 유지한다. 모델에 nullable 보정 필드를 추가했다. achievementBadges.js의 기존 topPercent <= 4 판정과 recap 로직은 변경하지 않았다.
+`my_nikke_screen.dart`는 기본 adjusted enum 상태로 시작하며 화면에서는 '미미르 스코어'로 표시한다. 토글을 끄면 우코 총합으로 전환한다. 미미르 스코어에는 +/%를 붙이지 않으며 순위 %와 막대의 (100 - topPercent)/100 정의는 유지한다. 모델에 nullable 보정 필드를 추가했다. achievementBadges.js의 기존 topPercent <= 4 판정과 recap 로직은 변경하지 않았다.
 
 운영 반영에는 변경된 Functions(계정 통계 조회, 일일 통계 생성, 관리자 수동 갱신)와 Flutter 앱 배포가 필요하다. 서버 배포 후 기존 관리자 통계 갱신 또는 다음 한국 시간 00:00 일일 갱신으로 보정 캐시가 만들어진다. 이번 로컬 구현 작업에서는 배포나 운영 DB 갱신을 실행하지 않았다.
