@@ -24,8 +24,9 @@ class AppFooter extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               // 🔗 Links/Buttons row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   _buildFooterLink(context, "개인정보처리방침", () {
                     Navigator.push(

@@ -26,16 +26,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late int _currentRaidPage = raidHistory.length - 1;
-  late final PageController _raidPageController = PageController(
-      initialPage: raidHistory.length - 1, viewportFraction: 1.0);
+  late final PageController _raidPageController =
+      PageController(initialPage: _currentRaidPage);
+  bool _isHoveringRaid = false;
 
   @override
   void dispose() {
     _raidPageController.dispose();
     super.dispose();
   }
-
-  bool _isHoveringRaid = false;
 
   String _selectedWeakness = '수냉';
 
@@ -142,59 +141,75 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.pushNamed(context, DeckLibraryScreen.routeName);
   }
 
-  Widget _buildMenuButton(BuildContext context,
-      {required String title,
-      required IconData icon,
-      required Color color,
-      required VoidCallback onTap,
-      bool isOutlined = false}) {
-    if (isOutlined) {
-      return SizedBox(
-        height: 56,
-        width: double.infinity,
-        child: OutlinedButton.icon(
-          onPressed: onTap,
-          icon: Icon(icon, color: color, size: 20),
-          label: Text(title,
-              style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold, color: color)),
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(color: color, width: 1.5),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        ),
-      );
+  static const _orange = Color(0xFFFF8800);
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+  Color get _surface => _isDark ? const Color(0xFF1E1E24) : Colors.white;
+  Color get _border =>
+      _isDark ? const Color(0xFF35353E) : const Color(0xFFEEEEF2);
+  Color get _muted => _isDark ? Colors.grey.shade400 : const Color(0xFF858590);
+
+  Widget _panel({required Widget child, EdgeInsets? padding}) {
+    return Container(
+      width: double.infinity,
+      padding: padding ?? const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(_isDark ? .08 : .025),
+              blurRadius: 8,
+              offset: const Offset(0, 3)),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Future<void> _openLink(String address) async {
+    try {
+      if (await launchUrl(Uri.parse(address))) return;
+    } catch (_) {
+      // Surface launch failures in the same way on every platform.
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('링크를 열 수 없습니다.')),
+    );
+  }
+
+  void _openUnionRaid() {
+    final current = raidHistory[_currentRaidPage];
+    final raid = current.type == RaidType.union
+        ? current
+        : raidHistory.lastWhere((raid) => raid.type == RaidType.union);
+    Navigator.pushNamed(context, UnionDeckBuilderScreen.routeName,
+        arguments: raid);
+  }
+
+  Future<void> _openMyNikke() async {
+    final uid = context.read<AuthProvider>().userId;
+    final openId = await DatabaseService().getSelectedCommanderOpenId(uid);
+    if (!mounted) return;
+    if (openId != null) {
+      Navigator.pushNamed(context, MyNikkeScreen.routeName, arguments: openId);
     } else {
-      return SizedBox(
-        height: 56,
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          onPressed: onTap,
-          icon: Icon(icon, color: Colors.white, size: 20),
-          label: Text(title,
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            elevation: 0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('먼저 BLABLALINK 계정을 연동해 주세요.'),
+        backgroundColor: Colors.orange,
+      ));
+      Navigator.pushNamed(context, SyncScreen.routeName);
     }
   }
 
-  // ✅ 레이드 요약 카드 위젯
   Widget _buildRaidSummaryCard(BuildContext context, RaidInfo raid) {
     final isDark = context.watch<ThemeProvider>().isDark;
 
     if (raid.type == RaidType.union) {
       return ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: double.infinity),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Container(
@@ -393,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 400),
+      constraints: const BoxConstraints(maxWidth: double.infinity),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Container(
@@ -524,42 +539,41 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    if (raid.keyword != null && raid.keyword!.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF1E1E1E)
-                              : const Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          alignment: WrapAlignment.start,
-                          children: raid.keyword!.map((kw) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2.5),
-                              decoration: BoxDecoration(
-                                color: Colors.orange,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                "#$kw",
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
+                    const SizedBox(height: 16),
+                    Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF1E1E1E)
+                            : const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.start,
+                        children: (raid.keyword ?? const <String>[]).map((kw) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2.5),
+                            decoration: BoxDecoration(
+                              color: Colors.orange,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              "#$kw",
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
@@ -654,320 +668,344 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const AppDrawer(activeRoute: '/'),
-      appBar: AppBar(
-        title: const Text(
-          "니케 덱 빌딩 도우미 MIMIR!",
-          style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              context.watch<ThemeProvider>().isDark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
-              color: Colors.white,
-            ),
-            tooltip: '테마 전환',
-            onPressed: () {
-              context.read<ThemeProvider>().toggleTheme();
-            },
-          ),
-          const AuthAccountButton(),
-        ],
-        backgroundColor: Colors.orange,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MouseRegion(
-                  onEnter: (_) => setState(() => _isHoveringRaid = true),
-                  onExit: (_) => setState(() => _isHoveringRaid = false),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 420),
-                        child: SizedBox(
-                          height: 495,
-                          child: PageView.builder(
-                            controller: _raidPageController,
-                            clipBehavior: Clip.none,
-                            onPageChanged: (index) {
-                              setState(() {
-                                _currentRaidPage = index;
-                              });
-                            },
-                            itemCount: raidHistory.length,
-                            itemBuilder: (context, index) {
-                              return AnimatedBuilder(
-                                animation: _raidPageController,
-                                builder: (context, child) {
-                                  double page = index.toDouble();
-                                  if (_raidPageController
-                                      .position.haveDimensions) {
-                                    page = _raidPageController.page ?? page;
-                                  } else {
-                                    page = _raidPageController.initialPage
-                                        .toDouble();
-                                  }
-                                  double diff = (page - index).abs();
-                                  double scale =
-                                      (1 - (diff * 0.15)).clamp(0.85, 1.0);
-                                  double opacity =
-                                      (1 - (diff * 0.5)).clamp(0.4, 1.0);
+  Widget _raidCard() {
+    return Column(children: [
+      MouseRegion(
+        onEnter: (_) => setState(() => _isHoveringRaid = true),
+        onExit: (_) => setState(() => _isHoveringRaid = false),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: double.infinity),
+              child: SizedBox(
+                height: 495,
+                child: PageView.builder(
+                  controller: _raidPageController,
+                  clipBehavior: Clip.none,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentRaidPage = index;
+                    });
+                  },
+                  itemCount: raidHistory.length,
+                  itemBuilder: (context, index) {
+                    return AnimatedBuilder(
+                      animation: _raidPageController,
+                      builder: (context, child) {
+                        double page = index.toDouble();
+                        if (_raidPageController.position.haveDimensions) {
+                          page = _raidPageController.page ?? page;
+                        } else {
+                          page = _raidPageController.initialPage.toDouble();
+                        }
+                        double diff = (page - index).abs();
+                        double scale = (1 - (diff * 0.15)).clamp(0.85, 1.0);
+                        double opacity = (1 - (diff * 0.5)).clamp(0.4, 1.0);
 
-                                  return Opacity(
-                                    opacity: opacity,
-                                    child: Transform.scale(
-                                      scale: scale,
-                                      child: child,
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  child: _buildRaidSummaryCard(
-                                      context, raidHistory[index]),
-                                ),
-                              );
-                            },
+                        return Opacity(
+                          opacity: opacity,
+                          child: Transform.scale(
+                            scale: scale,
+                            child: child,
                           ),
-                        ),
-                      ),
-                      // 좌측 화살표
-                      if (_currentRaidPage > 0)
-                        Positioned(
-                          left: 0,
-                          child: IgnorePointer(
-                            ignoring: !_isHoveringRaid,
-                            child: AnimatedOpacity(
-                              opacity: _isHoveringRaid ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 200),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.4),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.chevron_left,
-                                      color: Colors.white, size: 32),
-                                  onPressed: () {
-                                    _raidPageController.previousPage(
-                                      duration:
-                                          const Duration(milliseconds: 400),
-                                      curve: Curves.easeOutCubic,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      // 우측 화살표
-                      if (_currentRaidPage < raidHistory.length - 1)
-                        Positioned(
-                          right: 0,
-                          child: IgnorePointer(
-                            ignoring: !_isHoveringRaid,
-                            child: AnimatedOpacity(
-                              opacity: _isHoveringRaid ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 200),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.4),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.chevron_right,
-                                      color: Colors.white, size: 32),
-                                  onPressed: () {
-                                    _raidPageController.nextPage(
-                                      duration:
-                                          const Duration(milliseconds: 400),
-                                      curve: Curves.easeOutCubic,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(raidHistory.length, (index) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: _currentRaidPage == index ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _currentRaidPage == index
-                            ? Colors.orange
-                            : Colors.grey.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+                        );
+                      },
+                      child: _buildRaidSummaryCard(context, raidHistory[index]),
                     );
-                  }),
+                  },
                 ),
-                const SizedBox(height: 24),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Column(
-                    children: [
-                      _buildMenuButton(
-                        context,
-                        title: "솔로 레이드 덱 구성",
-                        icon: Icons.dashboard_customize,
-                        color: Colors.orange,
-                        onTap: () => _showWeaknessDialog(context,
-                            initialWeakness:
-                                raidHistory[_currentRaidPage].weakness),
+              ),
+            ),
+            // 좌측 화살표
+            if (_currentRaidPage > 0)
+              Positioned(
+                left: 0,
+                child: IgnorePointer(
+                  ignoring: !_isHoveringRaid,
+                  child: AnimatedOpacity(
+                    opacity: _isHoveringRaid ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.4),
+                        shape: BoxShape.circle,
                       ),
-                      const SizedBox(height: 12),
-                      _buildMenuButton(
-                        context,
-                        title: "유니온 레이드 덱 구성",
-                        icon: Icons.group_work,
-                        color: Colors.orange.shade700,
-                        onTap: () {
-                          final currentRaid = raidHistory[_currentRaidPage];
-                          final unionRaid = currentRaid.type == RaidType.union
-                              ? currentRaid
-                              : raidHistory
-                                  .firstWhere((r) => r.type == RaidType.union);
-                          Navigator.pushNamed(
-                            context,
-                            UnionDeckBuilderScreen.routeName,
-                            arguments: unionRaid,
+                      child: IconButton(
+                        icon: const Icon(Icons.chevron_left,
+                            color: Colors.white, size: 32),
+                        onPressed: () {
+                          _raidPageController.previousPage(
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutCubic,
                           );
                         },
                       ),
-                      const SizedBox(height: 12),
-                      _buildMenuButton(
-                        context,
-                        title: "덱 라이브러리",
-                        icon: Icons.auto_stories_rounded,
-                        color: Colors.deepOrange,
-                        onTap: () => _openDeckLibrary(context),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildMenuButton(
-                        context,
-                        title: "솔레 금서고 바로가기",
-                        icon: Icons.history,
-                        color: Colors.deepOrange,
-                        onTap: () async {
-                          final Uri url =
-                              Uri.parse('https://soloraidhistory.vercel.app/');
-                          if (!await launchUrl(url)) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('링크를 열 수 없습니다.'),
-                                    backgroundColor: Colors.orange),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildMenuButton(
-                        context,
-                        title: "딜량 계산기 DILDORO",
-                        icon: Icons.calculate_outlined,
-                        color: Colors.indigo,
-                        onTap: () async {
-                          final Uri url = Uri.parse('https://dildoro.com');
-                          if (!await launchUrl(url)) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('링크를 열 수 없습니다.'),
-                                    backgroundColor: Colors.orange),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _buildMenuButton(
-                        context,
-                        title: "전투 정보 동기화",
-                        icon: Icons.sync_rounded,
-                        color: Colors.blueAccent,
-                        onTap: () =>
-                            Navigator.pushNamed(context, SyncScreen.routeName),
-                        isOutlined: true,
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildMenuButton(
-                              context,
-                              title: "계산기",
-                              icon: Icons.calculate,
-                              color: Colors.teal,
-                              onTap: () => _openCalculator(context),
-                              isOutlined: true,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildMenuButton(
-                              context,
-                              title: "내 니케 정보",
-                              icon: Icons.person_search,
-                              color: Colors.purple,
-                              onTap: () async {
-                                final uid = context.read<AuthProvider>().userId;
-                                final selectedOpenId = await DatabaseService()
-                                    .getSelectedCommanderOpenId(uid);
-                                if (!context.mounted) return;
-                                if (selectedOpenId != null) {
-                                  Navigator.pushNamed(
-                                      context, MyNikkeScreen.routeName,
-                                      arguments: selectedOpenId);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content:
-                                            Text("먼저 BLABLALINK 계정을 연동해 주세요."),
-                                        backgroundColor: Colors.orange),
-                                  );
-                                  Navigator.pushNamed(
-                                      context, SyncScreen.routeName);
-                                }
-                              },
-                              isOutlined: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                const AppFooter(),
-              ],
-            ),
-          ),
+              ),
+            // 우측 화살표
+            if (_currentRaidPage < raidHistory.length - 1)
+              Positioned(
+                right: 0,
+                child: IgnorePointer(
+                  ignoring: !_isHoveringRaid,
+                  child: AnimatedOpacity(
+                    opacity: _isHoveringRaid ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.4),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.chevron_right,
+                            color: Colors.white, size: 32),
+                        onPressed: () {
+                          _raidPageController.nextPage(
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutCubic,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
+      const SizedBox(height: 12),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(raidHistory.length, (index) {
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            width: _currentRaidPage == index ? 24 : 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: _currentRaidPage == index
+                  ? Colors.orange
+                  : Colors.grey.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(4),
+            ),
+          );
+        }),
+      ),
+    ]);
+  }
+
+  Widget _tile(
+      {required String title,
+      required String subtitle,
+      required IconData icon,
+      required Color color,
+      required VoidCallback onTap,
+      bool external = false,
+      bool tinted = false}) {
+    return Material(
+      color: tinted ? color.withOpacity(_isDark ? .12 : .035) : _surface,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(13),
+          side: BorderSide(color: _border)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(children: [
+              Container(
+                width: 44,
+                height: 48,
+                decoration: BoxDecoration(
+                    color: color.withOpacity(.07),
+                    borderRadius: BorderRadius.circular(10)),
+                child: Icon(icon, color: color, size: 27),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Text(title,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: tinted ? color : null)),
+                    if (subtitle.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(subtitle,
+                          style: TextStyle(fontSize: 12, color: _muted)),
+                    ],
+                  ])),
+              const SizedBox(width: 6),
+              Icon(
+                  external
+                      ? Icons.north_east_rounded
+                      : Icons.chevron_right_rounded,
+                  size: external ? 16 : 20,
+                  color: _muted),
+            ]),
+          )),
+    );
+  }
+
+  Widget _pair(Widget first, Widget second) {
+    return LayoutBuilder(builder: (context, constraints) {
+      if (constraints.maxWidth < 440 ||
+          MediaQuery.textScalerOf(context).scale(16) > 20) {
+        return Column(children: [first, const SizedBox(height: 10), second]);
+      }
+      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: first),
+        const SizedBox(width: 12),
+        Expanded(child: second),
+      ]);
+    });
+  }
+
+  Widget _section(
+      String title, String subtitle, IconData icon, List<Widget> children) {
+    return _panel(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 6,
+            children: [
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(icon, color: _orange, size: 25),
+                const SizedBox(width: 10),
+                Flexible(
+                    child: Text(title,
+                        style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -.5))),
+              ]),
+              Text(subtitle, style: TextStyle(fontSize: 11, color: _muted)),
+            ],
+          )),
+      ...children,
+    ]));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor:
+          _isDark ? const Color(0xFF141418) : const Color(0xFFFAFAFC),
+      drawer: const AppDrawer(activeRoute: '/'),
+      appBar: AppBar(
+        title: const FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text('니케 덱 빌딩 도우미 MIMIR!',
+              style:
+                  TextStyle(fontWeight: FontWeight.w700, color: Colors.white)),
+        ),
+        centerTitle: true,
+        backgroundColor: _orange,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            tooltip: '테마 전환',
+            icon: Icon(
+                _isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+            onPressed: () => context.read<ThemeProvider>().toggleTheme(),
+          ),
+          const AuthAccountButton(),
+        ],
+      ),
+      body: SafeArea(
+          child: SingleChildScrollView(
+              child: Center(
+                  child: ConstrainedBox(
+        // Keep the original 400px card width, plus 16px outer padding per side.
+        constraints: const BoxConstraints(maxWidth: 432),
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(children: [
+              _raidCard(),
+              const SizedBox(height: 18),
+              _section(
+                  '덱 구성 및 라이브러리', '나에게 맞는 덱을 구성해보세요', Icons.dashboard_rounded, [
+                _pair(
+                  _tile(
+                      title: '솔로 레이드',
+                      subtitle: '덱 구성',
+                      icon: Icons.my_location_rounded,
+                      color: Colors.redAccent,
+                      onTap: () => _showWeaknessDialog(context,
+                          initialWeakness:
+                              raidHistory[_currentRaidPage].weakness)),
+                  _tile(
+                      title: '유니온 레이드',
+                      subtitle: '덱 구성',
+                      icon: Icons.groups_rounded,
+                      color: _orange,
+                      onTap: _openUnionRaid),
+                ),
+                const SizedBox(height: 10),
+                _tile(
+                    title: '덱 라이브러리',
+                    subtitle: '다양한 덱을 살펴보세요',
+                    icon: Icons.auto_stories_rounded,
+                    color: _orange,
+                    onTap: () => _openDeckLibrary(context)),
+              ]),
+              const SizedBox(height: 12),
+              _section('바로가기', '자주 쓰는 기능을 한 번에', Icons.link_rounded, [
+                _pair(
+                  _tile(
+                      title: '솔레 금서고',
+                      subtitle: '바로가기',
+                      icon: Icons.history_rounded,
+                      color: Colors.indigo,
+                      external: true,
+                      onTap: () =>
+                          _openLink('https://soloraidhistory.vercel.app/')),
+                  _tile(
+                      title: 'DILDORO',
+                      subtitle: '딜량 계산기',
+                      icon: Icons.calculate_outlined,
+                      color: Colors.indigo,
+                      external: true,
+                      onTap: () => _openLink('https://dildoro.com')),
+                ),
+                const SizedBox(height: 10),
+                _tile(
+                    title: '계산기',
+                    subtitle: '일반 계산기',
+                    icon: Icons.calculate_rounded,
+                    color: Colors.indigo,
+                    onTap: () => _openCalculator(context)),
+                const SizedBox(height: 10),
+                _tile(
+                    title: '전투 정보 동기화',
+                    subtitle: 'BLABLALINK 계정 연동',
+                    icon: Icons.sync_rounded,
+                    color: Colors.blue,
+                    onTap: () =>
+                        Navigator.pushNamed(context, SyncScreen.routeName)),
+              ]),
+              const SizedBox(height: 12),
+              _tile(
+                  title: '내 니케 정보',
+                  subtitle: '',
+                  icon: Icons.person_rounded,
+                  color: _isDark
+                      ? Colors.purpleAccent.shade100
+                      : Colors.deepPurple,
+                  tinted: true,
+                  onTap: _openMyNikke),
+              const AppFooter(),
+            ])),
+      )))),
     );
   }
 }
