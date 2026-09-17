@@ -120,4 +120,14 @@ final List<RaidInfo> raidHistory = [
       UnionBossInfo(element: "철갑", name: "레이턴스", keyword: ["코어", "차지 디버프"]),
     ],
   ),
+  const RaidInfo(
+    type: RaidType.solo,
+    seasonName: "SEASON 41",
+    bossName: "리버렐리오 바디",
+    period: " 9/24(목) 12:00 ~ 10/1(목) 4:59",
+    imagePath: "assets/images/raids/liberalio_body.png",
+    bossElement: "작열",
+    weakness: "수냉",
+    keyword: [],
+  ),
 ];

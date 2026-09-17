@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 import 'package:mimir/models/enums.dart';
@@ -17,6 +15,7 @@ import 'package:mimir/screens/login.dart';
 import 'package:mimir/screens/deck_library.dart';
 import 'package:mimir/screens/deck_publish.dart';
 import 'package:mimir/widgets/nikke_card.dart';
+import 'package:mimir/utils/capture_png.dart';
 import 'package:mimir/utils/image_export.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/auth_account_button.dart';
@@ -295,12 +294,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
   Future<Uint8List?> _capturePreview() async {
     try {
-      final boundary = _previewCaptureKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
-      if (boundary == null) return null;
-      final image = await boundary.toImage(pixelRatio: 2.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
+      return await capturePng(_previewCaptureKey);
     } catch (e) {
       debugPrint('Capture error: $e');
       return null;
@@ -318,11 +312,20 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
     }
 
     final filename = 'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png';
-    await exportPng(bytes, filename);
+    try {
+      await exportPng(bytes, filename);
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('이미지 저장에 실패했습니다: $error')),
+        );
+      }
+      return;
+    }
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(kIsWeb ? '이미지를 저장했습니다.' : '이미지 공유 화면을 열었습니다.'),
+          content: Text(kIsWeb ? '이미지 저장을 요청했습니다.' : '이미지 공유 화면을 열었습니다.'),
         ),
       );
     }
@@ -400,19 +403,10 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
   }
 
   Future<void> _copyToClipboard() async {
-    final bytes = await _capturePreview();
-    if (bytes == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('캡쳐 실패')));
-      }
-      return;
-    }
-
     try {
       final filename =
           'mimir_deck_${DateTime.now().millisecondsSinceEpoch}.png';
-      final copied = await copyPng(bytes, filename);
+      final copied = await copyPng(capturePng(_previewCaptureKey), filename);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
@@ -564,8 +558,10 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                         borderRadius: const BorderRadius.vertical(
                             bottom: Radius.circular(12)),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      child: Wrap(
+                        alignment: WrapAlignment.end,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
                           TextButton.icon(
                             icon: const Icon(Icons.content_copy,
@@ -574,7 +570,6 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                                 style: TextStyle(color: Colors.orange)),
                             onPressed: _copyToClipboard,
                           ),
-                          const SizedBox(width: 8),
                           ElevatedButton.icon(
                             icon:
                                 const Icon(Icons.download, color: Colors.white),
@@ -591,7 +586,6 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
                             onPressed: _downloadPreview,
                           ),
                           if (AuthProvider.showLoginFeatures) ...[
-                            const SizedBox(width: 8),
                             ElevatedButton.icon(
                               icon: const Icon(Icons.cloud_upload_rounded,
                                   color: Colors.white),

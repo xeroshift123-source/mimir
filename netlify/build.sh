@@ -14,7 +14,8 @@ flutter --version
 flutter config --enable-web
 
 flutter pub get
-flutter build web --release
+# RepaintBoundary.toImage requires CanvasKit, including on mobile browsers.
+flutter build web --release --web-renderer canvaskit
 
 # ------------------------------
 # Netlify secrets scan 오탐지 회피용 정리

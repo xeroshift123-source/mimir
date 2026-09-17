@@ -1,8 +1,5 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -11,10 +8,8 @@ import '../providers/nikke_provider.dart';
 import '../services/database_service.dart';
 import '../services/nikke_statistics_service.dart';
 import '../services/recap_service.dart';
+import '../utils/capture_png.dart';
 import '../utils/image_export.dart';
-import '../web/capture_marker.dart';
-import '../web/web_capture_stub.dart'
-    if (dart.library.html) '../web/web_capture.dart' as web_capture;
 
 class RecapScreen extends StatefulWidget {
   const RecapScreen({super.key});
@@ -37,15 +32,8 @@ class _RecapScreenState extends State<RecapScreen> {
   String? _error;
   List<RecapCardData>? _cards;
   List<GlobalKey> _captureKeys = const [];
-  List<String> _captureElementIds = const [];
-  List<String> _captureViewTypes = const [];
 
   bool get _busy => _saving || _copying;
-  bool get _useDomWebCapture =>
-      kIsWeb &&
-      defaultTargetPlatform != TargetPlatform.android &&
-      defaultTargetPlatform != TargetPlatform.iOS;
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -99,26 +87,9 @@ class _RecapScreenState extends State<RecapScreen> {
         elementDamageStatistics: elementDamageStatistics,
       );
       if (!mounted) return;
-      final captureToken = DateTime.now().microsecondsSinceEpoch;
-      final captureElementIds = List.generate(
-        cards.length,
-        (index) => 'recap-card-$captureToken-$index',
-      );
-      final captureViewTypes = List.generate(
-        cards.length,
-        (index) => 'recap-capture-marker-$captureToken-$index',
-      );
-      for (var index = 0; index < cards.length; index++) {
-        registerCaptureMarkerView(
-          captureViewTypes[index],
-          captureElementIds[index],
-        );
-      }
       setState(() {
         _cards = cards;
         _captureKeys = List.generate(cards.length, (_) => GlobalKey());
-        _captureElementIds = captureElementIds;
-        _captureViewTypes = captureViewTypes;
       });
     } catch (error) {
       if (!mounted) return;
@@ -127,16 +98,8 @@ class _RecapScreenState extends State<RecapScreen> {
     }
   }
 
-  Future<Uint8List?> _captureCurrentCard() async {
-    await WidgetsBinding.instance.endOfFrame;
-    final boundary = _captureKeys[_currentIndex]
-        .currentContext
-        ?.findRenderObject() as RenderRepaintBoundary?;
-    if (boundary == null) return null;
-    final image = await boundary.toImage(pixelRatio: kIsWeb ? 2 : 3);
-    final data = await image.toByteData(format: ui.ImageByteFormat.png);
-    return data?.buffer.asUint8List();
-  }
+  Future<Uint8List> _captureCurrentCard() =>
+      capturePng(_captureKeys[_currentIndex]);
 
   Future<void> _saveCurrentCard() async {
     if (_busy || _cards == null) return;
@@ -146,20 +109,12 @@ class _RecapScreenState extends State<RecapScreen> {
           _cards![_currentIndex].order.toString().padLeft(2, '0');
       final stamp = DateFormat('yyyyMMdd').format(DateTime.now());
       final filename = 'mimir_recap_${stamp}_$cardNumber.png';
-      if (_useDomWebCapture) {
-        await web_capture.captureByElementId(
-          elementId: _captureElementIds[_currentIndex],
-          fileName: filename,
-        );
-      } else {
-        final bytes = await _captureCurrentCard();
-        if (bytes == null) throw StateError('카드 캡처에 실패했습니다.');
-        await exportPng(bytes, filename);
-      }
+      final bytes = await _captureCurrentCard();
+      await exportPng(bytes, filename);
       if (!mounted) return;
       const feedback = kIsWeb
           ? SnackBar(
-              content: Text('리캡 카드를 다운로드했습니다.'),
+              content: Text('리캡 카드 저장을 요청했습니다.'),
               behavior: SnackBarBehavior.floating,
             )
           : SnackBar(
@@ -183,22 +138,11 @@ class _RecapScreenState extends State<RecapScreen> {
     if (_busy || _cards == null) return;
     setState(() => _copying = true);
     try {
-      var copied = true;
-      if (_useDomWebCapture) {
-        await web_capture.copyElementById(
-          elementId: _captureElementIds[_currentIndex],
-        );
-      } else {
-        final bytes = await _captureCurrentCard();
-        if (bytes == null) throw StateError('카드 캡처에 실패했습니다.');
-        final cardNumber =
-            _cards![_currentIndex].order.toString().padLeft(2, '0');
-        final stamp = DateFormat('yyyyMMdd').format(DateTime.now());
-        copied = await copyPng(
-          bytes,
-          'mimir_recap_${stamp}_$cardNumber.png',
-        );
-      }
+      final cardNumber =
+          _cards![_currentIndex].order.toString().padLeft(2, '0');
+      final stamp = DateFormat('yyyyMMdd').format(DateTime.now());
+      final copied = await copyPng(
+          _captureCurrentCard(), 'mimir_recap_${stamp}_$cardNumber.png');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -293,13 +237,6 @@ class _RecapScreenState extends State<RecapScreen> {
                                             total: cards.length,
                                           ),
                                         ),
-                                        if (kIsWeb)
-                                          IgnorePointer(
-                                            child: HtmlElementView(
-                                              viewType:
-                                                  _captureViewTypes[index],
-                                            ),
-                                          ),
                                       ],
                                     ),
                                   ),

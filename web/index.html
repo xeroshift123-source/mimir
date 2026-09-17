@@ -15,9 +15,9 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <base href="$FLUTTER_BASE_HREF">
+  <script src="image_export.js"></script>
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -103,74 +103,7 @@
     }
   </style>
 </head>
-<script>
-  async function renderElementToCanvas(elementId) {
-    const el = document.getElementById(elementId);
-    if (!el) throw new Error("capture target not found: " + elementId);
 
-    const rect = el.getBoundingClientRect();
-
-    // 전체 화면 캡쳐 후, rect 영역만 crop
-    const canvas = await html2canvas(document.body, {
-      backgroundColor: "#ffffff",
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      scrollX: -window.scrollX,
-      scrollY: -window.scrollY,
-      windowWidth: document.documentElement.clientWidth,
-      windowHeight: document.documentElement.clientHeight,
-    });
-
-    const out = document.createElement('canvas');
-    out.width = Math.round(rect.width * 2);
-    out.height = Math.round(rect.height * 2);
-
-    const ctx = out.getContext('2d');
-    ctx.drawImage(
-      canvas,
-      Math.round(rect.left * 2),
-      Math.round(rect.top * 2),
-      Math.round(rect.width * 2),
-      Math.round(rect.height * 2),
-      0,
-      0,
-      Math.round(rect.width * 2),
-      Math.round(rect.height * 2)
-    );
-
-    return out;
-  }
-
-  async function captureElementById(elementId, fileName) {
-    const out = await renderElementToCanvas(elementId);
-    const a = document.createElement('a');
-    a.href = out.toDataURL('image/png');
-    a.download = fileName || 'mimir_recap.png';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
-
-  async function copyElementById(elementId) {
-    if (!navigator.clipboard || typeof ClipboardItem === 'undefined') {
-      throw new Error('이 브라우저는 이미지 클립보드 복사를 지원하지 않습니다.');
-    }
-
-    // Safari는 사용자 입력 권한이 유지되는 동안 clipboard.write가 호출되어야 한다.
-    const pngBlob = renderElementToCanvas(elementId).then((canvas) =>
-      new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error('PNG 이미지를 만들지 못했습니다.'));
-        }, 'image/png');
-      })
-    );
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'image/png': pngBlob })
-    ]);
-  }
-</script>
 
 <body>
   <div id="loading">
@@ -188,7 +121,8 @@
           serviceWorkerVersion: serviceWorkerVersion,
         },
         onEntrypointLoaded: function (engineInitializer) {
-          engineInitializer.initializeEngine().then(function (appRunner) {
+          // Flutter 3.19's mobile HTML renderer cannot capture RepaintBoundary.
+          engineInitializer.initializeEngine({ renderer: 'canvaskit' }).then(function (appRunner) {
             appRunner.runApp();
             
             // Fading out and removing the loading screen beautifully

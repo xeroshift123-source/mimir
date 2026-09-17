@@ -1174,7 +1174,7 @@
     "name": "에피넬",
     "imageUrl": "assets/nikke/epinel.webp",
     "burst": "3",
-    "element": "Fire",
+    "element": "Wind",
     "weaponType": "MG",
     "company": "Missilis",
     "ability": [],
@@ -3536,7 +3536,8 @@
       "분배데미지",
       "분배뎀",
       "시전자 기준 공격력",
-      "시공증"
+      "시공증",
+      "페게리"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -3558,7 +3559,8 @@
       "분배뎀",
       "힐",
       "시전자 기준 공격력",
-      "시공증"
+      "시공증",
+      "페게리"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -3582,7 +3584,45 @@
     "squadNum": 0,
     "rank": "SSR",
     "type": "DEF",
-    "isTemporary": true,
+    "isTemporary": false,
     "blablaNameCode": 5181
+  },
+  {
+    "id": "guilty_mighty_bunny",
+    "name": "길티 : 마이티 바니",
+    "imageUrl": "assets/nikke/guilty_mighty_bunny.webp",
+    "burst": "3",
+    "element": "Water",
+    "weaponType": "SR",
+    "company": "Missilis",
+    "ability": [
+      "방무뎀"
+      , "방어력무시데미지"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK",
+    "isTemporary": true,
+    "blablaNameCode": 5182
+  },
+  {
+    "id": "sin_swift_bunny",
+    "name": "신 : 스위프트 바니",
+    "imageUrl": "assets/nikke/sin_swift_bunny.webp",
+    "burst": "3",
+    "element": "Water",
+    "weaponType": "SR",
+    "company": "Missilis",
+    "ability": [
+      "방무뎀"
+      , "방어력무시데미지"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK",
+    "isTemporary": true,
+    "blablaNameCode": 5183
   }
 ]

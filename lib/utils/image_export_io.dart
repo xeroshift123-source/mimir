@@ -1,5 +1,6 @@
 // lib/utils/image_export_io.dart
 import 'dart:io';
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:path_provider/path_provider.dart';
@@ -19,12 +20,13 @@ Future<void> exportPng(Uint8List bytes, String filename) async {
   );
 }
 
-Future<bool> copyPng(Uint8List bytes, String filename) async {
+Future<bool> copyPng(FutureOr<Uint8List> bytes, String filename) async {
+  final png = await bytes;
   try {
-    await Pasteboard.writeImage(bytes);
+    await Pasteboard.writeImage(png);
     return true;
   } catch (_) {
-    await exportPng(bytes, filename);
+    await exportPng(png, filename);
     return false;
   }
 }

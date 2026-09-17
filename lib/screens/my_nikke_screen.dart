@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui' as ui;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 import 'package:provider/provider.dart';
@@ -18,6 +16,7 @@ import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/services/database_service.dart';
 import 'package:mimir/services/nikke_statistics_service.dart';
 import 'package:mimir/utils/cp_calculator.dart';
+import 'package:mimir/utils/capture_png.dart';
 import 'package:mimir/utils/image_export.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/nikke_statistics_card.dart';
@@ -3270,16 +3269,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   Future<Uint8List?> _captureKeyToBytes(GlobalKey key) async {
     try {
-      // Allow some delay for rendering
-      await Future.delayed(const Duration(milliseconds: 100));
-      final boundary =
-          key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary == null) return null;
-      final image = await boundary.toImage(pixelRatio: 2.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
+      return await capturePng(key);
     } catch (e) {
       debugPrint('Capture error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('이미지 캡처에 실패했습니다. 다시 시도해 주세요.')),
+        );
+      }
       return null;
     }
   }
@@ -3336,8 +3333,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      Wrap(
+                        alignment: WrapAlignment.end,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
                           TextButton.icon(
                             icon: const Icon(Icons.content_copy,
@@ -3345,32 +3344,28 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                             label: const Text("클립보드 복사",
                                 style: TextStyle(color: Colors.purple)),
                             onPressed: () async {
-                              final bytes =
-                                  await _captureKeyToBytes(captureKey);
-                              if (bytes != null) {
-                                try {
-                                  final filename =
-                                      'license_${DateTime.now().millisecondsSinceEpoch}.png';
-                                  final copied = await copyPng(bytes, filename);
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(copied
-                                            ? '클립보드에 복사되었습니다!'
-                                            : '이미지 복사를 지원하지 않아 저장으로 전환했습니다.'),
-                                      ),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('복사 실패: $e')));
-                                  }
+                              try {
+                                final filename =
+                                    'license_${DateTime.now().millisecondsSinceEpoch}.png';
+                                final copied = await copyPng(
+                                  capturePng(captureKey), filename,
+                                );
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(copied
+                                        ? '클립보드에 복사되었습니다!'
+                                        : '이미지 복사를 지원하지 않아 저장으로 전환했습니다.')),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('복사 실패: $e')),
+                                  );
                                 }
                               }
                             },
                           ),
-                          const SizedBox(width: 8),
                           ElevatedButton.icon(
                             icon:
                                 const Icon(Icons.download, color: Colors.white),
@@ -3386,12 +3381,21 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                               if (bytes != null) {
                                 final filename =
                                     'license_${DateTime.now().millisecondsSinceEpoch}.png';
-                                await exportPng(bytes, filename);
+                                try {
+                                  await exportPng(bytes, filename);
+                                } catch (error) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('이미지 저장에 실패했습니다: $error')),
+                                    );
+                                  }
+                                  return;
+                                }
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(kIsWeb
-                                          ? '이미지를 저장했습니다.'
+                                          ? '이미지 저장을 요청했습니다.'
                                           : '이미지 공유 화면을 열었습니다.'),
                                     ),
                                   );
