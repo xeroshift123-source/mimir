@@ -9,6 +9,30 @@ class OverloadSimulatorProvider with ChangeNotifier {
   final Map<String, dynamic>? charData;
   final bool assumeCube15;
   late List<OverloadEquipment> equipments;
+  final Map<EquipmentPart, List<OverloadSlot>> _previousSlots = {};
+
+  bool canUndo(EquipmentPart part) => _previousSlots.containsKey(part);
+
+  void _saveForUndo(OverloadEquipment equipment) {
+    _previousSlots[equipment.part] = equipment.slots.map((slot) => OverloadSlot(
+      optionType: slot.optionType,
+      skillLevel: slot.skillLevel,
+      isModuleLocked: slot.isModuleLocked,
+      isKeyLocked: slot.isKeyLocked,
+      isInitialLocked: slot.isInitialLocked,
+    )).toList();
+  }
+
+  void undoChange(EquipmentPart part) {
+    final previous = _previousSlots.remove(part);
+    if (previous == null) return;
+    final equipment = _getEquipment(part);
+    // 옵션과 잠금 상태만 복원한다. 소모한 재화는 반환하지 않는다.
+    for (var i = 0; i < equipment.slots.length; i++) {
+      equipment.slots[i] = previous[i];
+    }
+    _calculateCP();
+  }
 
   int _modulesSpentOnRolls = 0;
   int _modulesSpentOnLocking = 0;
@@ -34,9 +58,11 @@ class OverloadSimulatorProvider with ChangeNotifier {
     return 0;
   }
 
-  final Random _random = Random();
+  final Random _random;
 
-  OverloadSimulatorProvider(this.nikke, {this.charData, this.assumeCube15 = false}) {
+  OverloadSimulatorProvider(this.nikke,
+      {this.charData, this.assumeCube15 = false, Random? random})
+      : _random = random ?? Random() {
     _initializeStats();
     _initializeEquipments();
     _calculateCP();
@@ -237,6 +263,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
   }
 
   void reset() {
+    _previousSlots.clear();
     _modulesSpentOnRolls = 0;
     _modulesSpentOnLocking = 0;
     totalLockKeysUsed = 0;
@@ -259,6 +286,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
   // 효과 변경
   void changeEffect(EquipmentPart part) {
     final eq = _getEquipment(part);
+    _saveForUndo(eq);
 
     // 1. 비용 계산 및 소모
     int mLockCount = eq.moduleLockedCount + eq.initialLockedCount;
@@ -276,16 +304,13 @@ class OverloadSimulatorProvider with ChangeNotifier {
     _modulesSpentOnRolls += moduleCost;
     totalLockKeysUsed += keyCost;
 
-    // 2. 잠금 해제될 락키 옵션 미리 확인
-    final keyLockedSlots = eq.slots.where((s) => s.isKeyLocked).toList();
-
-    // 3. 현재 잠긴 옵션 수집 (중복 방지용)
+    // 2. 현재 잠긴 옵션 수집 (중복 방지용)
     final lockedOptions = eq.slots
         .where((s) => s.isLocked && !s.isEmpty)
         .map((s) => s.optionType!)
         .toSet();
 
-    // 4. 슬롯 롤링
+    // 3. 슬롯 롤링
     final unlockProbabilities = [1.0, 0.5, 0.3];
     for (int i = 0; i < 3; i++) {
       final slot = eq.slots[i];
@@ -293,19 +318,20 @@ class OverloadSimulatorProvider with ChangeNotifier {
 
       bool isUnlocked = _random.nextDouble() < unlockProbabilities[i];
       if (isUnlocked) {
-        // 새 옵션 부여 (중복 제외)
-        slot.optionType = _getRandomOptionType(lockedOptions);
+        // 기존 효과와 수치가 모두 같으면 해당 조합을 다시 추첨한다.
+        // 확정 전에는 중복 방지 세트에 추가하지 않는다.
+        final previousType = slot.optionType;
+        final previousLevel = slot.skillLevel;
+        do {
+          slot.optionType = _getRandomOptionType(lockedOptions);
+          slot.skillLevel = _getRandomSkillLevel();
+        } while (slot.optionType == previousType &&
+            slot.skillLevel == previousLevel);
         lockedOptions.add(slot.optionType!); // 방금 뽑은 것도 중복 방지 세트에 추가
-        slot.skillLevel = _getRandomSkillLevel();
       } else {
         slot.optionType = null;
         slot.skillLevel = null;
       }
-    }
-
-    // 5. 락키 잠금 해제
-    for (final slot in keyLockedSlots) {
-      slot.isKeyLocked = false;
     }
 
     _calculateCP();
@@ -314,6 +340,7 @@ class OverloadSimulatorProvider with ChangeNotifier {
   // 수치 변경
   void changeValue(EquipmentPart part) {
     final eq = _getEquipment(part);
+    _saveForUndo(eq);
 
     // 1. 비용 계산 (수치 변경도 효과 변경과 동일한 비용 구조를 가짐)
     int mLockCount = eq.moduleLockedCount + eq.initialLockedCount;
@@ -331,17 +358,13 @@ class OverloadSimulatorProvider with ChangeNotifier {
     _modulesSpentOnRolls += moduleCost;
     totalLockKeysUsed += keyCost;
 
-    final keyLockedSlots = eq.slots.where((s) => s.isKeyLocked).toList();
-
     // 2. 잠기지 않은 유효한 슬롯의 수치(스킬 레벨)만 변경
     for (final slot in eq.slots) {
       if (slot.isLocked || slot.isEmpty) continue;
-      slot.skillLevel = _getRandomSkillLevel();
-    }
-
-    // 3. 락키 잠금 해제
-    for (final slot in keyLockedSlots) {
-      slot.isKeyLocked = false;
+      final previousLevel = slot.skillLevel;
+      do {
+        slot.skillLevel = _getRandomSkillLevel();
+      } while (slot.skillLevel == previousLevel);
     }
 
     _calculateCP();

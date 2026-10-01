@@ -513,6 +513,17 @@ class _OverloadSimulatorView extends StatelessWidget {
               Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(width: 12),
               _buildEquipmentLevelStepper(context, provider, part, eq.level, isDark),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: provider.canUndo(part)
+                    ? () => provider.undoChange(part)
+                    : null,
+                icon: const Icon(Icons.undo, size: 18),
+                label: const Text('되돌리기'),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
