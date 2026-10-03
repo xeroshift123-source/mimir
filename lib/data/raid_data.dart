@@ -130,4 +130,17 @@ final List<RaidInfo> raidHistory = [
     weakness: "수냉",
     keyword: [],
   ),
+  const RaidInfo(
+    type: RaidType.union,
+    seasonName: "26년 10월",
+    period: "10/9(금)",
+    imagePath: "assets/images/union_raid.webp",
+    unionBosses: [
+      UnionBossInfo(element: "수냉", name: "두리안", keyword: ["코어", "힐"]),
+      UnionBossInfo(element: "철갑", name: "핑거즈", keyword: ["코어"]),
+      UnionBossInfo(element: "전격", name: "크리스탈 체임버 (★)", keyword: ["파츠", "관통"]),
+      UnionBossInfo(element: "작열", name: "리빌드 벌컨R", keyword: ["코어", "파츠"]),
+      UnionBossInfo(element: "풍압", name: "크라켄", keyword: ["코어", "파츠"]),
+    ],
+  ),
 ];
