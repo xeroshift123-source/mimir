@@ -128,7 +128,7 @@ final List<RaidInfo> raidHistory = [
     imagePath: "assets/images/raids/liberalio_body.png",
     bossElement: "작열",
     weakness: "수냉",
-    keyword: [],
+    keyword: ["방무뎀", "코어"],
   ),
   const RaidInfo(
     type: RaidType.union,
@@ -142,5 +142,15 @@ final List<RaidInfo> raidHistory = [
       UnionBossInfo(element: "작열", name: "리빌드 벌컨R", keyword: ["코어", "파츠"]),
       UnionBossInfo(element: "풍압", name: "크라켄", keyword: ["코어", "파츠"]),
     ],
+  ),
+  const RaidInfo(
+    type: RaidType.solo,
+    seasonName: "SEASON 42",
+    bossName: "앨트루이아",
+    period: " 10/15(목) 12:00 ~ 10/22(목) 4:59",
+    imagePath: "assets/images/raids/altruia.png",
+    bossElement: "수냉",
+    weakness: "전격",
+    keyword: ["파츠", "방무뎀"],
   ),
 ];

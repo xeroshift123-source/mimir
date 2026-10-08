@@ -3603,7 +3603,7 @@
     "squadNum": 0,
     "rank": "SSR",
     "type": "ATK",
-    "isTemporary": true,
+    "isTemporary": false,
     "blablaNameCode": 5182
   },
   {
@@ -3622,7 +3622,30 @@
     "squadNum": 0,
     "rank": "SSR",
     "type": "ATK",
-    "isTemporary": true,
+    "isTemporary": false,
     "blablaNameCode": 5183
+  },
+  {
+    "id": "belorta_pumpkin_witch",
+    "name": "벨로타 : 펌킨 위치",
+    "imageUrl": "assets/nikke/belorta_pumpkin_witch.webp",
+    "burst": "2",
+    "element": "Water",
+    "weaponType": "RL",
+    "company": "Tetra",
+    "ability": [
+      "지속데미지"
+      , "지딜"
+      , "시전자 기준 공격력"
+      , "시공증"
+      , "받는데미지증가"
+      , "받뎀증"
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "SUP",
+    "isTemporary": true,
+    "blablaNameCode": 5184
   }
 ]
