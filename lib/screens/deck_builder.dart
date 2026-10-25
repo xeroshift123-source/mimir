@@ -423,6 +423,11 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
 
   Widget _buildFiveSquadsShareCanvas(String weaknessElement) {
     const double w = 600;
+    final visibleSquadIndices = List.generate(_squads.length, (index) => index)
+        .where((index) => _squads[index].any((nikke) => nikke != null))
+        .toList();
+    final showCandidate =
+        _hasCandidate && _candidateSquad.any((nikke) => nikke != null);
 
     final List<String> raidKeywordsToPass =
         _isSpecificRaid ? _currentRaidKeywords : [];
@@ -435,9 +440,9 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ...List.generate(_squads.length, (index) {
+          ...visibleSquadIndices.map((index) {
             final isLastWithoutCandidate =
-                !_hasCandidate && index == _squads.length - 1;
+                !showCandidate && index == visibleSquadIndices.last;
             return Padding(
               padding: EdgeInsets.only(bottom: isLastWithoutCandidate ? 0 : 8),
               child: _ShareSquadPanel(
@@ -449,7 +454,7 @@ class _DeckBuilderScreenState extends State<DeckBuilderScreen> {
               ),
             );
           }),
-          if (_hasCandidate)
+          if (showCandidate)
             Padding(
               padding: const EdgeInsets.only(bottom: 0),
               child: _ShareSquadPanel(

@@ -3647,5 +3647,59 @@
     "type": "SUP",
     "isTemporary": true,
     "blablaNameCode": 5184
+  },
+  {
+    "id": "marian_queen",
+    "name": "마리안 : 퀸",
+    "imageUrl": "assets/nikke/marian_queen.png",
+    "burst": "3",
+    "element": "Fire",
+    "weaponType": "MG",
+    "company": "Pilgrim",
+    "ability": [
+
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK",
+    "isTemporary": true,
+    "blablaNameCode": 5185
+  },
+  {
+    "id": "scarlet_godkiller",
+    "name": "홍련 : 신살",
+    "imageUrl": "assets/nikke/scarlet_godkiller.png",
+    "burst": "3",
+    "element": "Fire",
+    "weaponType": "AR",
+    "company": "Pilgrim",
+    "ability": [
+
+    ],
+    "coolTime": 40,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "ATK",
+    "isTemporary": true,
+    "blablaNameCode": 5186
+  },
+  {
+    "id": "rapunzel_sanctuary",
+    "name": "라푼젤 : 생츄어리",
+    "imageUrl": "assets/nikke/rapunzel_sanctuary.png",
+    "burst": "2",
+    "element": "Fire",
+    "weaponType": "RL",
+    "company": "Pilgrim",
+    "ability": [
+
+    ],
+    "coolTime": 20,
+    "squadNum": 0,
+    "rank": "SSR",
+    "type": "SUP",
+    "isTemporary": true,
+    "blablaNameCode": 5187
   }
 ]

@@ -153,4 +153,17 @@ final List<RaidInfo> raidHistory = [
     weakness: "전격",
     keyword: ["파츠", "방무뎀"],
   ),
+  const RaidInfo(
+    type: RaidType.union,
+    seasonName: "26년 11월",
+    period: "10/30(금)",
+    imagePath: "assets/images/union_raid.webp",
+    unionBosses: [
+      UnionBossInfo(element: "수냉", name: "블랙스미스", keyword: ["코어"]),
+      UnionBossInfo(element: "철갑", name: "오벨리스크", keyword: ["코어"]),
+      UnionBossInfo(element: "전격", name: "크리스탈 아머 (★)", keyword: ["파츠"]),
+      UnionBossInfo(element: "작열", name: "알트아이젠 (★)", keyword: ["파츠"]),
+      UnionBossInfo(element: "풍압", name: "리빌드 빅 암즈", keyword: ["코어"]),
+    ],
+  ),
 ];

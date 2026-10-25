@@ -438,6 +438,11 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
 
   Widget _buildFiveSquadsShareCanvas() {
     const double w = 600;
+    final visibleSquadIndices = List.generate(_squads.length, (index) => index)
+        .where((index) => _squads[index].any((nikke) => nikke != null))
+        .toList();
+    final showCandidate =
+        _hasCandidate && _candidateSquad.any((nikke) => nikke != null);
 
     return Container(
       width: w,
@@ -447,9 +452,9 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ...List.generate(_squads.length, (index) {
+          ...visibleSquadIndices.map((index) {
             final isLastWithoutCandidate =
-                !_hasCandidate && index == _squads.length - 1;
+                !showCandidate && index == visibleSquadIndices.last;
 
             final squadName = _squadNames[index];
             List<String> bossKeywords = [];
@@ -474,7 +479,7 @@ class _UnionDeckBuilderScreenState extends State<UnionDeckBuilderScreen> {
               ),
             );
           }),
-          if (_hasCandidate)
+          if (showCandidate)
             Padding(
               padding: const EdgeInsets.only(bottom: 0),
               child: _ShareSquadPanel(
