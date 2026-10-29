@@ -3651,13 +3651,15 @@
   {
     "id": "marian_queen",
     "name": "마리안 : 퀸",
-    "imageUrl": "assets/nikke/marian_queen.png",
+    "imageUrl": "assets/nikke/marian_queen.webp",
     "burst": "3",
     "element": "Fire",
     "weaponType": "MG",
     "company": "Pilgrim",
     "ability": [
-
+        "코어데미지증가"
+        ,"모더니아"
+        ,"모엥이"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -3667,15 +3669,18 @@
     "blablaNameCode": 5185
   },
   {
-    "id": "scarlet_godkiller",
+    "id": "scarlet_goddeath",
     "name": "홍련 : 신살",
-    "imageUrl": "assets/nikke/scarlet_godkiller.png",
+    "imageUrl": "assets/nikke/scarlet_goddeath.webp",
     "burst": "3",
     "element": "Fire",
     "weaponType": "AR",
     "company": "Pilgrim",
     "ability": [
-
+        "갑북이"
+        ,"홍북이"
+        ,"관통데미지"
+        ,"관통뎀"
     ],
     "coolTime": 40,
     "squadNum": 0,
@@ -3687,7 +3692,7 @@
   {
     "id": "rapunzel_sanctuary",
     "name": "라푼젤 : 생츄어리",
-    "imageUrl": "assets/nikke/rapunzel_sanctuary.png",
+    "imageUrl": "assets/nikke/rapunzel_sanctuary.webp",
     "burst": "2",
     "element": "Fire",
     "weaponType": "RL",
