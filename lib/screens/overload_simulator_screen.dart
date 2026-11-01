@@ -401,89 +401,115 @@ class _OverloadSimulatorView extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context, OverloadSimulatorProvider provider, bool isDark) {
     final formatCp = NumberFormat('#,###').format(provider.currentCp.round());
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: isDark ? const Color(0xFF14151B) : Colors.white,
-      child: Row(
-        children: [
-          // 니케 이미지 (둥근 프로필)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              provider.nikke.imageUrl,
-              width: 60,
-              height: 60,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  Container(width: 60, height: 60, color: Colors.grey),
-            ),
+    final identity = Row(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.asset(
+            provider.nikke.imageUrl,
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                Container(width: 60, height: 60, color: Colors.grey),
           ),
-          const SizedBox(width: 16),
-          // 이름 및 전투력
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      provider.nikke.name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 8),
-                    InkWell(
-                      onTap: () => provider.reset(),
-                      borderRadius: BorderRadius.circular(16),
-                      child: const Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Icon(Icons.refresh, size: 20, color: Colors.grey),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Tooltip(
+                      message: provider.nikke.name,
+                      child: Text(
+                        provider.nikke.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '40Lv 전투력: $formatCp',
-                  style: const TextStyle(fontSize: 14, color: Colors.orange, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-          // 소모 재화 카운트
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2A2B36) : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Image.asset('assets/icons/module.png', width: 18, height: 18),
-                    const SizedBox(width: 6),
-                    Text('${provider.totalModulesUsed}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                  ],
-                ),
+                  ),
+                  IconButton(
+                    tooltip: '원래대로 되돌리기',
+                    onPressed: () => provider.reset(),
+                    icon: const Icon(Icons.refresh, color: Colors.grey),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2A2B36) : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Image.asset('assets/icons/lockkey.png', width: 18, height: 18),
-                    const SizedBox(width: 6),
-                    Text('${provider.totalLockKeysUsed}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                  ],
+              const SizedBox(height: 4),
+              Text(
+                '40Lv 전투력: $formatCp',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.orange,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-        ],
+        ),
+      ],
+    );
+
+    Widget resourceCounter(String imagePath, int count) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF2A2B36) : Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(imagePath, width: 18, height: 18),
+            const SizedBox(width: 6),
+            Text(
+              '$count',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final counters = Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        resourceCounter('assets/icons/module.png', provider.totalModulesUsed),
+        resourceCounter('assets/icons/lockkey.png', provider.totalLockKeysUsed),
+      ],
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: isDark ? const Color(0xFF14151B) : Colors.white,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 600) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                identity,
+                const SizedBox(height: 12),
+                counters,
+              ],
+            );
+          }
+          return Row(
+            children: [
+              Expanded(child: identity),
+              const SizedBox(width: 16),
+              Flexible(child: counters),
+            ],
+          );
+        },
       ),
     );
   }
