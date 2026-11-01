@@ -562,8 +562,8 @@ class _BadgeCircle extends StatelessWidget {
       width: size,
       height: size,
       fit: BoxFit.cover,
+      // Keep portrait assets proportional before the circular cover crop.
       cacheWidth: 256,
-      cacheHeight: 256,
       filterQuality: FilterQuality.high,
       isAntiAlias: true,
       gaplessPlayback: true,
