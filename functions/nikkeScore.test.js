@@ -62,6 +62,37 @@ test('one successful sync computes and persists each owned element once; duplica
   assert.equal(calls.length, 4);
 });
 
+test('sync batches all owned targets into five weakness requests and matches shuffled results by id', async () => {
+  const db = memoryDb({ 'nikke_score_results/account': pendingScoreSnapshot('batched') });
+  const p = profile();
+  p.characters = [...new Map([...TARGETS].map(([key, t]) => {
+    const c = structuredClone(profile(key).characters[0]);
+    c.equipment = [];
+    return [t.nameCode, c];
+  })).values()];
+  p.characters.find(c => c.name_code === 5186).growthDataQuality.complete = false;
+  const calls = [];
+  const output = await calculateSyncedScores({ db, openId: 'account', syncId: 'batched', commander: p,
+    calculate: async (key, items) => {
+      calls.push({ key, count: items.length });
+      assert.ok(items.length > 1 && items.length <= 100);
+      assert.ok(items.every(item => TARGETS.has(`${item.target}:${resolveTarget(key).weakness}`)));
+      return { calc_version: 'c80', items: [...items].reverse().map(item => item.target === 5185
+        ? { id: item.id, error: { code: 'unsupported_nikke' } }
+        : { id: item.id, damage: item.target * 1000 }) };
+    } });
+  assert.equal(calls.length, 5);
+  assert.equal(calls.reduce((sum, call) => sum + call.count, 0), 55);
+  assert.deepEqual(output, { status: 'partial', count: 56 });
+  const saved = db.data.get('nikke_score_results/account').results;
+  assert.equal(saved['5186:fire'].code, 'resync_required');
+  assert.equal(saved['5185:fire'].code, 'unsupported_nikke');
+  for (const [key, target] of TARGETS) {
+    if ([5185, 5186].includes(target.nameCode)) continue;
+    assert.equal(saved[key].damage, target.nameCode * 1000);
+  }
+});
+
 test('profile and legacy score reads never calculate, write, or expire saved scores', async () => {
   const snapshot = storedSnapshot();
   snapshot.results['5129:fire'].calculatedAtMs = Date.now() - 90 * 86400000;
