@@ -1,0 +1,132 @@
+{
+  "source": "https://sg-tools-cdn.blablalink.com/yb-61/eaff19debcb789edef7e1e8a377e12e5.json",
+  "verifiedAt": "2026-11-02T23:25:54.263065+00:00",
+  "items": {
+    "5020": {
+      "tid": 200101,
+      "level": 2,
+      "weapon": "MG",
+      "source": "https://sg-tools-cdn.blablalink.com/jz-38/fw-26/b638839718faca7c78e8701ce61a3b93.json"
+    },
+    "5003": {
+      "tid": 200201,
+      "level": 2,
+      "weapon": "SR",
+      "source": "https://sg-tools-cdn.blablalink.com/pn-95/xi-65/be27ea0deda676d4feb3a8423500f5f2.json"
+    },
+    "5010": {
+      "tid": 200301,
+      "level": 2,
+      "weapon": "SR",
+      "source": "https://sg-tools-cdn.blablalink.com/ly-77/ou-05/8869390e2b6d936d2caefddb97e31a44.json"
+    },
+    "1010": {
+      "tid": 200401,
+      "level": 2,
+      "weapon": "RL",
+      "source": "https://sg-tools-cdn.blablalink.com/ij-59/gg-44/3c7d2c3916e6a13fd60e33a2fd0aa041.json"
+    },
+    "1022": {
+      "tid": 200501,
+      "level": 2,
+      "weapon": "SG",
+      "source": "https://sg-tools-cdn.blablalink.com/eu-41/xs-83/11ecd7d685411f1ec23ad7441bb41c1c.json"
+    },
+    "5017": {
+      "tid": 200601,
+      "level": 2,
+      "weapon": "SMG",
+      "source": "https://sg-tools-cdn.blablalink.com/bf-23/pe-23/b4a7fde4bf66cd0af98d06bc33013f4e.json"
+    },
+    "5066": {
+      "tid": 200701,
+      "level": 2,
+      "weapon": "SR",
+      "source": "https://sg-tools-cdn.blablalink.com/xq-05/rg-40/32724bc393188fe449dbe1ce07506792.json"
+    },
+    "5024": {
+      "tid": 200801,
+      "level": 2,
+      "weapon": "SG",
+      "source": "https://sg-tools-cdn.blablalink.com/ii-79/is-79/91cdb7aad5568fdb8ea1a418756a4083.json"
+    },
+    "5028": {
+      "tid": 200901,
+      "level": 2,
+      "weapon": "SR",
+      "source": "https://sg-tools-cdn.blablalink.com/et-61/ae-19/86b8f963a4c55f353102fd73b014efee.json"
+    },
+    "5016": {
+      "tid": 201001,
+      "level": 2,
+      "weapon": "SG",
+      "source": "https://sg-tools-cdn.blablalink.com/fy-55/ym-20/42d3476e7e8a2de8e672b034dd86d831.json"
+    },
+    "5081": {
+      "tid": 201101,
+      "level": 2,
+      "weapon": "AR",
+      "source": "https://sg-tools-cdn.blablalink.com/qq-30/py-59/d64be9057c6d45e668e2910042515c71.json"
+    },
+    "5014": {
+      "tid": 201201,
+      "level": 2,
+      "weapon": "AR",
+      "source": "https://sg-tools-cdn.blablalink.com/nb-12/hk-98/d6d204b5cea131788c736ee86811e83a.json"
+    },
+    "5111": {
+      "tid": 201301,
+      "level": 2,
+      "weapon": "RL",
+      "source": "https://sg-tools-cdn.blablalink.com/jm-93/yw-38/06ff56e76562bcd975677af5f019db5c.json"
+    },
+    "5007": {
+      "tid": 201401,
+      "level": 2,
+      "weapon": "AR",
+      "source": "https://sg-tools-cdn.blablalink.com/fx-75/qi-77/a8d5815c4abf0739635c7ace8ab01b6f.json"
+    },
+    "5088": {
+      "tid": 201501,
+      "level": 2,
+      "weapon": "SG",
+      "source": "https://sg-tools-cdn.blablalink.com/ci-57/hu-17/5ab514123138b2fa74d02ec1e53eff6d.json"
+    },
+    "5021": {
+      "tid": 201601,
+      "level": 2,
+      "weapon": "RL",
+      "source": "https://sg-tools-cdn.blablalink.com/yt-39/zg-56/0f7b00a47fc1f705ae8901764572d936.json"
+    },
+    "1021": {
+      "tid": 201701,
+      "level": 2,
+      "weapon": "AR",
+      "source": "https://sg-tools-cdn.blablalink.com/ve-21/qs-95/8043ef4eb8beceb30e4c3e3780fbc14e.json"
+    },
+    "5122": {
+      "tid": 201801,
+      "level": 2,
+      "weapon": "AR",
+      "source": "https://sg-tools-cdn.blablalink.com/oz-71/ie-35/799e3c52ec21d038006aca48d7aa5b71.json"
+    },
+    "5126": {
+      "tid": 201901,
+      "level": 2,
+      "weapon": "MG",
+      "source": "https://sg-tools-cdn.blablalink.com/lk-53/zq-74/6849e81a56b7c22517ef5b7032252228.json"
+    },
+    "5045": {
+      "tid": 202001,
+      "level": 2,
+      "weapon": "MG",
+      "source": "https://sg-tools-cdn.blablalink.com/dm-71/xy-75/ae2e2d4b1383c071cdac16820e8a2646.json"
+    },
+    "5002": {
+      "tid": 202101,
+      "level": 2,
+      "weapon": "SG",
+      "source": "https://sg-tools-cdn.blablalink.com/xh-22/pk-15/2690b4fe625a8e9ddcf5a29402aa507b.json"
+    }
+  }
+}

@@ -336,6 +336,8 @@ function attachUserComparison(statistics, character) {
 }
 
 module.exports = {
+  optionDefinition,
+  optionValue,
   addCommanderToAccountElementDamage,
   addCharacterToStatistics,
   aggregateAccountElementDamageStatistics,

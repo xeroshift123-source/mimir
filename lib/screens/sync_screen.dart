@@ -397,7 +397,15 @@ class _SyncScreenState extends State<SyncScreen> {
                         ),
                       ),
                       child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
+                          ? const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox.square(dimension: 20,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+                                SizedBox(width: 10),
+                                Text('동기화 및 스코어 저장 중…', style: TextStyle(color: Colors.white)),
+                              ],
+                            )
                           : const Text(
                               "동기화 시작하기",
                               style: TextStyle(

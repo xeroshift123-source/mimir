@@ -1,0 +1,363 @@
+{
+  "version": "s41-water-dorothy-serendipity-common-v1",
+  "engineCommit": "23164e4a88fe46af609cc99b0de38a98313a5f4d",
+  "targetId": "dorothy_serendipity",
+  "targetNameCode": 5145,
+  "targetElement": "Water",
+  "enemyModel": "common-engine-defaults-v1",
+  "bossName": "공통 평가 대상",
+  "source": {
+    "provider": "enikk",
+    "url": "https://enikk.app/soloraid/41",
+    "seasonId": 41,
+    "seasonEndedAtKst": "2026-10-01T04:59:59+09:00",
+    "selectionDateKst": "2026-10-19",
+    "scope": "서버별 상위 50명 공개 표본",
+    "samplePlayers": 300,
+    "sampleTeams": 1500,
+    "selectedTeamCount": 296,
+    "selectedOrderCount": 145,
+    "servers": {
+      "NA": 50,
+      "JP": 50,
+      "GLOBAL": 50,
+      "KR": 50,
+      "SEA": 50,
+      "TW-HK": 50
+    },
+    "rawSnapshotSha256": "e0f155c94492518bfe5224eb6881ca4d4d81778d4f0fc935d784c1e62a380281",
+    "capturedAt": "2026-10-19T14:12:08.778883+00:00",
+    "grouping": "unordered_members",
+    "orderPolicy": "most_frequent_slot_order",
+    "tieBreak": "lexicographic_names",
+    "importedFields": [
+      "team_members",
+      "enemy_element"
+    ]
+  },
+  "request": {
+    "schema_version": 2,
+    "squad": [
+      "토브",
+      "아르카나 : 포츈 메이트",
+      "도로시 : 세렌디피티",
+      "슈가",
+      "솔린 : 프로스트 티켓"
+    ],
+    "sim": {
+      "duration": 180,
+      "expected": true,
+      "seed": 0,
+      "first_burst": 3.0,
+      "burst_gauge_mode": "fixed",
+      "allow_unparsed": false
+    },
+    "enemy": {
+      "def": 31784,
+      "core_px": 0,
+      "has_parts": false,
+      "part_break_interval": 0.0,
+      "optimal_range_weapons": [],
+      "code": "작열"
+    },
+    "operation": {
+      "auto": [
+        "토브",
+        "아르카나 : 포츈 메이트",
+        "도로시 : 세렌디피티",
+        "슈가",
+        "솔린 : 프로스트 티켓"
+      ],
+      "control_mode": "solo",
+      "camera_mode": "single"
+    },
+    "chars": {
+      "토브": {
+        "control": {
+          "burst": {
+            "pattern": "전담"
+          }
+        }
+      },
+      "아르카나 : 포츈 메이트": {
+        "control": {}
+      },
+      "도로시 : 세렌디피티": {
+        "control": {}
+      },
+      "슈가": {
+        "control": {}
+      },
+      "솔린 : 프로스트 티켓": {
+        "control": {}
+      }
+    },
+    "profile": {
+      "base": "default",
+      "chars": {
+        "토브": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        },
+        "아르카나 : 포츈 메이트": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        },
+        "도로시 : 세렌디피티": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        },
+        "슈가": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        },
+        "솔린 : 프로스트 티켓": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        }
+      }
+    },
+    "profile_level": "fixed"
+  },
+  "assumptions": [
+    "솔로레이드는 최다 조합과 우월 코드 적용 속성만 선정합니다.",
+    "모든 니케는 공통 적 스탯을 사용하며 시즌 보스 스탯·이동·무적·파츠 패턴을 적용하지 않습니다.",
+    "400레벨·180초·기대값·고정 버스트 게이지 조건입니다.",
+    "대상은 실제 육성, 동료 4명은 고정 육성을 적용합니다."
+  ]
+}

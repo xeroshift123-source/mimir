@@ -1,0 +1,666 @@
+{
+  "seasonId": 40,
+  "snapshotSha256": "478664847b602710348049c9af5138a65a3f27178949d7949386b8333f319237",
+  "teams": [
+    {
+      "members": [
+        "2B",
+        "Liter",
+        "Modernia",
+        "Nayuta",
+        "Rei"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Ada",
+        "Brid: Silent Track",
+        "Diesel: Winter Sweets",
+        "Moran",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Anis: Star",
+        "Crown",
+        "Privaty",
+        "Rapi: Red Hood"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Cinderella",
+        "Grave",
+        "Liter",
+        "Modernia"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Cinderella: Crystal Wave",
+        "Grave",
+        "Liter",
+        "Ludmilla: Winter Owner"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Alice",
+        "Cinderella: Crystal Wave",
+        "Grave",
+        "Liter",
+        "Modernia"
+      ],
+      "count": 58
+    },
+    {
+      "members": [
+        "Alice",
+        "Cinderella: Crystal Wave",
+        "Grave",
+        "Liter",
+        "Privaty"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Cinderella: Crystal Wave",
+        "Liter",
+        "Mint",
+        "Prika"
+      ],
+      "count": 4
+    },
+    {
+      "members": [
+        "Alice",
+        "Crown",
+        "Moran",
+        "Privaty",
+        "Yukiko"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Alice",
+        "Diesel: Winter Sweets",
+        "Mint",
+        "Moran",
+        "Prika"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Grave",
+        "Helm",
+        "Liter",
+        "Modernia"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Grave",
+        "Liter",
+        "Mihara: Bonding Chain",
+        "Rei"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Grave",
+        "Liter",
+        "Modernia",
+        "Rei"
+      ],
+      "count": 181
+    },
+    {
+      "members": [
+        "Alice",
+        "Grave",
+        "Liter",
+        "Modernia",
+        "Scarlet: Black Shadow"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Grave",
+        "Modernia",
+        "Moran",
+        "Privaty"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Grave",
+        "Modernia",
+        "Moran",
+        "Rei"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Liter",
+        "Modernia",
+        "Nayuta",
+        "Rei"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Alice",
+        "Mihara: Bonding Chain",
+        "Mint",
+        "Moran",
+        "Prika"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Anchor: Innocent Maid",
+        "Diesel: Winter Sweets",
+        "Mast: Romantic Maid",
+        "Moran",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Anchor: Innocent Maid",
+        "Little Mermaid",
+        "Mast: Romantic Maid",
+        "Queen (Makoto)",
+        "Yukiko"
+      ],
+      "count": 3
+    },
+    {
+      "members": [
+        "Anis: Star",
+        "Brid: Silent Track",
+        "Diesel: Winter Sweets",
+        "Mast: Romantic Maid",
+        "Mihara: Bonding Chain"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Anis: Star",
+        "Brid: Silent Track",
+        "Diesel: Winter Sweets",
+        "Mast: Romantic Maid",
+        "Rapi: Red Hood"
+      ],
+      "count": 16
+    },
+    {
+      "members": [
+        "Anis: Star",
+        "Brid: Silent Track",
+        "Diesel: Winter Sweets",
+        "Privaty",
+        "Rapi: Red Hood"
+      ],
+      "count": 5
+    },
+    {
+      "members": [
+        "Anis: Star",
+        "Brid: Silent Track",
+        "Mast: Romantic Maid",
+        "Mihara: Bonding Chain",
+        "Rapi: Red Hood"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Anis: Star",
+        "Brid: Silent Track",
+        "Mihara: Bonding Chain",
+        "Privaty",
+        "Rapi: Red Hood"
+      ],
+      "count": 270
+    },
+    {
+      "members": [
+        "Anis: Star",
+        "Crown",
+        "Mihara: Bonding Chain",
+        "Privaty",
+        "Rapi: Red Hood"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Anis: Star",
+        "Mihara: Bonding Chain",
+        "Nayuta",
+        "Privaty",
+        "Rapi: Red Hood"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Anis: Star",
+        "Modernia",
+        "Nayuta",
+        "Privaty",
+        "Rapi: Red Hood"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Arcana: Fortune Mate",
+        "Dorothy: Serendipity",
+        "Drake",
+        "Soline: Frost Ticket",
+        "Tove"
+      ],
+      "count": 296
+    },
+    {
+      "members": [
+        "Arcana: Fortune Mate",
+        "Drake",
+        "Queen (Makoto)",
+        "Soline: Frost Ticket",
+        "Tove"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Arcana: Fortune Mate",
+        "Drake",
+        "Rei",
+        "Soline: Frost Ticket",
+        "Tove"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Arcana: Fortune Mate",
+        "Drake",
+        "Soline: Frost Ticket",
+        "Sugar",
+        "Tove"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Asuka",
+        "Grave",
+        "Liter",
+        "Modernia",
+        "Rei"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Brid: Silent Track",
+        "Diesel: Winter Sweets",
+        "Flora",
+        "Liter",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Brid: Silent Track",
+        "Diesel: Winter Sweets",
+        "Flora",
+        "Moran",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 3
+    },
+    {
+      "members": [
+        "Cinderella",
+        "Cinderella: Crystal Wave",
+        "Grave",
+        "Liter",
+        "Modernia"
+      ],
+      "count": 4
+    },
+    {
+      "members": [
+        "Cinderella",
+        "Cinderella: Crystal Wave",
+        "Liberalio",
+        "Liter",
+        "Nayuta"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Cinderella",
+        "Cinderella: Crystal Wave",
+        "Liter",
+        "Nayuta",
+        "Velvet"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Diesel: Winter Sweets",
+        "Mint",
+        "Moran",
+        "Prika"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Grave",
+        "Helm",
+        "Liter",
+        "Modernia"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Grave",
+        "Liter",
+        "Modernia",
+        "Rei"
+      ],
+      "count": 27
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Grave",
+        "Liter",
+        "Modernia",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Grave",
+        "Modernia",
+        "Rei",
+        "Volume"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Helm",
+        "Liter",
+        "Modernia",
+        "Nayuta"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Liter",
+        "Mint",
+        "Prika",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Liter",
+        "Modernia",
+        "Nayuta",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 3
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Mint",
+        "Moran",
+        "Prika",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 3
+    },
+    {
+      "members": [
+        "Cinderella: Crystal Wave",
+        "Modernia",
+        "Moran",
+        "Nayuta",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Crown",
+        "Helm",
+        "Little Mermaid",
+        "Mihara: Bonding Chain",
+        "Miranda"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Crown",
+        "Helm",
+        "Little Mermaid",
+        "Privaty",
+        "Rapi: Red Hood"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Crown",
+        "Helm",
+        "Little Mermaid",
+        "Queen (Makoto)",
+        "Yukiko"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Crown",
+        "Little Mermaid",
+        "Mast: Romantic Maid",
+        "Queen (Makoto)",
+        "Yukiko"
+      ],
+      "count": 277
+    },
+    {
+      "members": [
+        "Crown",
+        "Little Mermaid",
+        "Mihara: Bonding Chain",
+        "Miranda",
+        "Privaty"
+      ],
+      "count": 13
+    },
+    {
+      "members": [
+        "Crown",
+        "Little Mermaid",
+        "Modernia",
+        "Queen (Makoto)",
+        "Yukiko"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "D: Killer Wife",
+        "Grave",
+        "Mihara: Bonding Chain",
+        "Miranda",
+        "Rei"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "D: Killer Wife",
+        "Maxwell",
+        "Mihara: Bonding Chain",
+        "Mint",
+        "Miranda"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Diesel: Winter Sweets",
+        "Dolla",
+        "Flora",
+        "Miranda",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Diesel: Winter Sweets",
+        "Flora",
+        "Liberalio",
+        "Moran",
+        "Nayuta"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Diesel: Winter Sweets",
+        "Flora",
+        "Moran",
+        "Nayuta",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 26
+    },
+    {
+      "members": [
+        "Diesel: Winter Sweets",
+        "Mint",
+        "Moran",
+        "Prika",
+        "Rei"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Diesel: Winter Sweets",
+        "Mint",
+        "Moran",
+        "Prika",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 240
+    },
+    {
+      "members": [
+        "Grave",
+        "Little Mermaid",
+        "Mihara: Bonding Chain",
+        "Miranda",
+        "Rei"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Grave",
+        "Mihara: Bonding Chain",
+        "Miranda",
+        "Rei",
+        "Rouge"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Liberalio",
+        "Liter",
+        "Modernia",
+        "Nayuta",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 1
+    },
+    {
+      "members": [
+        "Mihara: Bonding Chain",
+        "Mint",
+        "Moran",
+        "Prika",
+        "Snow White: Heavy Arms"
+      ],
+      "count": 2
+    },
+    {
+      "members": [
+        "Mint",
+        "Prika",
+        "Queen (Makoto)",
+        "Volume",
+        "Yukiko"
+      ],
+      "count": 13
+    }
+  ]
+}

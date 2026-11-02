@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "source": "User-specified parties in slot order; incomplete parties are not executable.",
+  "groups": [
+    {"profiles": ["5159:fire"], "team": [1021, 5172, 5159, 5161, 5173], "note": "2026-11-03 low-damage correction: keep members and fixed growth, give Diesel the earlier B3 slot."},
+    {"profiles": ["5185:fire"], "team": [5169, 5160, 5185, 5129, 5007]},
+    {"profiles": ["5186:fire"], "team": [1021, 5172, 5186, 5159, 5173]},
+    {"profiles": ["5007:water"], "team": [5017, 5155, 5007, 5161, 5137]},
+    {"profiles": ["5004:fire", "5044:fire", "5119:fire"], "team": [5011, 5125, 5004, 5119, 5044]},
+    {"profiles": ["5002:iron"], "team": [5081, 5167, 5113, 5002, 5024]},
+    {"profiles": ["5150:iron"], "team": [5130, 5175, 5150, 5131, 5137]},
+    {"profiles": ["5012:iron"], "team": [5088, 5155, 5012, 5001, 5098]},
+    {"profiles": ["5152:electric", "5077:electric"], "team": [5152, 5126, 5077, 5165, 5129]},
+    {"profiles": ["5133:wind", "5132:wind", "5137:wind"], "team": [5065, 5133, 5137, 5132, 5007]},
+    {"profiles": ["5177:wind", "5181:wind"], "team": [5181, 5049, 5177, 5178, 5134]},
+    {"profiles": ["5174:wind", "5117:wind"], "team": [5129, 5117, 5174, 5001, 5116]},
+    {"profiles": ["5146:water", "5103:water", "5066:water"], "team": [5011, 5065, 5066, 5103, 5146]},
+    {"profiles": ["5122:water"], "team": [5169, 5122, 5131, 5135, 5130]},
+    {"profiles": ["5182:water", "5183:water"], "team": [5182, 5126, 5183, 5165, 5129]}
+  ]
+}

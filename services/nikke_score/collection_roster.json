@@ -1,0 +1,673 @@
+{
+  "schemaVersion": 1,
+  "requestedAtKst": "2026-11-02",
+  "status": "planning",
+  "note": "Requested roster only. New teams and element-specific runtime storage must be configured before activation.",
+  "confirmedNameCorrection": {
+    "requested": "네온 : 헤비암즈",
+    "nameCode": 5170,
+    "name": "네온 : 비전아이"
+  },
+  "profiles": [
+    {
+      "key": "5185:fire",
+      "nameCode": 5185,
+      "name": "마리안 : 퀸",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5186:fire",
+      "nameCode": 5186,
+      "name": "홍련 : 신살",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5129:fire",
+      "nameCode": 5129,
+      "name": "라피 : 레드 후드",
+      "weakness": "fire",
+      "teamStatus": "existing",
+      "team": [
+        5160,
+        5129,
+        5169,
+        5138,
+        5007
+      ],
+      "teamNames": [
+        "브리드 : 사일런트 트랙",
+        "라피 : 레드 후드",
+        "아니스 : 스타",
+        "미하라 : 본딩 체인",
+        "프리바티"
+      ]
+    },
+    {
+      "key": "5138:fire",
+      "nameCode": 5138,
+      "name": "미하라 : 본딩 체인",
+      "weakness": "fire",
+      "teamStatus": "existing",
+      "team": [
+        5160,
+        5129,
+        5169,
+        5138,
+        5007
+      ],
+      "teamNames": [
+        "브리드 : 사일런트 트랙",
+        "라피 : 레드 후드",
+        "아니스 : 스타",
+        "미하라 : 본딩 체인",
+        "프리바티"
+      ]
+    },
+    {
+      "key": "5159:fire",
+      "nameCode": 5159,
+      "name": "디젤 : 윈터 스위츠",
+      "weakness": "fire",
+      "teamStatus": "existing",
+      "team": [
+        1021,
+        5172,
+        5161,
+        5159,
+        5173
+      ],
+      "teamNames": [
+        "목단",
+        "민트",
+        "스노우 화이트 : 헤비암즈",
+        "디젤 : 윈터 스위츠",
+        "프리카"
+      ]
+    },
+    {
+      "key": "5180:fire",
+      "nameCode": 5180,
+      "name": "아마기 유키코",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5179:fire",
+      "nameCode": 5179,
+      "name": "퀸(니지마 마코토)",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5024:fire",
+      "nameCode": 5024,
+      "name": "드레이크",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5167:fire",
+      "nameCode": 5167,
+      "name": "아르카나 : 포츈 메이트",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5004:fire",
+      "nameCode": 5004,
+      "name": "앨리스",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5044:fire",
+      "nameCode": 5044,
+      "name": "모더니아",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5119:fire",
+      "nameCode": 5119,
+      "name": "레이",
+      "weakness": "fire",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5175:iron",
+      "nameCode": 5175,
+      "name": "신데렐라 : 크리스탈 웨이브",
+      "weakness": "iron",
+      "teamStatus": "existing",
+      "team": [
+        5130,
+        5175,
+        5131,
+        5142,
+        5137
+      ],
+      "teamNames": [
+        "마스트 : 로망틱 메이드",
+        "신데렐라 : 크리스탈 웨이브",
+        "앵커 : 이노센트 메이드",
+        "이브",
+        "리틀 머메이드"
+      ]
+    },
+    {
+      "key": "5129:iron",
+      "nameCode": 5129,
+      "name": "라피 : 레드 후드",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5143:iron",
+      "nameCode": 5143,
+      "name": "레이븐",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5142:iron",
+      "nameCode": 5142,
+      "name": "이브",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5002:iron",
+      "nameCode": 5002,
+      "name": "슈가",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5176:iron",
+      "nameCode": 5176,
+      "name": "마르차나 : 마린 스터디",
+      "weakness": "iron",
+      "teamStatus": "existing",
+      "team": [
+        5017,
+        5176,
+        5066,
+        5155,
+        5098
+      ],
+      "teamNames": [
+        "미란다",
+        "마르차나 : 마린 스터디",
+        "헬름",
+        "나유타",
+        "헬름 : 아쿠아마린"
+      ]
+    },
+    {
+      "key": "5113:iron",
+      "nameCode": 5113,
+      "name": "소다 : 트윙클링 바니",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5150:iron",
+      "nameCode": 5150,
+      "name": "밀크 : 블루밍 바니",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5101:iron",
+      "nameCode": 5101,
+      "name": "레드 후드",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5164:iron",
+      "nameCode": 5164,
+      "name": "치사토",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "1010:iron",
+      "nameCode": 1010,
+      "name": "라플라스",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5012:iron",
+      "nameCode": 5012,
+      "name": "스노우 화이트",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5001:iron",
+      "nameCode": 5001,
+      "name": "맥스웰",
+      "weakness": "iron",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5124:electric",
+      "nameCode": 5124,
+      "name": "신데렐라",
+      "weakness": "electric",
+      "teamStatus": "existing",
+      "team": [
+        5013,
+        5140,
+        5124,
+        5169,
+        5065
+      ],
+      "teamNames": [
+        "이사벨",
+        "아르카나",
+        "신데렐라",
+        "아니스 : 스타",
+        "크라운"
+      ]
+    },
+    {
+      "key": "5170:electric",
+      "nameCode": 5170,
+      "name": "네온 : 비전아이",
+      "weakness": "electric",
+      "teamStatus": "existing",
+      "team": [
+        5130,
+        5137,
+        5170,
+        5156,
+        5131
+      ],
+      "teamNames": [
+        "마스트 : 로망틱 메이드",
+        "리틀 머메이드",
+        "네온 : 비전 아이",
+        "리버렐리오",
+        "앵커 : 이노센트 메이드"
+      ]
+    },
+    {
+      "key": "5152:electric",
+      "nameCode": 5152,
+      "name": "에이다",
+      "weakness": "electric",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5127:electric",
+      "nameCode": 5127,
+      "name": "메이든 : 아이스 로즈",
+      "weakness": "electric",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5097:electric",
+      "nameCode": 5097,
+      "name": "아니스 : 스파클링 서머",
+      "weakness": "electric",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5013:electric",
+      "nameCode": 5013,
+      "name": "이사벨",
+      "weakness": "electric",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5077:electric",
+      "nameCode": 5077,
+      "name": "아인",
+      "weakness": "electric",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5169:electric",
+      "nameCode": 5169,
+      "name": "아니스 : 스타",
+      "weakness": "electric",
+      "teamStatus": "existing",
+      "team": [
+        5013,
+        5140,
+        5124,
+        5169,
+        5065
+      ],
+      "teamNames": [
+        "이사벨",
+        "아르카나",
+        "신데렐라",
+        "아니스 : 스타",
+        "크라운"
+      ]
+    },
+    {
+      "key": "1021:electric",
+      "nameCode": 1021,
+      "name": "목단",
+      "weakness": "electric",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5045:electric",
+      "nameCode": 5045,
+      "name": "로산나",
+      "weakness": "electric",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5105:wind",
+      "nameCode": 5105,
+      "name": "홍련 : 흑영",
+      "weakness": "wind",
+      "teamStatus": "existing",
+      "team": [
+        5169,
+        5156,
+        5131,
+        5105,
+        5130
+      ],
+      "teamNames": [
+        "아니스 : 스타",
+        "리버렐리오",
+        "앵커 : 이노센트 메이드",
+        "홍련 : 흑영",
+        "마스트 : 로망틱 메이드"
+      ]
+    },
+    {
+      "key": "5156:wind",
+      "nameCode": 5156,
+      "name": "리버렐리오",
+      "weakness": "wind",
+      "teamStatus": "existing",
+      "team": [
+        5169,
+        5156,
+        5131,
+        5105,
+        5130
+      ],
+      "teamNames": [
+        "아니스 : 스타",
+        "리버렐리오",
+        "앵커 : 이노센트 메이드",
+        "홍련 : 흑영",
+        "마스트 : 로망틱 메이드"
+      ]
+    },
+    {
+      "key": "5133:wind",
+      "nameCode": 5133,
+      "name": "아스카 : WILLE",
+      "weakness": "wind",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5177:wind",
+      "nameCode": 5177,
+      "name": "라플라스 : 얼티밋 히어로",
+      "weakness": "wind",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5181:wind",
+      "nameCode": 5181,
+      "name": "드레이크 : 그레이트 빌런",
+      "weakness": "wind",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5174:wind",
+      "nameCode": 5174,
+      "name": "아크레인저 블랙",
+      "weakness": "wind",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5132:wind",
+      "nameCode": 5132,
+      "name": "레이 (가칭)",
+      "weakness": "wind",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5117:wind",
+      "nameCode": 5117,
+      "name": "사쿠라 : 블룸 인 서머",
+      "weakness": "wind",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5137:wind",
+      "nameCode": 5137,
+      "name": "리틀 머메이드",
+      "weakness": "wind",
+      "teamStatus": "existing",
+      "team": [
+        5155,
+        5175,
+        5137,
+        5007,
+        5163
+      ],
+      "teamNames": [
+        "나유타",
+        "신데렐라 : 크리스탈 웨이브",
+        "리틀 머메이드",
+        "프리바티",
+        "벨벳"
+      ]
+    },
+    {
+      "key": "5161:water",
+      "nameCode": 5161,
+      "name": "스노우 화이트 : 헤비암즈",
+      "weakness": "water",
+      "teamStatus": "existing",
+      "team": [
+        5017,
+        5065,
+        5161,
+        5007,
+        5137
+      ],
+      "teamNames": [
+        "미란다",
+        "크라운",
+        "스노우 화이트 : 헤비암즈",
+        "프리바티",
+        "리틀 머메이드"
+      ]
+    },
+    {
+      "key": "5145:water",
+      "nameCode": 5145,
+      "name": "도로시 : 세렌디피티",
+      "weakness": "water",
+      "teamStatus": "existing",
+      "team": [
+        5081,
+        5167,
+        5145,
+        5002,
+        5158
+      ],
+      "teamNames": [
+        "토브",
+        "아르카나 : 포츈 메이트",
+        "도로시 : 세렌디피티",
+        "슈가",
+        "솔린 : 프로스트 티켓"
+      ]
+    },
+    {
+      "key": "5007:water",
+      "nameCode": 5007,
+      "name": "프리바티",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5146:water",
+      "nameCode": 5146,
+      "name": "일레그 : 붐 앤 쇼크",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5002:water",
+      "nameCode": 5002,
+      "name": "슈가",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5122:water",
+      "nameCode": 5122,
+      "name": "팬텀",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5158:water",
+      "nameCode": 5158,
+      "name": "솔린 : 프로스트 티켓",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5135:water",
+      "nameCode": 5135,
+      "name": "브래디",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5103:water",
+      "nameCode": 5103,
+      "name": "루드밀라 : 윈터 오너",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5066:water",
+      "nameCode": 5066,
+      "name": "헬름",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5182:water",
+      "nameCode": 5182,
+      "name": "길티 : 마이티 바니",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    },
+    {
+      "key": "5183:water",
+      "nameCode": 5183,
+      "name": "신 : 스위프트 바니",
+      "weakness": "water",
+      "teamStatus": "needs_selection",
+      "team": null,
+      "teamNames": null
+    }
+  ]
+}

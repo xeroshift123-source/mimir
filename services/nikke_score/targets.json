@@ -1,0 +1,234 @@
+[
+  {
+    "id": "rapi_red_hood",
+    "name": "라피 : 레드 후드",
+    "nameCode": 5129,
+    "element": "Fire",
+    "weapon": "MG",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1201,
+    "collectionIds": {
+      "100201": "R",
+      "100202": "SR"
+    },
+    "season": 40,
+    "version": "s40-fire-rapi-common-v3"
+  },
+  {
+    "id": "snow_white_heavy_arms",
+    "name": "스노우 화이트 : 헤비암즈",
+    "nameCode": 5161,
+    "element": "Water",
+    "weapon": "SR",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1204,
+    "collectionIds": {
+      "100601": "R",
+      "100602": "SR"
+    },
+    "season": 41,
+    "version": "s41-water-snow-white-heavy-arms-common-v2"
+  },
+  {
+    "id": "scarlet_black_shadow",
+    "name": "홍련 : 흑영",
+    "nameCode": 5105,
+    "element": "Wind",
+    "weapon": "RL",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1204,
+    "collectionIds": {
+      "100301": "R",
+      "100302": "SR"
+    },
+    "season": 38,
+    "version": "s38-wind-scarlet-black-shadow-common-v2"
+  },
+  {
+    "id": "cinderella",
+    "name": "신데렐라",
+    "nameCode": 5124,
+    "element": "Electric",
+    "weapon": "RL",
+    "classIndex": 2,
+    "classResearch": 1102,
+    "companyResearch": 1204,
+    "collectionIds": {
+      "100301": "R",
+      "100302": "SR"
+    },
+    "season": 36,
+    "version": "s36-electric-cinderella-common-v2"
+  },
+  {
+    "id": "cinderella_crystal_wave",
+    "name": "신데렐라 : 크리스탈 웨이브",
+    "nameCode": 5175,
+    "element": "Iron",
+    "weapon": "MG",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1204,
+    "collectionIds": {
+      "100201": "R",
+      "100202": "SR"
+    },
+    "season": 39,
+    "version": "s39-iron-cinderella-crystal-wave-common-v2"
+  },
+  {
+    "id": "dorothy_serendipity",
+    "name": "도로시 : 세렌디피티",
+    "nameCode": 5145,
+    "element": "Water",
+    "weapon": "SG",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1204,
+    "collectionIds": {
+      "100401": "R",
+      "100402": "SR"
+    },
+    "season": 41,
+    "version": "s41-water-dorothy-serendipity-common-v2"
+  },
+  {
+    "id": "mihara_bonding_chain",
+    "name": "미하라 : 본딩 체인",
+    "nameCode": 5138,
+    "element": "Fire",
+    "weapon": "MG",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1202,
+    "collectionIds": {
+      "100201": "R",
+      "100202": "SR"
+    },
+    "season": 40,
+    "version": "s40-fire-mihara-bonding-chain-common-v1",
+    "selectionDateKst": "2026-10-25"
+  },
+  {
+    "id": "diesel_winter_sweets",
+    "name": "디젤 : 윈터 스위츠",
+    "nameCode": 5159,
+    "element": "Fire",
+    "weapon": "RL",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1201,
+    "collectionIds": {
+      "100301": "R",
+      "100302": "SR"
+    },
+    "season": 40,
+    "version": "s40-fire-diesel-winter-sweets-common-v1",
+    "selectionDateKst": "2026-10-25"
+  },
+  {
+    "id": "liberalio",
+    "name": "리버렐리오",
+    "nameCode": 5156,
+    "element": "Wind",
+    "weapon": "SR",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1204,
+    "collectionIds": {
+      "100601": "R",
+      "100602": "SR"
+    },
+    "season": 38,
+    "version": "s38-wind-liberalio-common-v1",
+    "selectionDateKst": "2026-10-25"
+  },
+  {
+    "id": "nayuta",
+    "name": "나유타",
+    "nameCode": 5155,
+    "element": "Wind",
+    "weapon": "SMG",
+    "classIndex": 3,
+    "classResearch": 1103,
+    "companyResearch": 1204,
+    "collectionIds": {
+      "100501": "R",
+      "100502": "SR"
+    },
+    "season": 38,
+    "version": "s38-wind-nayuta-common-v1",
+    "selectionDateKst": "2026-10-25"
+  },
+  {
+    "id": "little_mermaid",
+    "name": "리틀 머메이드",
+    "nameCode": 5137,
+    "element": "Wind",
+    "weapon": "SMG",
+    "classIndex": 3,
+    "classResearch": 1103,
+    "companyResearch": 1204,
+    "collectionIds": {
+      "100501": "R",
+      "100502": "SR"
+    },
+    "season": 38,
+    "version": "s38-wind-little-mermaid-common-v1",
+    "selectionDateKst": "2026-10-25"
+  },
+  {
+    "id": "neon_vision_eye",
+    "name": "네온 : 비전 아이",
+    "nameCode": 5170,
+    "element": "Electric",
+    "weapon": "RL",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1202,
+    "collectionIds": {
+      "100301": "R",
+      "100302": "SR"
+    },
+    "season": 36,
+    "version": "s36-electric-neon-vision-eye-common-v1",
+    "selectionDateKst": "2026-10-25"
+  },
+  {
+    "id": "anis_star",
+    "name": "아니스 : 스타",
+    "nameCode": 5169,
+    "element": "Electric",
+    "weapon": "RL",
+    "classIndex": 2,
+    "classResearch": 1102,
+    "companyResearch": 1203,
+    "collectionIds": {
+      "100301": "R",
+      "100302": "SR"
+    },
+    "season": 36,
+    "version": "s36-electric-anis-star-common-v1",
+    "selectionDateKst": "2026-10-25"
+  },
+  {
+    "id": "marciana_marine_study",
+    "name": "마르차나 : 마린 스터디",
+    "nameCode": 5176,
+    "element": "Iron",
+    "weapon": "AR",
+    "classIndex": 1,
+    "classResearch": 1101,
+    "companyResearch": 1201,
+    "collectionIds": {
+      "100101": "R",
+      "100102": "SR"
+    },
+    "season": 39,
+    "version": "s39-iron-marciana-marine-study-common-v1",
+    "selectionDateKst": "2026-10-25"
+  }
+]

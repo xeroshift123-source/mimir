@@ -4,6 +4,11 @@ const { getFirestore } = require('firebase-admin/firestore');
 const axios = require('axios');
 const cors = require('cors')({ origin: true });
 const { fetchCDNJson } = require('./cdnDecrypt');
+const { growthDataQuality } = require('./growthDataQuality');
+const { createNikkeScoreHandler, createNikkeScoresHandler } = require('./nikkeScoreEndpoint');
+const { pendingScoreSnapshot, calculateSyncedScores } = require('./nikkeScorePersistence');
+const { randomUUID: newScoreSyncId } = require('node:crypto');
+const { createNikkeScoreSchedule } = require('./nikkeScoreSchedule');
 const { createNikkeStatisticsHandler } = require('./nikkeStatisticsEndpoint');
 const { createAccountElementDamageHandler } = require('./accountElementDamageEndpoint');
 const { createDailyNikkeStatisticsHandler } = require('./nikkeStatisticsSchedule');
@@ -33,7 +38,7 @@ async function getAuthenticatedUid(req) {
     const decoded = await admin.auth().verifyIdToken(authorization.slice(7));
     return decoded.uid;
 }
-exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
+exports.scrapeNikkeProfile = functions.runWith({ timeoutSeconds: 540, memory: '1GB', secrets: ['DILDORO_API_KEY'] }).https.onRequest(async (req, res) => {
     // 💡 100% 무결점 동적 CORS 헤더 주입 및 Credentials 허용 (Flutter Web 연동 끝판왕)
     const origin = req.headers.origin || '*';
     res.set('Access-Control-Allow-Origin', origin);
@@ -276,6 +281,15 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
 
                     if (detailsRes && detailsRes.data && detailsRes.data.code === 0 && detailsRes.data.data) {
                         const detailsList = detailsRes.data.data.character_details || [];
+                        const optionIds = new Set(detailsList.flatMap(d =>
+                            ['head', 'torso', 'arm', 'leg'].flatMap(slot =>
+                                [1, 2, 3].map(i => String(d[`${slot}_equip_option${i}_id`] || 0)))));
+                        results.stateEffects = (detailsRes.data.data.state_effects || [])
+                            .filter(e => optionIds.has(String(e.id)) && e.function_details?.[0])
+                            .map(e => ({ id: e.id, function_details: [{
+                                function_type: e.function_details[0].function_type,
+                                function_value: e.function_details[0].function_value,
+                            }] }));
                         for (const d of detailsList) {
                             detailsMap[d.name_code] = d;
                         }
@@ -313,6 +327,7 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
 
                     mappedList.push({
                         name_code: c.name_code,
+                        growthDataQuality: growthDataQuality(c, d),
                         combat: c.combat,
                         level: c.lv,
                         core: c.core,
@@ -381,10 +396,17 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
                 overclockSubseasonHighScore
             ),
             recycleRoom: results.gameInfo ? results.gameInfo.recycle_room_researches : [],
+            recycleRoomComplete: Array.isArray(results.gameInfo?.recycle_room_researches),
+            stateEffects: results.stateEffects || [],
             infraCoreLevel: results.gameInfo ? results.gameInfo.infra_core_level : 0,
             characters: results.characters, // 176명 상세 덱
             lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
         };
+
+        const scoreSyncId = newScoreSyncId();
+        payloadToSave.scoreSyncId = scoreSyncId;
+        const scoreSnapshotRef = db.collection('nikke_score_results').doc(openId);
+        const scoreSnapshot = pendingScoreSnapshot(scoreSyncId);
 
         if (authenticatedUid) {
             const bindingRef = db.collection('open_id_bindings').doc(openId);
@@ -414,6 +436,7 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
 
 
                     transaction.set(userDocRef, payloadToSave, { merge: true });
+                    transaction.set(scoreSnapshotRef, scoreSnapshot);
                     transaction.set(bindingRef, {
                         openId,
                         uid: authenticatedUid,
@@ -443,7 +466,26 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
                 throw bindingError;
             }
         } else {
-            await userDocRef.set(payloadToSave, { merge: true });
+            const syncBatch = db.batch();
+            syncBatch.set(userDocRef, payloadToSave, { merge: true });
+            syncBatch.set(scoreSnapshotRef, scoreSnapshot);
+            await syncBatch.commit();
+        }
+
+        // Await persistence independently of browser navigation. Calculation
+        // errors do not roll back successfully synced character data.
+        let scoreStatus;
+        try {
+            scoreStatus = await calculateSyncedScores({ db, openId, syncId: scoreSyncId, commander: payloadToSave });
+        } catch (_) {
+            console.error('Synced score persistence failed');
+            scoreStatus = { status: 'failed' };
+            await db.runTransaction(async transaction => {
+                const snapshot = (await transaction.get(scoreSnapshotRef)).data();
+                if (snapshot?.syncId === scoreSyncId) {
+                    transaction.set(scoreSnapshotRef, { ...snapshot, status: 'failed', updatedAtMs: Date.now() });
+                }
+            });
         }
 
         const guestAccessToken = authenticatedUid
@@ -452,6 +494,7 @@ exports.scrapeNikkeProfile = functions.https.onRequest(async (req, res) => {
         return res.status(200).json({
             success: true,
             data: payloadToSave,
+            scoreStatus,
             ...(guestAccessToken ? { guestAccessToken } : {})
         });
     } catch (e) {
@@ -771,6 +814,9 @@ exports.deleteSharedDeck = functions.https.onRequest(async (req, res) => {
 });
 
 exports.getNikkeStatistics = createNikkeStatisticsHandler({ functions, admin, db, getAuthenticatedUid });
+exports.calculateNikkeScore = createNikkeScoreHandler({ functions, db, getAuthenticatedUid });
+exports.getNikkeScores = createNikkeScoresHandler({ functions, db, getAuthenticatedUid });
+exports.refreshNikkeScoreStatistics = createNikkeScoreSchedule({ functions, db });
 exports.getAccountElementDamageStatistics = createAccountElementDamageHandler({ functions, db, getAuthenticatedUid });
 exports.refreshDailyNikkeStatistics = createDailyNikkeStatisticsHandler({ functions, admin, db });
 exports.refreshNikkeStatisticsNow = createNikkeStatisticsRefreshHandler({ functions, admin, db, getAuthenticatedUid });

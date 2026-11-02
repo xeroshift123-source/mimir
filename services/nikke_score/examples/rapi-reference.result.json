@@ -1,0 +1,362 @@
+{
+  "status": "ok",
+  "nikkeId": "rapi_red_hood",
+  "evaluationVersion": "s40-fire-rapi-common-v2",
+  "evaluationLevel": 400,
+  "engineRevision": "23164e4a88fe46af609cc99b0de38a98313a5f4d",
+  "adapterVersion": 3,
+  "contextHash": "73bb78b8ad8a13dd89e9a5799e542dab7a8f88950807a90afc6f52da4f555519",
+  "inputHash": "4d4f6ac8703a4ab9df54bf23faa158eb0ee626c401483b3e2b522a90e447f6ca",
+  "cacheKey": "066e53a1dd631aa3361e27bde73aa396b99df04513cdb8b040c4d1902ff3400f",
+  "personalDamage": 2749050297,
+  "personalDps": 15272501.65,
+  "durationSeconds": 180,
+  "partyDamage": 8154290725,
+  "score": 137.45251485,
+  "source": {
+    "provider": "enikk",
+    "url": "https://enikk.app/soloraid/40",
+    "seasonId": 40,
+    "seasonEndedAtKst": "2026-08-27T04:59:59+09:00",
+    "selectionDateKst": "2026-10-19",
+    "scope": "서버별 상위 50명 공개 표본",
+    "samplePlayers": 300,
+    "sampleTeams": 1500,
+    "selectedTeamCount": 270,
+    "selectedOrderCount": 130,
+    "servers": {
+      "JP": 50,
+      "TW-HK": 50,
+      "GLOBAL": 50,
+      "NA": 50,
+      "KR": 50,
+      "SEA": 50
+    },
+    "rawSnapshotSha256": "478664847b602710348049c9af5138a65a3f27178949d7949386b8333f319237",
+    "capturedAt": "2026-10-19T10:46:14.183249+00:00",
+    "grouping": "unordered_members",
+    "orderPolicy": "most_frequent_slot_order",
+    "tieBreak": "lexicographic_names",
+    "importedFields": [
+      "team_members",
+      "enemy_element"
+    ]
+  },
+  "party": [
+    "브리드 : 사일런트 트랙",
+    "라피 : 레드 후드",
+    "아니스 : 스타",
+    "미하라 : 본딩 체인",
+    "프리바티"
+  ],
+  "bossName": "공통 평가 대상",
+  "weakness": "Fire",
+  "assumptions": [
+    "솔로레이드는 최다 조합과 우월 코드 적용 속성만 선정합니다.",
+    "모든 니케는 공통 적 스탯을 사용하며 시즌 보스 스탯·이동·무적·파츠 패턴을 적용하지 않습니다.",
+    "400레벨·180초·기대값·고정 버스트 게이지 조건입니다.",
+    "대상은 실제 육성, 동료 4명은 고정 육성을 적용합니다."
+  ],
+  "warnings": [
+    "인라인 육성 프로필 '인라인' 적용 — 고정 스펙 아님. 다른 보고서와 총딜을 직접 비교하지 않는다. (레벨 400 고정 (솔로레이드 기준), 항목 5종, 적지 않은 니케는 기본 스펙)",
+    "애장품 단계가 3 미만인 캐릭터: 라피 : 레드 후드 0단계. 그 단계의 스킬 판본으로 계산했다 — 기본 스펙(3단계)보다 딜이 낮게 나오는 게 정상이다."
+  ],
+  "appliedGrowth": {
+    "브리드 : 사일런트 트랙": {
+      "level": 400,
+      "breakthrough": 3,
+      "core_enhancement": 0,
+      "affinity": 30,
+      "skill_levels": {
+        "1": 10,
+        "2": 10,
+        "3": 10
+      },
+      "equipment": {
+        "머리": {
+          "level": 5,
+          "skills": []
+        },
+        "몸통": {
+          "level": 5,
+          "skills": []
+        },
+        "팔": {
+          "level": 5,
+          "skills": []
+        },
+        "다리": {
+          "level": 5,
+          "skills": []
+        }
+      },
+      "equip_skills": {
+        "atk_pct": 22.22,
+        "element_bonus": 88.6,
+        "max_ammo_pct": 129.64,
+        "crit_rate": 0,
+        "crit_dmg": 0,
+        "charge_speed_pct": 0,
+        "charge_dmg_pct": 0,
+        "accuracy_pct": 0,
+        "def_pct": 0
+      },
+      "cube": {
+        "name": "렐릭 베어 큐브",
+        "level": 15
+      },
+      "console": {
+        "common_level": 180,
+        "class_level": 100,
+        "company_level": 100
+      },
+      "collection_stage": "SR15",
+      "favorite_stage": 3,
+      "control": {}
+    },
+    "라피 : 레드 후드": {
+      "level": 400,
+      "breakthrough": 3,
+      "core_enhancement": 0,
+      "affinity": 30,
+      "skill_levels": {
+        "1": 10,
+        "2": 10,
+        "3": 10
+      },
+      "equipment": {
+        "머리": {
+          "level": 5,
+          "skills": []
+        },
+        "몸통": {
+          "level": 5,
+          "skills": []
+        },
+        "팔": {
+          "level": 5,
+          "skills": []
+        },
+        "다리": {
+          "level": 5,
+          "skills": []
+        }
+      },
+      "equip_skills": {
+        "atk_pct": 22.22,
+        "element_bonus": 88.6,
+        "max_ammo_pct": 129.64,
+        "crit_rate": 0,
+        "crit_dmg": 0,
+        "charge_speed_pct": 0,
+        "charge_dmg_pct": 0,
+        "accuracy_pct": 0,
+        "def_pct": 0
+      },
+      "cube": {
+        "name": "렐릭 베어 큐브",
+        "level": 15
+      },
+      "console": {
+        "common_level": 180,
+        "class_level": 100,
+        "company_level": 100
+      },
+      "collection_stage": "SR15",
+      "favorite_stage": 0,
+      "control": {}
+    },
+    "아니스 : 스타": {
+      "level": 400,
+      "breakthrough": 3,
+      "core_enhancement": 0,
+      "affinity": 30,
+      "skill_levels": {
+        "1": 10,
+        "2": 10,
+        "3": 10
+      },
+      "equipment": {
+        "머리": {
+          "level": 5,
+          "skills": []
+        },
+        "몸통": {
+          "level": 5,
+          "skills": []
+        },
+        "팔": {
+          "level": 5,
+          "skills": []
+        },
+        "다리": {
+          "level": 5,
+          "skills": []
+        }
+      },
+      "equip_skills": {
+        "atk_pct": 22.22,
+        "element_bonus": 88.6,
+        "max_ammo_pct": 129.64,
+        "crit_rate": 0,
+        "crit_dmg": 0,
+        "charge_speed_pct": 0,
+        "charge_dmg_pct": 0,
+        "accuracy_pct": 0,
+        "def_pct": 0
+      },
+      "cube": {
+        "name": "렐릭 베어 큐브",
+        "level": 15
+      },
+      "console": {
+        "common_level": 180,
+        "class_level": 100,
+        "company_level": 100
+      },
+      "collection_stage": "SR15",
+      "favorite_stage": 3,
+      "control": {}
+    },
+    "미하라 : 본딩 체인": {
+      "level": 400,
+      "breakthrough": 3,
+      "core_enhancement": 0,
+      "affinity": 30,
+      "skill_levels": {
+        "1": 10,
+        "2": 10,
+        "3": 10
+      },
+      "equipment": {
+        "머리": {
+          "level": 5,
+          "skills": []
+        },
+        "몸통": {
+          "level": 5,
+          "skills": []
+        },
+        "팔": {
+          "level": 5,
+          "skills": []
+        },
+        "다리": {
+          "level": 5,
+          "skills": []
+        }
+      },
+      "equip_skills": {
+        "atk_pct": 23.22,
+        "element_bonus": 88.6,
+        "max_ammo_pct": 129.64,
+        "crit_rate": 0,
+        "crit_dmg": 0,
+        "charge_speed_pct": 0,
+        "charge_dmg_pct": 0,
+        "accuracy_pct": 0,
+        "def_pct": 0
+      },
+      "cube": {
+        "name": "렐릭 베어 큐브",
+        "level": 15
+      },
+      "console": {
+        "common_level": 180,
+        "class_level": 100,
+        "company_level": 100
+      },
+      "collection_stage": "SR15",
+      "favorite_stage": 3,
+      "control": {}
+    },
+    "프리바티": {
+      "level": 400,
+      "breakthrough": 3,
+      "core_enhancement": 0,
+      "affinity": 30,
+      "skill_levels": {
+        "1": 10,
+        "2": 10,
+        "3": 10
+      },
+      "equipment": {
+        "머리": {
+          "level": 5,
+          "skills": []
+        },
+        "몸통": {
+          "level": 5,
+          "skills": []
+        },
+        "팔": {
+          "level": 5,
+          "skills": []
+        },
+        "다리": {
+          "level": 5,
+          "skills": []
+        }
+      },
+      "equip_skills": {
+        "atk_pct": 22.22,
+        "element_bonus": 88.6,
+        "max_ammo_pct": 0,
+        "crit_rate": 0,
+        "crit_dmg": 0,
+        "charge_speed_pct": 0,
+        "charge_dmg_pct": 0,
+        "accuracy_pct": 0,
+        "def_pct": 0
+      },
+      "cube": {
+        "name": "렐릭 베어 큐브",
+        "level": 15
+      },
+      "console": {
+        "common_level": 180,
+        "class_level": 100,
+        "company_level": 100
+      },
+      "collection_stage": "SR15",
+      "favorite_stage": 3,
+      "control": {}
+    }
+  },
+  "engineSpec": {
+    "baseline": "profile",
+    "at_baseline": true,
+    "char_defaults": {
+      "applied": [],
+      "skipped": [
+        "브리드 : 사일런트 트랙",
+        "라피 : 레드 후드",
+        "아니스 : 스타",
+        "미하라 : 본딩 체인",
+        "프리바티"
+      ]
+    },
+    "deviated": [],
+    "deviations": {},
+    "tactics": {},
+    "profile": {
+      "name": "인라인",
+      "level_mode": "fixed",
+      "source": "inline",
+      "base": "default",
+      "ungrown": []
+    },
+    "preview": [],
+    "text": "⚠ 인라인 육성 프로필 '인라인' 적용 — 고정 스펙 아님. 다른 보고서와 총딜을 직접 비교하지 않는다. (레벨 400 고정 (솔로레이드 기준), 항목 5종, 적지 않은 니케는 기본 스펙)\n⚠ 애장품 단계가 3 미만인 캐릭터: 라피 : 레드 후드 0단계. 그 단계의 스킬 판본으로 계산했다 — 기본 스펙(3단계)보다 딜이 낮게 나오는 게 정상이다.\n프로필 그대로 — 추가 지정 없음."
+  },
+  "control": {
+    "mode": "solo",
+    "camera_mode": "single",
+    "by_char": {},
+    "max_concurrent": 0,
+    "overlap_t": 0.0,
+    "overlaps": [],
+    "preempted": {}
+  },
+  "computeSeconds": 4.481
+}

@@ -1,0 +1,378 @@
+{
+  "version": "s39-iron-marciana-marine-study-common-v1",
+  "engineCommit": "23164e4a88fe46af609cc99b0de38a98313a5f4d",
+  "targetId": "marciana_marine_study",
+  "targetNameCode": 5176,
+  "targetElement": "Iron",
+  "enemyModel": "common-engine-defaults-v1",
+  "burstPolicy": "target-b3-first-ready-b2-slot-order-v1",
+  "bossName": "공통 평가 대상",
+  "source": {
+    "provider": "enikk",
+    "url": "https://enikk.app/soloraid/39",
+    "seasonId": 39,
+    "seasonEndedAtKst": "2026-07-23T04:59:59+09:00",
+    "selectionDateKst": "2026-10-25",
+    "scope": "서버별 상위 50명 공개 표본",
+    "samplePlayers": 300,
+    "sampleTeams": 1500,
+    "selectedTeamCount": 121,
+    "selectedOrderCount": 57,
+    "servers": {
+      "NA": 50,
+      "JP": 50,
+      "GLOBAL": 50,
+      "KR": 50,
+      "SEA": 50,
+      "TW-HK": 50
+    },
+    "rawSnapshotSha256": "3da3d1e1973d7a5fa5975afeb8e11ba39e9913e9092081a1ba031ea20d3fce4d",
+    "capturedAt": "2026-10-19T14:12:01.611701+00:00",
+    "grouping": "unordered_members",
+    "orderPolicy": "most_frequent_slot_order",
+    "tieBreak": "lexicographic_names",
+    "importedFields": [
+      "team_members",
+      "enemy_element"
+    ]
+  },
+  "request": {
+    "schema_version": 2,
+    "squad": [
+      "미란다",
+      "마르차나 : 마린 스터디",
+      "헬름",
+      "나유타",
+      "헬름 : 아쿠아마린"
+    ],
+    "sim": {
+      "duration": 180,
+      "expected": true,
+      "seed": 0,
+      "first_burst": 3.0,
+      "burst_gauge_mode": "fixed",
+      "allow_unparsed": false
+    },
+    "enemy": {
+      "def": 31784,
+      "core_px": 0,
+      "has_parts": false,
+      "part_break_interval": 0.0,
+      "optimal_range_weapons": [],
+      "code": "전격"
+    },
+    "operation": {
+      "auto": [
+        "미란다",
+        "마르차나 : 마린 스터디",
+        "헬름",
+        "나유타",
+        "헬름 : 아쿠아마린"
+      ],
+      "control_mode": "solo",
+      "camera_mode": "single"
+    },
+    "chars": {
+      "미란다": {
+        "control": {}
+      },
+      "마르차나 : 마린 스터디": {
+        "control": {
+          "burst": {
+            "pattern": false
+          }
+        }
+      },
+      "헬름": {
+        "control": {
+          "burst": {
+            "pattern": []
+          }
+        }
+      },
+      "나유타": {
+        "control": {
+          "burst": {
+            "pattern": []
+          }
+        }
+      },
+      "헬름 : 아쿠아마린": {
+        "control": {
+          "burst": {
+            "pattern": []
+          }
+        }
+      }
+    },
+    "profile": {
+      "base": "default",
+      "chars": {
+        "미란다": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        },
+        "마르차나 : 마린 스터디": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        },
+        "헬름": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 0,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        },
+        "나유타": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        },
+        "헬름 : 아쿠아마린": {
+          "level": 400,
+          "breakthrough": 3,
+          "core_enhancement": 0,
+          "affinity": 30,
+          "skill_levels": {
+            "1": 10,
+            "2": 10,
+            "3": 10
+          },
+          "equipment": {
+            "머리": {
+              "level": 5,
+              "skills": []
+            },
+            "몸통": {
+              "level": 5,
+              "skills": []
+            },
+            "팔": {
+              "level": 5,
+              "skills": []
+            },
+            "다리": {
+              "level": 5,
+              "skills": []
+            }
+          },
+          "equip_skills": {
+            "atk_pct": 22.22,
+            "element_bonus": 88.6,
+            "max_ammo_pct": 129.64,
+            "crit_rate": 0,
+            "crit_dmg": 0,
+            "charge_speed_pct": 0,
+            "charge_dmg_pct": 0,
+            "accuracy_pct": 0,
+            "def_pct": 0
+          },
+          "cube": {
+            "name": "렐릭 베어 큐브",
+            "level": 15
+          },
+          "console": {
+            "common_level": 180,
+            "class_level": 100,
+            "company_level": 100
+          },
+          "collection_stage": "SR15",
+          "favorite_stage": 3
+        }
+      }
+    },
+    "profile_level": "fixed"
+  },
+  "assumptions": [
+    "솔로레이드는 최다 조합과 우월 코드 적용 속성만 선정합니다.",
+    "모든 니케는 공통 적 스탯을 사용하며 시즌 보스 스탯·이동·무적·파츠 패턴을 적용하지 않습니다.",
+    "400레벨·180초·기대값·고정 버스트 게이지 조건입니다.",
+    "대상은 실제 육성, 동료 4명은 고정 육성을 적용합니다.",
+    "버스트는 평가 대상의 단계에서 본인 우선, 쿨타임 중에는 동료를 사용합니다. 그 외 2단계는 사용 가능한 동료를 배치 순으로 선택합니다.",
+    "버스트 운용은 평가용 고정 정책이며 랭킹 표본에서 수집한 실전 운용이 아닙니다."
+  ]
+}

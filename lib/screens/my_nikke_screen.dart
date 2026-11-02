@@ -20,6 +20,8 @@ import 'package:mimir/utils/capture_png.dart';
 import 'package:mimir/utils/image_export.dart';
 import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/nikke_statistics_card.dart';
+import 'package:mimir/widgets/nikke_damage_card.dart';
+import 'package:mimir/services/nikke_score_service.dart';
 import 'deck_builder.dart';
 
 class MyNikkeScreen extends StatefulWidget {
@@ -173,6 +175,8 @@ Color _elementRankingColor(double score) {
 class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final DatabaseService _dbService = DatabaseService();
   final NikkeStatisticsService _statisticsService = NikkeStatisticsService();
+  Future<StoredNikkeScores>? _storedScores;
+  String _scoreRevision = '';
   ElementDamageDisplayMode _elementDamageMode =
       ElementDamageDisplayMode.adjusted;
   bool _isLoading = true;
@@ -238,7 +242,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
     try {
       final data = await _dbService.getCommanderProfile(openId);
+      if (!mounted) return;
       if (data != null) {
+        _loadStoredScores(openId, data);
         setState(() {
           _profileData = data;
           _accountElementDamageFuture = _statisticsService
@@ -254,6 +260,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _errorMessage = "프로필 로드 중 오류가 발생했습니다: ${e.toString()}";
@@ -263,6 +270,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   String _getOptionName(int id) {
     return BlablaMap.getOptionName(id);
+  }
+
+  void _loadStoredScores(String openId, Map<String, dynamic> profile) {
+    _scoreRevision = profile['scoreSyncId']?.toString() ??
+        profile['lastUpdatedAt']?.toString() ?? '';
+    _storedScores = NikkeScoreService.loadStoredScores(openId: openId);
+    // One read shared by all cards. No calculation request, even on a miss.
+    unawaited(_storedScores!.then<void>((_) {}, onError: (Object _, StackTrace __) {}));
   }
 
   String _getElementLabel(ElementType type) {
@@ -348,6 +363,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         throw StateError('갱신된 지휘관 정보를 불러오지 못했습니다.');
       }
       if (!mounted) return;
+      _loadStoredScores(openId, refreshedProfile);
       setState(() {
         _profileData = refreshedProfile;
         _accountElementDamageFuture = _statisticsService
@@ -355,7 +371,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('최신 니케 정보로 갱신했습니다.'),
+          content: Text('동기화를 완료했습니다. 저장된 미미르 스코어를 불러옵니다.'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
@@ -753,7 +769,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   ),
                 ),
                 Tooltip(
-                  message: _refreshCooldownSeconds > 0
+                  message: _isRefreshing ? '동기화 및 스코어 저장 중…' : _refreshCooldownSeconds > 0
                       ? '$_refreshCooldownSeconds초 후 새로고침 가능'
                       : '최신 니케 정보로 새로고침',
                   child: SizedBox(
@@ -2395,6 +2411,17 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       children: [
         _buildDetailHeader(char, localNikke, isDark),
         if (_openId case final openId?) ...[
+          for (final scoreProfile in NikkeScoreService.profilesFor(nameCode)) ...[
+            const SizedBox(height: 16),
+            NikkeDamageCard(
+              key: ValueKey('$openId:${scoreProfile.key}'),
+              openId: openId,
+              nameCode: nameCode,
+              weakness: scoreProfile.weakness,
+              profileRevision: _scoreRevision,
+              evaluate: () => _storedScores!.then((scores) => scores.resultFor(scoreProfile.key)),
+            ),
+          ],
           const SizedBox(height: 16),
           NikkeStatisticsCard(
             openId: openId,

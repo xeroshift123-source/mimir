@@ -1,0 +1,96 @@
+{
+  "_note": "Synthetic reference growth, not a real user account.",
+  "nikkeId": "rapi_red_hood",
+  "evaluationVersion": "s40-fire-rapi-common-v3",
+  "recycleRoomComplete": true,
+  "recycleRoom": [
+    {
+      "tid": 1001,
+      "lv": 180
+    },
+    {
+      "tid": 1101,
+      "lv": 100
+    },
+    {
+      "tid": 1201,
+      "lv": 100
+    }
+  ],
+  "character": {
+    "name_code": 5129,
+    "level": 750,
+    "combat": 999999,
+    "grade": 3,
+    "core": 0,
+    "skills": {
+      "skill1": 10,
+      "skill2": 10,
+      "burst": 10
+    },
+    "bondLevel": 30,
+    "favoriteItem": {
+      "tid": 100202,
+      "level": 15
+    },
+    "harmonyCube": {
+      "tid": 1000303,
+      "level": 15
+    },
+    "growthDataQuality": {
+      "schemaVersion": 1,
+      "complete": true,
+      "missingFields": []
+    },
+    "equipment": [
+      {
+        "slot": "head",
+        "tid": 3111001,
+        "tier": 10,
+        "level": 5,
+        "corporationType": 0,
+        "overloadOptions": [
+          7000510,
+          7000810,
+          7000710
+        ]
+      },
+      {
+        "slot": "torso",
+        "tid": 3211001,
+        "tier": 10,
+        "level": 5,
+        "corporationType": 0,
+        "overloadOptions": [
+          7000510,
+          7000810,
+          7000710
+        ]
+      },
+      {
+        "slot": "arm",
+        "tid": 3311001,
+        "tier": 10,
+        "level": 5,
+        "corporationType": 0,
+        "overloadOptions": [
+          7000510,
+          0,
+          0
+        ]
+      },
+      {
+        "slot": "leg",
+        "tid": 3411001,
+        "tier": 10,
+        "level": 5,
+        "corporationType": 0,
+        "overloadOptions": [
+          7000510,
+          0,
+          0
+        ]
+      }
+    ]
+  }
+}

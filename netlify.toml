@@ -28,6 +28,11 @@ for = "/assets/assets/logo.png"
 
 # Generated fonts (e.g. tree-shaken MaterialIcons) can change at the same URL.
 [[headers]]
+for = "/score/*"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
 for = "/assets/fonts/*"
   [headers.values]
   Cache-Control = "public, max-age=0, must-revalidate"
