@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../data/nikke_score_targets.dart';
+import '../utils/ranking_color.dart';
 import '../services/nikke_score_service.dart';
+import '../services/nikke_statistics_service.dart';
 
 class NikkeDamageCard extends StatefulWidget {
   const NikkeDamageCard(
@@ -11,11 +13,13 @@ class NikkeDamageCard extends StatefulWidget {
       required this.nameCode,
       required this.profileRevision,
       this.weakness,
+      this.onStatisticsRefreshed,
       this.evaluate});
   final String openId;
   final int nameCode;
   final String profileRevision;
   final String? weakness;
+  final VoidCallback? onStatisticsRefreshed;
   final Future<NikkeScoreResult> Function()? evaluate;
   @override
   State<NikkeDamageCard> createState() => _NikkeDamageCardState();
@@ -25,6 +29,7 @@ class _NikkeDamageCardState extends State<NikkeDamageCard> {
   NikkeScoreResult? _result;
   String? _error;
   bool _loading = false;
+  bool _refreshing = false;
   int _request = 0;
   @override
   void initState() {
@@ -77,6 +82,23 @@ class _NikkeDamageCardState extends State<NikkeDamageCard> {
     }
   }
 
+  Future<void> _refreshStatistics() async {
+    setState(() => _refreshing = true);
+    try {
+      await NikkeStatisticsService().refreshAllStatistics();
+      if (!mounted) return;
+      widget.onStatisticsRefreshed?.call();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('표본 통계를 갱신했습니다.')));
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(error.toString().replaceFirst('Bad state: ', ''))));
+    } finally {
+      if (mounted) setState(() => _refreshing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
@@ -90,8 +112,7 @@ class _NikkeDamageCardState extends State<NikkeDamageCard> {
     final team = result != null && result.teamNames.isNotEmpty
         ? result.teamNames
         : profile?.teamNames ?? const <String>[];
-    final rankColor =
-        top != null && top <= 50 ? const Color(0xFF98B51D) : Colors.orange;
+    final rankColor = top == null ? Colors.grey : rankingColor(100 - top);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -117,9 +138,20 @@ class _NikkeDamageCardState extends State<NikkeDamageCard> {
               if (result != null)
                 Text('표본 ${result.sampleCount}명',
                     style: TextStyle(fontSize: 11, color: muted)),
+              if (result?.canRefreshStatistics == true)
+                IconButton(
+                  tooltip: '표본 통계 새로고침',
+                  onPressed: _refreshing ? null : _refreshStatistics,
+                  icon: _refreshing
+                      ? const SizedBox.square(
+                          dimension: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.refresh, size: 18),
+                ),
               const SizedBox(width: 8),
               Tooltip(
                 message: '대상은 내 육성 · 동료 4명은 고정 육성 · Lv.400 · 180초\n'
+                    '코어 있음·없음 각각 180초 딜량을 50%씩 합산한 근사값\n'
                     '연구실은 사용자 기준으로 조합 전체에 적용\n'
                     '${team.join(' · ')}',
                 waitDuration: const Duration(milliseconds: 300),

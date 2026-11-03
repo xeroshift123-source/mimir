@@ -1,4 +1,5 @@
 'use strict';
+const { refreshAllScoreStatistics } = require('./nikkeScoreSchedule');
 
 const {
   buildStatisticsSnapshotsFromStore,
@@ -37,6 +38,7 @@ async function refreshAllNikkeStatistics({ admin, db, source }) {
       snapshots,
       generatedAt: startedAt,
     });
+    await refreshAllScoreStatistics({ db });
 
     await metaRef.set({
       status: 'success',

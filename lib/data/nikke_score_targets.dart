@@ -5,63 +5,133 @@ class NikkeScoreProfile {
   final String weakness;
   final List<String> teamNames;
   String get key => '$nameCode:$weakness';
-  String get elementName => const {'fire': '작열', 'iron': '철갑', 'electric': '전격', 'wind': '풍압', 'water': '수냉'}[weakness]!;
+  String get elementName => const {
+        'fire': '작열',
+        'iron': '철갑',
+        'electric': '전격',
+        'wind': '풍압',
+        'water': '수냉'
+      }[weakness]!;
 }
+
 const nikkeScoreProfiles = <String, NikkeScoreProfile>{
-  '5185:fire': NikkeScoreProfile(5185, 'fire', ["아니스 : 스타", "브리드 : 사일런트 트랙", "마리안 : 퀸", "라피 : 레드 후드", "프리바티"]),
-  '5186:fire': NikkeScoreProfile(5186, 'fire', ["목단", "민트", "홍련 : 신살", "디젤 : 윈터 스위츠", "프리카"]),
-  '5129:fire': NikkeScoreProfile(5129, 'fire', ["브리드 : 사일런트 트랙", "라피 : 레드 후드", "아니스 : 스타", "미하라 : 본딩 체인", "프리바티"]),
-  '5138:fire': NikkeScoreProfile(5138, 'fire', ["브리드 : 사일런트 트랙", "라피 : 레드 후드", "아니스 : 스타", "미하라 : 본딩 체인", "프리바티"]),
-  '5159:fire': NikkeScoreProfile(5159, 'fire', ["목단", "민트", "디젤 : 윈터 스위츠", "스노우 화이트 : 헤비암즈", "프리카"]),
-  '5180:fire': NikkeScoreProfile(5180, 'fire', ["크라운", "아마기 유키코", "리틀 머메이드", "퀸(니지마 마코토)", "마스트 : 로망틱 메이드"]),
-  '5179:fire': NikkeScoreProfile(5179, 'fire', ["크라운", "아마기 유키코", "리틀 머메이드", "퀸(니지마 마코토)", "마스트 : 로망틱 메이드"]),
-  '5024:fire': NikkeScoreProfile(5024, 'fire', ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "드레이크", "솔린 : 프로스트 티켓"]),
-  '5167:fire': NikkeScoreProfile(5167, 'fire', ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "드레이크", "솔린 : 프로스트 티켓"]),
-  '5004:fire': NikkeScoreProfile(5004, 'fire', ["리타", "그레이브", "앨리스", "레이", "모더니아"]),
-  '5044:fire': NikkeScoreProfile(5044, 'fire', ["리타", "그레이브", "앨리스", "레이", "모더니아"]),
-  '5119:fire': NikkeScoreProfile(5119, 'fire', ["리타", "그레이브", "앨리스", "레이", "모더니아"]),
-  '5175:iron': NikkeScoreProfile(5175, 'iron', ["마스트 : 로망틱 메이드", "신데렐라 : 크리스탈 웨이브", "앵커 : 이노센트 메이드", "이브", "리틀 머메이드"]),
-  '5129:iron': NikkeScoreProfile(5129, 'iron', ["크라운", "라피 : 레드 후드", "아니스 : 스타", "프리바티", "나가"]),
-  '5143:iron': NikkeScoreProfile(5143, 'iron', ["리타", "민트", "레드 후드", "프리카", "레이븐"]),
-  '5142:iron': NikkeScoreProfile(5142, 'iron', ["마스트 : 로망틱 메이드", "신데렐라 : 크리스탈 웨이브", "앵커 : 이노센트 메이드", "이브", "리틀 머메이드"]),
-  '5002:iron': NikkeScoreProfile(5002, 'iron', ["토브", "아르카나 : 포츈 메이트", "소다 : 트윙클링 바니", "슈가", "드레이크"]),
-  '5176:iron': NikkeScoreProfile(5176, 'iron', ["미란다", "마르차나 : 마린 스터디", "헬름", "나유타", "헬름 : 아쿠아마린"]),
-  '5113:iron': NikkeScoreProfile(5113, 'iron', ["토브", "아르카나 : 포츈 메이트", "소다 : 트윙클링 바니", "도로시 : 세렌디피티", "드레이크"]),
-  '5150:iron': NikkeScoreProfile(5150, 'iron', ["마스트 : 로망틱 메이드", "신데렐라 : 크리스탈 웨이브", "밀크 : 블루밍 바니", "앵커 : 이노센트 메이드", "리틀 머메이드"]),
-  '5101:iron': NikkeScoreProfile(5101, 'iron', ["리타", "민트", "레드 후드", "프리카", "레이븐"]),
-  '5164:iron': NikkeScoreProfile(5164, 'iron', ["목단", "타키나", "스노우 화이트 : 헤비암즈", "치사토", "에이다"]),
-  '1010:iron': NikkeScoreProfile(1010, 'iron', ["목단", "치사토", "타키나", "라플라스", "에이다"]),
-  '5012:iron': NikkeScoreProfile(5012, 'iron', ["츠바이", "나유타", "스노우 화이트", "맥스웰", "헬름 : 아쿠아마린"]),
-  '5001:iron': NikkeScoreProfile(5001, 'iron', ["츠바이", "나유타", "스노우 화이트", "맥스웰", "헬름 : 아쿠아마린"]),
-  '5124:electric': NikkeScoreProfile(5124, 'electric', ["이사벨", "아르카나", "신데렐라", "아니스 : 스타", "크라운"]),
-  '5170:electric': NikkeScoreProfile(5170, 'electric', ["마스트 : 로망틱 메이드", "리틀 머메이드", "네온 : 비전아이", "리버렐리오", "앵커 : 이노센트 메이드"]),
-  '5152:electric': NikkeScoreProfile(5152, 'electric', ["에이다", "플로라", "아인", "타키나", "라피 : 레드 후드"]),
-  '5127:electric': NikkeScoreProfile(5127, 'electric', ["목단", "아니스 : 스파클링 서머", "에이드 : 에이전트 바니", "메이든 : 아이스 로즈", "프리바티"]),
-  '5097:electric': NikkeScoreProfile(5097, 'electric', ["목단", "아니스 : 스파클링 서머", "에이드 : 에이전트 바니", "메이든 : 아이스 로즈", "프리바티"]),
-  '5013:electric': NikkeScoreProfile(5013, 'electric', ["이사벨", "아르카나", "아니스 : 스타", "플로라", "신데렐라"]),
-  '5077:electric': NikkeScoreProfile(5077, 'electric', ["에이다", "플로라", "아인", "타키나", "라피 : 레드 후드"]),
-  '5169:electric': NikkeScoreProfile(5169, 'electric', ["이사벨", "아르카나", "신데렐라", "아니스 : 스타", "크라운"]),
-  '1021:electric': NikkeScoreProfile(1021, 'electric', ["목단", "아니스 : 스파클링 서머", "에이드 : 에이전트 바니", "메이든 : 아이스 로즈", "프리바티"]),
-  '5045:electric': NikkeScoreProfile(5045, 'electric', ["로산나", "나유타", "스노우 화이트 : 헤비암즈", "신데렐라 : 크리스탈 웨이브", "리타"]),
-  '5105:wind': NikkeScoreProfile(5105, 'wind', ["아니스 : 스타", "리버렐리오", "앵커 : 이노센트 메이드", "홍련 : 흑영", "마스트 : 로망틱 메이드"]),
-  '5156:wind': NikkeScoreProfile(5156, 'wind', ["아니스 : 스타", "리버렐리오", "앵커 : 이노센트 메이드", "홍련 : 흑영", "마스트 : 로망틱 메이드"]),
-  '5133:wind': NikkeScoreProfile(5133, 'wind', ["크라운", "아스카 : WILLE", "리틀 머메이드", "레이 (가칭)", "프리바티"]),
-  '5177:wind': NikkeScoreProfile(5177, 'wind', ["드레이크 : 그레이트 빌런", "루주", "라플라스 : 얼티밋 히어로", "맥스웰 : 오디너리 미케닉", "트리나"]),
-  '5181:wind': NikkeScoreProfile(5181, 'wind', ["드레이크 : 그레이트 빌런", "루주", "라플라스 : 얼티밋 히어로", "맥스웰 : 오디너리 미케닉", "트리나"]),
-  '5174:wind': NikkeScoreProfile(5174, 'wind', ["라피 : 레드 후드", "사쿠라 : 블룸 인 서머", "아크레인저 블랙", "맥스웰", "로산나 : 시크 오션"]),
-  '5132:wind': NikkeScoreProfile(5132, 'wind', ["크라운", "아스카 : WILLE", "리틀 머메이드", "레이 (가칭)", "프리바티"]),
-  '5117:wind': NikkeScoreProfile(5117, 'wind', ["라피 : 레드 후드", "사쿠라 : 블룸 인 서머", "아크레인저 블랙", "맥스웰", "로산나 : 시크 오션"]),
-  '5137:wind': NikkeScoreProfile(5137, 'wind', ["크라운", "아스카 : WILLE", "리틀 머메이드", "레이 (가칭)", "프리바티"]),
-  '5161:water': NikkeScoreProfile(5161, 'water', ["미란다", "크라운", "스노우 화이트 : 헤비암즈", "프리바티", "리틀 머메이드"]),
-  '5145:water': NikkeScoreProfile(5145, 'water', ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "슈가", "솔린 : 프로스트 티켓"]),
-  '5007:water': NikkeScoreProfile(5007, 'water', ["미란다", "나유타", "프리바티", "스노우 화이트 : 헤비암즈", "리틀 머메이드"]),
-  '5146:water': NikkeScoreProfile(5146, 'water', ["리타", "크라운", "헬름", "루드밀라 : 윈터 오너", "일레그 : 붐 앤 쇼크"]),
-  '5002:water': NikkeScoreProfile(5002, 'water', ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "슈가", "솔린 : 프로스트 티켓"]),
-  '5122:water': NikkeScoreProfile(5122, 'water', ["아니스 : 스타", "팬텀", "앵커 : 이노센트 메이드", "브래디", "마스트 : 로망틱 메이드"]),
-  '5158:water': NikkeScoreProfile(5158, 'water', ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "슈가", "솔린 : 프로스트 티켓"]),
-  '5135:water': NikkeScoreProfile(5135, 'water', ["아니스 : 스타", "팬텀", "앵커 : 이노센트 메이드", "브래디", "마스트 : 로망틱 메이드"]),
-  '5103:water': NikkeScoreProfile(5103, 'water', ["리타", "크라운", "헬름", "루드밀라 : 윈터 오너", "일레그 : 붐 앤 쇼크"]),
-  '5066:water': NikkeScoreProfile(5066, 'water', ["리타", "크라운", "헬름", "루드밀라 : 윈터 오너", "일레그 : 붐 앤 쇼크"]),
-  '5182:water': NikkeScoreProfile(5182, 'water', ["길티 : 마이티 바니", "플로라", "신 : 스위프트 바니", "타키나", "라피 : 레드 후드"]),
-  '5183:water': NikkeScoreProfile(5183, 'water', ["길티 : 마이티 바니", "플로라", "신 : 스위프트 바니", "타키나", "라피 : 레드 후드"]),
+  '5185:fire': NikkeScoreProfile(5185, 'fire',
+      ["아니스 : 스타", "브리드 : 사일런트 트랙", "마리안 : 퀸", "라피 : 레드 후드", "프리바티"]),
+  '5186:fire': NikkeScoreProfile(
+      5186, 'fire', ["목단", "민트", "홍련 : 신살", "디젤 : 윈터 스위츠", "프리카"]),
+  '5129:fire': NikkeScoreProfile(5129, 'fire',
+      ["브리드 : 사일런트 트랙", "라피 : 레드 후드", "아니스 : 스타", "미하라 : 본딩 체인", "프리바티"]),
+  '5138:fire': NikkeScoreProfile(5138, 'fire',
+      ["브리드 : 사일런트 트랙", "라피 : 레드 후드", "아니스 : 스타", "미하라 : 본딩 체인", "프리바티"]),
+  '5159:fire': NikkeScoreProfile(
+      5159, 'fire', ["목단", "민트", "디젤 : 윈터 스위츠", "스노우 화이트 : 헤비암즈", "프리카"]),
+  '5180:fire': NikkeScoreProfile(5180, 'fire',
+      ["크라운", "아마기 유키코", "리틀 머메이드", "퀸(니지마 마코토)", "마스트 : 로망틱 메이드"]),
+  '5179:fire': NikkeScoreProfile(5179, 'fire',
+      ["크라운", "아마기 유키코", "리틀 머메이드", "퀸(니지마 마코토)", "마스트 : 로망틱 메이드"]),
+  '5024:fire': NikkeScoreProfile(5024, 'fire',
+      ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "드레이크", "솔린 : 프로스트 티켓"]),
+  '5167:fire': NikkeScoreProfile(5167, 'fire',
+      ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "드레이크", "솔린 : 프로스트 티켓"]),
+  '5004:fire':
+      NikkeScoreProfile(5004, 'fire', ["리타", "그레이브", "앨리스", "레이", "모더니아"]),
+  '5044:fire':
+      NikkeScoreProfile(5044, 'fire', ["리타", "그레이브", "앨리스", "레이", "모더니아"]),
+  '5119:fire':
+      NikkeScoreProfile(5119, 'fire', ["리타", "그레이브", "앨리스", "레이", "모더니아"]),
+  '5175:iron': NikkeScoreProfile(5175, 'iron',
+      ["마스트 : 로망틱 메이드", "신데렐라 : 크리스탈 웨이브", "앵커 : 이노센트 메이드", "이브", "리틀 머메이드"]),
+  '5129:iron': NikkeScoreProfile(
+      5129, 'iron', ["크라운", "라피 : 레드 후드", "아니스 : 스타", "이브", "프리바티"]),
+  '5143:iron':
+      NikkeScoreProfile(5143, 'iron', ["리타", "민트", "레드 후드", "프리카", "레이븐"]),
+  '5142:iron': NikkeScoreProfile(5142, 'iron',
+      ["마스트 : 로망틱 메이드", "신데렐라 : 크리스탈 웨이브", "앵커 : 이노센트 메이드", "이브", "리틀 머메이드"]),
+  '5002:iron': NikkeScoreProfile(
+      5002, 'iron', ["토브", "아르카나 : 포츈 메이트", "소다 : 트윙클링 바니", "슈가", "드레이크"]),
+  '5176:iron': NikkeScoreProfile(
+      5176, 'iron', ["미란다", "마르차나 : 마린 스터디", "헬름", "나유타", "헬름 : 아쿠아마린"]),
+  '5113:iron': NikkeScoreProfile(5113, 'iron',
+      ["토브", "아르카나 : 포츈 메이트", "소다 : 트윙클링 바니", "도로시 : 세렌디피티", "드레이크"]),
+  '5150:iron': NikkeScoreProfile(5150, 'iron', [
+    "마스트 : 로망틱 메이드",
+    "신데렐라 : 크리스탈 웨이브",
+    "밀크 : 블루밍 바니",
+    "앵커 : 이노센트 메이드",
+    "리틀 머메이드"
+  ]),
+  '5101:iron':
+      NikkeScoreProfile(5101, 'iron', ["리타", "민트", "레드 후드", "프리카", "레이븐"]),
+  '5164:iron': NikkeScoreProfile(
+      5164, 'iron', ["목단", "타키나", "스노우 화이트 : 헤비암즈", "치사토", "에이다"]),
+  '1010:iron':
+      NikkeScoreProfile(1010, 'iron', ["목단", "치사토", "타키나", "라플라스", "에이다"]),
+  '5012:iron': NikkeScoreProfile(
+      5012, 'iron', ["츠바이", "나유타", "스노우 화이트", "맥스웰", "헬름 : 아쿠아마린"]),
+  '5001:iron': NikkeScoreProfile(
+      5001, 'iron', ["츠바이", "나유타", "스노우 화이트", "맥스웰", "헬름 : 아쿠아마린"]),
+  '5124:electric': NikkeScoreProfile(
+      5124, 'electric', ["이사벨", "아르카나", "신데렐라", "아니스 : 스타", "크라운"]),
+  '5170:electric': NikkeScoreProfile(5170, 'electric',
+      ["마스트 : 로망틱 메이드", "리틀 머메이드", "네온 : 비전아이", "리버렐리오", "앵커 : 이노센트 메이드"]),
+  '5152:electric': NikkeScoreProfile(
+      5152, 'electric', ["에이다", "플로라", "아인", "타키나", "라피 : 레드 후드"]),
+  '5127:electric': NikkeScoreProfile(5127, 'electric',
+      ["목단", "아니스 : 스파클링 서머", "에이드 : 에이전트 바니", "메이든 : 아이스 로즈", "프리바티"]),
+  '5097:electric': NikkeScoreProfile(5097, 'electric',
+      ["목단", "아니스 : 스파클링 서머", "에이드 : 에이전트 바니", "메이든 : 아이스 로즈", "프리바티"]),
+  '5013:electric': NikkeScoreProfile(
+      5013, 'electric', ["이사벨", "아르카나", "아니스 : 스타", "플로라", "신데렐라"]),
+  '5077:electric': NikkeScoreProfile(
+      5077, 'electric', ["에이다", "플로라", "아인", "타키나", "라피 : 레드 후드"]),
+  '5169:electric': NikkeScoreProfile(
+      5169, 'electric', ["이사벨", "아르카나", "신데렐라", "아니스 : 스타", "크라운"]),
+  '1021:electric': NikkeScoreProfile(1021, 'electric',
+      ["목단", "아니스 : 스파클링 서머", "에이드 : 에이전트 바니", "메이든 : 아이스 로즈", "프리바티"]),
+  '5045:electric': NikkeScoreProfile(5045, 'electric',
+      ["로산나", "나유타", "스노우 화이트 : 헤비암즈", "신데렐라 : 크리스탈 웨이브", "리타"]),
+  '5105:wind': NikkeScoreProfile(5105, 'wind',
+      ["아니스 : 스타", "리버렐리오", "앵커 : 이노센트 메이드", "홍련 : 흑영", "마스트 : 로망틱 메이드"]),
+  '5156:wind': NikkeScoreProfile(5156, 'wind',
+      ["아니스 : 스타", "리버렐리오", "앵커 : 이노센트 메이드", "홍련 : 흑영", "마스트 : 로망틱 메이드"]),
+  '5133:wind': NikkeScoreProfile(
+      5133, 'wind', ["크라운", "아스카 : WILLE", "리틀 머메이드", "레이 (가칭)", "프리바티"]),
+  '5177:wind': NikkeScoreProfile(5177, 'wind',
+      ["드레이크 : 그레이트 빌런", "루주", "라플라스 : 얼티밋 히어로", "맥스웰 : 오디너리 미케닉", "트리나"]),
+  '5181:wind': NikkeScoreProfile(5181, 'wind',
+      ["드레이크 : 그레이트 빌런", "루주", "라플라스 : 얼티밋 히어로", "맥스웰 : 오디너리 미케닉", "트리나"]),
+  '5174:wind': NikkeScoreProfile(5174, 'wind',
+      ["라피 : 레드 후드", "사쿠라 : 블룸 인 서머", "아크레인저 블랙", "맥스웰", "로산나 : 시크 오션"]),
+  '5132:wind': NikkeScoreProfile(
+      5132, 'wind', ["크라운", "아스카 : WILLE", "리틀 머메이드", "레이 (가칭)", "프리바티"]),
+  '5117:wind': NikkeScoreProfile(5117, 'wind',
+      ["라피 : 레드 후드", "사쿠라 : 블룸 인 서머", "아크레인저 블랙", "맥스웰", "로산나 : 시크 오션"]),
+  '5137:wind': NikkeScoreProfile(
+      5137, 'wind', ["나유타", "신데렐라 : 크리스탈 웨이브", "리틀 머메이드", "프리바티", "벨벳"]),
+  '5155:wind': NikkeScoreProfile(
+      5155, 'wind', ["나유타", "신데렐라 : 크리스탈 웨이브", "리틀 머메이드", "프리바티", "벨벳"]),
+  '5161:water': NikkeScoreProfile(
+      5161, 'water', ["미란다", "크라운", "스노우 화이트 : 헤비암즈", "프리바티", "리틀 머메이드"]),
+  '5145:water': NikkeScoreProfile(5145, 'water',
+      ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "슈가", "솔린 : 프로스트 티켓"]),
+  '5007:water': NikkeScoreProfile(
+      5007, 'water', ["미란다", "나유타", "프리바티", "스노우 화이트 : 헤비암즈", "리틀 머메이드"]),
+  '5146:water': NikkeScoreProfile(
+      5146, 'water', ["리타", "크라운", "헬름", "루드밀라 : 윈터 오너", "일레그 : 붐 앤 쇼크"]),
+  '5002:water': NikkeScoreProfile(5002, 'water',
+      ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "슈가", "솔린 : 프로스트 티켓"]),
+  '5122:water': NikkeScoreProfile(5122, 'water',
+      ["아니스 : 스타", "팬텀", "앵커 : 이노센트 메이드", "브래디", "마스트 : 로망틱 메이드"]),
+  '5158:water': NikkeScoreProfile(5158, 'water',
+      ["토브", "아르카나 : 포츈 메이트", "도로시 : 세렌디피티", "슈가", "솔린 : 프로스트 티켓"]),
+  '5135:water': NikkeScoreProfile(5135, 'water',
+      ["아니스 : 스타", "팬텀", "앵커 : 이노센트 메이드", "브래디", "마스트 : 로망틱 메이드"]),
+  '5103:water': NikkeScoreProfile(
+      5103, 'water', ["리타", "크라운", "헬름", "루드밀라 : 윈터 오너", "일레그 : 붐 앤 쇼크"]),
+  '5066:water': NikkeScoreProfile(
+      5066, 'water', ["리타", "크라운", "헬름", "루드밀라 : 윈터 오너", "일레그 : 붐 앤 쇼크"]),
+  '5182:water': NikkeScoreProfile(5182, 'water',
+      ["길티 : 마이티 바니", "플로라", "신 : 스위프트 바니", "타키나", "라피 : 레드 후드"]),
+  '5183:water': NikkeScoreProfile(5183, 'water',
+      ["길티 : 마이티 바니", "플로라", "신 : 스위프트 바니", "타키나", "라피 : 레드 후드"]),
 };

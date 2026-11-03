@@ -82,8 +82,8 @@ test('sync batches all owned targets into five weakness requests and matches shu
         : { id: item.id, damage: item.target * 1000 }) };
     } });
   assert.equal(calls.length, 5);
-  assert.equal(calls.reduce((sum, call) => sum + call.count, 0), 55);
-  assert.deepEqual(output, { status: 'partial', count: 56 });
+  assert.equal(calls.reduce((sum, call) => sum + call.count, 0), 56);
+  assert.deepEqual(output, { status: 'partial', count: 57 });
   const saved = db.data.get('nikke_score_results/account').results;
   assert.equal(saved['5186:fire'].code, 'resync_required');
   assert.equal(saved['5185:fire'].code, 'unsupported_nikke');
@@ -229,8 +229,8 @@ function memoryDb(seed = {}) {
   return db;
 }
 
-test('all 56 policies use the requested weakness, 5 unique members, and only target actual growth', () => {
-  assert.equal(TARGETS.size, 56);
+test('all 57 policies use the requested weakness, 5 unique members, and only target actual growth', () => {
+  assert.equal(TARGETS.size, 57);
   for (const [key, target] of TARGETS) {
     const code = target.nameCode;
     const p = profile(key);
@@ -240,7 +240,7 @@ test('all 56 policies use the requested weakness, 5 unique members, and only tar
     assert.ok(item.team.includes(code));
     assert.equal(requestBody(key, [item]).weakness, target.weakness);
     assert.equal(item.data.characters.find(c => c.name_code === code).core, 7);
-    assert.ok(item.data.characters.filter(c => c.name_code !== code).every(c => c.core === 0));
+    assert.ok(item.data.characters.filter(c => c.name_code !== code).every(c => c.core === (c.name_code === 5156 ? 7 : 0)));
     assert.ok(!JSON.stringify(item).includes('PRIVATE'));
     const used = new Set(item.data.character_details.flatMap(d => ['head', 'torso', 'arm', 'leg']
       .flatMap(s => [1, 2, 3].map(i => d[`${s}_equip_option${i}_id`])).filter(Boolean)));
@@ -310,16 +310,16 @@ test('signed accuracy and charge-time options survive raw and legacy mapping', (
 test('same Nikke has distinct element policies and cache keys; requested roster is complete', () => {
   const roster = require('../services/nikke_score/collection_team_selection.json');
   assert.deepEqual([...TARGETS.keys()].sort(), roster.profiles.map(p => p.key).sort());
-  assert.equal(new Set([...TARGETS.values()].map(t => t.nameCode)).size, 54);
+  assert.equal(new Set([...TARGETS.values()].map(t => t.nameCode)).size, 55);
   for (const [a, b] of [['5129:fire', '5129:iron'], ['5002:iron', '5002:water']]) {
     const item = buildScoreItem(profile(a), a, 'same');
     assert.notEqual(inputHash(item, a), inputHash(item, b));
     assert.notEqual(requestBody(a, [item]).weakness, requestBody(b, [item]).weakness);
   }
   assert.ok(TARGETS.has('5185:fire'));
-  assert.ok(![...TARGETS.values()].some(t => [1019, 5155].includes(t.nameCode)));
+  assert.ok(![...TARGETS.values()].some(t => [1019].includes(t.nameCode)));
   assert.deepEqual(resolveTarget('5159:fire').team, [1021, 5172, 5159, 5161, 5173]);
-  assert.deepEqual(resolveTarget('5137:wind').team, [5065, 5133, 5137, 5132, 5007]);
+  assert.deepEqual(resolveTarget('5137:wind').team, resolveTarget('5155:wind').team);
   assert.equal(resolveTarget('5045:electric').nameCode, 5045);
 });
 
@@ -395,3 +395,76 @@ test('endpoint rejects unauthenticated and unrelated accounts without calling up
   }
 });
 
+
+const { elementDamageTotals, compareElements } = require('./nikkeScoreElements');
+
+test('element rankings compare account sums, not individual percentiles or ownership averages', async () => {
+  const now = Date.now();
+  const seed = { 'nikke_score_state/version': { calcVersion: 'c80' } };
+  for (let i = 0; i < 20; i++) {
+    seed[`open_id_bindings/a${i}`] = { uid: 'owner' };
+    seed[`commanders/a${i}`] = { scoreSyncId: 'sync-1', lastUpdatedAt: now,
+      characters: [{ name_code: 5129 }] };
+    seed[`nikke_score_results/a${i}`] = storedSnapshot();
+  }
+  const db = memoryDb(seed);
+  await refreshScorePage({ db, now });
+  const distribution = db.data.get('nikke_score_distributions/element-fire');
+  assert.equal(distribution.damages.length, 20);
+  const p = seed['commanders/a0'];
+  const elements = compareElements(storedSnapshot(), p, { fire: distribution }, now);
+  assert.equal(elements[0].score, 101.5);
+  assert.equal(elements[0].average, 101.5);
+  assert.equal(elements[0].topPercent, 50);
+  assert.equal(elements[0].sampleCount, 20);
+  const summed = storedSnapshot();
+  summed.results['5138:fire'] = storedResult('5138:fire', 500000000);
+  const twoOwned = { ...p, characters: [{ name_code: 5129 }, { name_code: 5138 }] };
+  assert.equal(elementDamageTotals(summed, twoOwned, 'c80').fire, 2530000000);
+  summed.results['5138:fire'].policyHash = 'previous-policy';
+  assert.equal(elementDamageTotals(summed, twoOwned, 'c80').fire, undefined);
+  // Scores remain visible before a distribution exists, without a made-up rank.
+  assert.equal(compareElements(storedSnapshot(), p, {}, now)[0].score, 101.5);
+  assert.equal(compareElements(storedSnapshot(), p, {}, now)[0].topPercent, null);
+  const failed = storedSnapshot(); failed.status = 'partial';
+  failed.results['5129:fire'] = { status: 'error' };
+  assert.equal(elementDamageTotals(failed, p, 'c80').fire, undefined);
+  assert.equal(elementDamageTotals(failed, p, 'c80').iron, 1000000000);
+  assert.equal(elementDamageTotals(storedSnapshot(), { ...p, scoreSyncId: 'new' }, 'c80').fire, undefined);
+  const job = db.data.get('nikke_score_state/statistics');
+  assert.equal((job.nextRunAtMs + 9 * 3600000) % 86400000, 0);
+  await refreshScorePage({ db, now: now + 1, force: true });
+  assert.notEqual(db.data.get('nikke_score_state/statistics').generation, job.generation);
+});
+
+test('Liberalio dummy has core7 and four max attack lines but actual target stays user-owned', () => {
+  for (const [key, target] of TARGETS) {
+    if (!target.team.includes(5156) || target.nameCode === 5156) continue;
+    const item = buildScoreItem(profile(key), key, 'lib');
+    assert.equal(item.data.characters.find(c => c.name_code === 5156).core, 7);
+    const d = item.data.character_details.find(c => c.name_code === 5156);
+    const ids = ['head', 'torso', 'arm', 'leg'].flatMap(s => [1, 2, 3].map(i => d[`${s}_equip_option${i}_id`]));
+    const attacks = item.data.state_effects.filter(e => ids.includes(e.id) && e.function_details[0].function_type === 'StatAtk');
+    assert.equal(attacks.length, 4);
+    assert.ok(attacks.every(e => e.function_details[0].function_value === 1463));
+  }
+  const p = profile('5156:wind'); p.characters[0].core = 0;
+  assert.equal(buildScoreItem(p, '5156:wind', 'actual').data.characters.find(c => c.name_code === 5156).core, 0);
+});
+
+test('core approximation averages matched IDs from two continuous 180s runs and rejects mixed versions', async () => {
+  const db = memoryDb(), item = buildScoreItem(profile(), 5129, 'one');
+  const calls = [];
+  const transport = { post: async (_, body) => {
+    const b = JSON.parse(body); calls.push(b);
+    return { status: 200, data: { calc_version: 'c80', items: b.items.map(i => ({ id: i.id,
+      damage: b.boss.core_size === 0 ? 100 : 201 })).reverse() } };
+  } };
+  const result = await createScoreApi(db, () => 'fake', transport)(5129, [item, { ...item, id: 'two' }]);
+  assert.deepEqual(calls.map(b => [b.duration, b.boss.core_size]), [[180, 0], [180, 100]]);
+  assert.ok(result.items.every(i => i.damage === 151));
+  let n = 0;
+  transport.post = async () => ({ status: 200, data: { calc_version: `c${++n}`,
+    items: [{ id: 'one', damage: 100 }] } });
+  await assert.rejects(createScoreApi(db, () => 'fake', transport)(5129, [item]), { code: 'invalid_response' });
+});

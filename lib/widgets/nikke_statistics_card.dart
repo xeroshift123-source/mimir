@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/nikke_statistics.dart';
+import '../utils/ranking_color.dart';
 import '../services/nikke_statistics_service.dart';
 
 class NikkeStatisticsCard extends StatefulWidget {
@@ -356,7 +357,7 @@ class _OverloadRow extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: mine == null
                       ? Colors.grey
-                      : _rankingColor(rankingScore ?? 0),
+                      : rankingColor(rankingScore ?? 0),
                 ),
               ),
             ],
@@ -373,7 +374,7 @@ class _OverloadRow extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: rankingScore / 100,
                         minHeight: 8,
-                        color: _rankingColor(rankingScore),
+                        color: rankingColor(rankingScore),
                         backgroundColor: isDark
                             ? Colors.grey.shade800
                             : Colors.grey.shade200,
@@ -389,7 +390,7 @@ class _OverloadRow extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w800,
-                        color: _rankingColor(rankingScore),
+                        color: rankingColor(rankingScore),
                       ),
                     ),
                   ),
@@ -462,7 +463,7 @@ class _CombinedOffenseRow extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: mine == null
                       ? Colors.grey
-                      : _rankingColor(rankingScore ?? 0),
+                      : rankingColor(rankingScore ?? 0),
                 ),
               ),
             ],
@@ -477,7 +478,7 @@ class _CombinedOffenseRow extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: rankingScore / 100,
                       minHeight: 8,
-                      color: _rankingColor(rankingScore),
+                      color: rankingColor(rankingScore),
                       backgroundColor:
                           isDark ? Colors.grey.shade800 : Colors.grey.shade200,
                     ),
@@ -492,7 +493,7 @@ class _CombinedOffenseRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
-                      color: _rankingColor(rankingScore),
+                      color: rankingColor(rankingScore),
                     ),
                   ),
                 ),
@@ -503,29 +504,6 @@ class _CombinedOffenseRow extends StatelessWidget {
       ),
     );
   }
-}
-
-Color _rankingColor(double score) {
-  final normalized = score.clamp(0.0, 100.0);
-  if (normalized <= 33.3) {
-    return Color.lerp(
-      Colors.red.shade500,
-      Colors.amber.shade600,
-      normalized / 33.3,
-    )!;
-  }
-  if (normalized <= 66.6) {
-    return Color.lerp(
-      Colors.amber.shade600,
-      Colors.green.shade500,
-      (normalized - 33.3) / 33.3,
-    )!;
-  }
-  return Color.lerp(
-    Colors.green.shade500,
-    Colors.blue.shade600,
-    (normalized - 66.6) / 33.4,
-  )!;
 }
 
 class _SkillPresetBar extends StatelessWidget {

@@ -10,11 +10,9 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:mimir/providers/nikke_provider.dart';
 import 'package:mimir/models/nikke.dart';
-import 'package:mimir/models/nikke_statistics.dart';
 import 'package:mimir/models/enums.dart';
 import 'package:mimir/utils/blabla_map.dart';
 import 'package:mimir/services/database_service.dart';
-import 'package:mimir/services/nikke_statistics_service.dart';
 import 'package:mimir/utils/cp_calculator.dart';
 import 'package:mimir/utils/capture_png.dart';
 import 'package:mimir/utils/image_export.dart';
@@ -22,6 +20,7 @@ import 'package:mimir/widgets/app_drawer.dart';
 import 'package:mimir/widgets/nikke_statistics_card.dart';
 import 'package:mimir/widgets/nikke_damage_card.dart';
 import 'package:mimir/services/nikke_score_service.dart';
+import 'package:mimir/widgets/account_element_score_bar.dart';
 import 'deck_builder.dart';
 
 class MyNikkeScreen extends StatefulWidget {
@@ -33,157 +32,14 @@ class MyNikkeScreen extends StatefulWidget {
   State<MyNikkeScreen> createState() => _MyNikkeScreenState();
 }
 
-enum ElementDamageDisplayMode { raw, adjusted }
-
-class _AccountElementDamageBar extends StatelessWidget {
-  const _AccountElementDamageBar({
-    required this.statistic,
-    required this.isDark,
-    required this.mode,
-  });
-
-  final ElementDamageDisplayMode mode;
-  final AccountElementDamageStatistic statistic;
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    final adjusted = mode == ElementDamageDisplayMode.adjusted;
-    final topPercent =
-        adjusted ? statistic.adjustedTopPercent : statistic.topPercent;
-    final score = adjusted ? statistic.adjustedScore : statistic.myTotalPercent;
-    final average =
-        adjusted ? statistic.adjustedAverage : statistic.averageTotalPercent;
-    String formatValue(double? value) => value == null
-        ? '갱신 대기'
-        : adjusted
-            ? value.toStringAsFixed(2)
-            : '+${value.toStringAsFixed(2)}%';
-    final rankingScore =
-        topPercent == null ? 0.0 : (100.0 - topPercent).clamp(0.0, 100.0);
-    final rankingColor = _elementRankingColor(rankingScore);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(.04) : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Image.asset(
-                'assets/icons/elements/icon-elements-${statistic.key}.webp',
-                width: 18,
-                height: 18,
-                errorBuilder: (_, __, ___) => const SizedBox.square(
-                  dimension: 18,
-                  child:
-                      Icon(Icons.bolt_rounded, size: 16, color: Colors.orange),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: Text(
-                  statistic.name,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              Text(
-                formatValue(score),
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  color: rankingColor,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: rankingScore / 100,
-              minHeight: 6,
-              color: rankingColor,
-              backgroundColor:
-                  isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '평균 ${formatValue(average)}',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 9,
-                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
-                  ),
-                ),
-              ),
-              Text(
-                topPercent == null
-                    ? '비교 불가'
-                    : '상위 ${topPercent.toStringAsFixed(1)}%',
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  color: topPercent == null ? Colors.grey : rankingColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-Color _elementRankingColor(double score) {
-  final normalized = score.clamp(0.0, 100.0);
-  if (normalized <= 33.3) {
-    return Color.lerp(
-      Colors.red.shade500,
-      Colors.amber.shade600,
-      normalized / 33.3,
-    )!;
-  }
-  if (normalized <= 66.6) {
-    return Color.lerp(
-      Colors.amber.shade600,
-      Colors.green.shade500,
-      (normalized - 33.3) / 33.3,
-    )!;
-  }
-  return Color.lerp(
-    Colors.green.shade500,
-    Colors.blue.shade600,
-    (normalized - 66.6) / 33.4,
-  )!;
-}
-
 class _MyNikkeScreenState extends State<MyNikkeScreen> {
   final DatabaseService _dbService = DatabaseService();
-  final NikkeStatisticsService _statisticsService = NikkeStatisticsService();
   Future<StoredNikkeScores>? _storedScores;
   String _scoreRevision = '';
-  ElementDamageDisplayMode _elementDamageMode =
-      ElementDamageDisplayMode.adjusted;
   bool _isLoading = true;
   String? _errorMessage;
   Map<String, dynamic>? _profileData;
   String? _openId;
-  Future<AccountElementDamageStatistics>? _accountElementDamageFuture;
   bool _isRefreshing = false;
   int _refreshCooldownSeconds = 0;
   Timer? _refreshCooldownTimer;
@@ -247,8 +103,6 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
         _loadStoredScores(openId, data);
         setState(() {
           _profileData = data;
-          _accountElementDamageFuture = _statisticsService
-              .getAccountElementDamageStatistics(openId: openId);
           _isLoading = false;
         });
         _restoreRefreshCooldown(data);
@@ -274,10 +128,20 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
 
   void _loadStoredScores(String openId, Map<String, dynamic> profile) {
     _scoreRevision = profile['scoreSyncId']?.toString() ??
-        profile['lastUpdatedAt']?.toString() ?? '';
+        profile['lastUpdatedAt']?.toString() ??
+        '';
     _storedScores = NikkeScoreService.loadStoredScores(openId: openId);
     // One read shared by all cards. No calculation request, even on a miss.
-    unawaited(_storedScores!.then<void>((_) {}, onError: (Object _, StackTrace __) {}));
+    unawaited(_storedScores!
+        .then<void>((_) {}, onError: (Object _, StackTrace __) {}));
+  }
+
+  void _reloadScoreStatistics() {
+    if (_openId == null || _profileData == null) return;
+    setState(() {
+      _loadStoredScores(_openId!, _profileData!);
+      _scoreRevision += ':${DateTime.now().microsecondsSinceEpoch}';
+    });
   }
 
   String _getElementLabel(ElementType type) {
@@ -366,8 +230,6 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       _loadStoredScores(openId, refreshedProfile);
       setState(() {
         _profileData = refreshedProfile;
-        _accountElementDamageFuture = _statisticsService
-            .getAccountElementDamageStatistics(openId: openId);
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -769,9 +631,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   ),
                 ),
                 Tooltip(
-                  message: _isRefreshing ? '동기화 및 스코어 저장 중…' : _refreshCooldownSeconds > 0
-                      ? '$_refreshCooldownSeconds초 후 새로고침 가능'
-                      : '최신 니케 정보로 새로고침',
+                  message: _isRefreshing
+                      ? '동기화 및 스코어 저장 중…'
+                      : _refreshCooldownSeconds > 0
+                          ? '$_refreshCooldownSeconds초 후 새로고침 가능'
+                          : '최신 니케 정보로 새로고침',
                   child: SizedBox(
                     width: 44,
                     height: 38,
@@ -872,10 +736,10 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
   }
 
   Widget _buildAccountElementDamageSection(bool isDark) {
-    final future = _accountElementDamageFuture;
+    final future = _storedScores;
     if (future == null) return const SizedBox.shrink();
 
-    return FutureBuilder<AccountElementDamageStatistics>(
+    return FutureBuilder<StoredNikkeScores>(
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -889,9 +753,11 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
             ),
           );
         }
-        if (snapshot.hasError || snapshot.data == null) {
+        if (snapshot.hasError ||
+            snapshot.data == null ||
+            snapshot.data!.elements.isEmpty) {
           return Text(
-            '속성별 우월코드 통계는 다음 통계 갱신 후 표시됩니다.',
+            '속성별 미미르 스코어는 다음 동기화·통계 갱신 후 표시됩니다.',
             style: TextStyle(
               fontSize: 11,
               color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
@@ -918,7 +784,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                               size: 15, color: Colors.orange),
                           const SizedBox(width: 5),
                           Text(
-                            '속성별 우월코드 통계',
+                            '속성별 미미르 스코어',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -930,7 +796,7 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                         ],
                       ),
                       Text(
-                        '표본 ${statistics.sampleCount}명',
+                        '속성별 합산 점수',
                         style: TextStyle(
                           fontSize: 10,
                           color: isDark
@@ -942,39 +808,14 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text('미미르 스코어', style: TextStyle(fontSize: 11)),
-                SizedBox(
-                  width: 44,
-                  height: 32,
-                  child: FittedBox(
-                    child: Switch(
-                      value: _elementDamageMode ==
-                          ElementDamageDisplayMode.adjusted,
-                      activeColor: Colors.orange,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      onChanged: (enabled) => setState(() {
-                        _elementDamageMode = enabled
-                            ? ElementDamageDisplayMode.adjusted
-                            : ElementDamageDisplayMode.raw;
-                      }),
-                    ),
-                  ),
-                ),
                 const Tooltip(
                   triggerMode: TooltipTriggerMode.tap,
-                  message: '니케별 우월코드 보유자의 평균 수치와 평균 옵션 줄 수, 채택률을 반영한 가중 점수입니다.',
+                  message:
+                      '각 속성의 미미르 스코어 합계와 표본 평균, 합산 점수의 상위 %입니다. 미보유는 0점이며 계산 실패·이전 조건의 점수는 비교에서 제외합니다.',
                   child: Icon(Icons.info_outline, size: 16),
                 ),
               ],
             ),
-            if (_elementDamageMode == ElementDamageDisplayMode.adjusted &&
-                statistics.elements
-                    .any((element) => element.adjustedScore == null))
-              const Padding(
-                padding: EdgeInsets.only(top: 6),
-                child: Text('미미르 스코어는 다음 통계 갱신 후 표시됩니다.',
-                    style: TextStyle(fontSize: 11)),
-              ),
             const SizedBox(height: 7),
             LayoutBuilder(
               builder: (context, constraints) {
@@ -992,9 +833,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                   children: statistics.elements
                       .map((element) => SizedBox(
                             width: itemWidth,
-                            child: _AccountElementDamageBar(
+                            child: AccountElementScoreBar(
                               statistic: element,
-                              mode: _elementDamageMode,
                               isDark: isDark,
                             ),
                           ))
@@ -2411,7 +2251,8 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
       children: [
         _buildDetailHeader(char, localNikke, isDark),
         if (_openId case final openId?) ...[
-          for (final scoreProfile in NikkeScoreService.profilesFor(nameCode)) ...[
+          for (final scoreProfile
+              in NikkeScoreService.profilesFor(nameCode)) ...[
             const SizedBox(height: 16),
             NikkeDamageCard(
               key: ValueKey('$openId:${scoreProfile.key}'),
@@ -2419,7 +2260,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
               nameCode: nameCode,
               weakness: scoreProfile.weakness,
               profileRevision: _scoreRevision,
-              evaluate: () => _storedScores!.then((scores) => scores.resultFor(scoreProfile.key)),
+              onStatisticsRefreshed: _reloadScoreStatistics,
+              evaluate: () => _storedScores!
+                  .then((scores) => scores.resultFor(scoreProfile.key)),
             ),
           ],
           const SizedBox(height: 16),
@@ -3375,13 +3218,15 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                 final filename =
                                     'license_${DateTime.now().millisecondsSinceEpoch}.png';
                                 final copied = await copyPng(
-                                  capturePng(captureKey), filename,
+                                  capturePng(captureKey),
+                                  filename,
                                 );
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(copied
-                                        ? '클립보드에 복사되었습니다!'
-                                        : '이미지 복사를 지원하지 않아 저장으로 전환했습니다.')),
+                                    SnackBar(
+                                        content: Text(copied
+                                            ? '클립보드에 복사되었습니다!'
+                                            : '이미지 복사를 지원하지 않아 저장으로 전환했습니다.')),
                                   );
                                 }
                               } catch (e) {
@@ -3413,7 +3258,9 @@ class _MyNikkeScreenState extends State<MyNikkeScreen> {
                                 } catch (error) {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('이미지 저장에 실패했습니다: $error')),
+                                      SnackBar(
+                                          content:
+                                              Text('이미지 저장에 실패했습니다: $error')),
                                     );
                                   }
                                   return;

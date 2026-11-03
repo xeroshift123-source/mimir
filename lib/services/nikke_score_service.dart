@@ -11,6 +11,7 @@ class NikkeScoreResult {
       required this.calcVersion,
       required this.sampleCount,
       this.topPercent,
+      this.canRefreshStatistics = false,
       this.generatedAt,
       this.teamNames = const []});
   final double score;
@@ -18,6 +19,7 @@ class NikkeScoreResult {
   final String calcVersion;
   final int sampleCount;
   final double? topPercent;
+  final bool canRefreshStatistics;
   final DateTime? generatedAt;
   final List<String> teamNames;
 
@@ -46,6 +48,7 @@ class NikkeScoreResult {
         calcVersion: version,
         sampleCount: count,
         topPercent: (top as num?)?.toDouble(),
+        canRefreshStatistics: json['canRefreshStatistics'] == true,
         generatedAt: DateTime.tryParse(json['generatedAt']?.toString() ?? ''),
         teamNames: json['team'] is List
             ? (json['team'] as List).whereType<String>().toList()
@@ -64,7 +67,14 @@ class NikkeScoreException implements Exception {
 class StoredNikkeScores {
   StoredNikkeScores.fromJson(Map<String, dynamic> json)
       : status = json['status'] as String? ?? 'not_saved',
-        results = Map<String, dynamic>.from(json['results'] as Map? ?? {});
+        results = Map<String, dynamic>.from(json['results'] as Map? ?? {}),
+        canRefreshStatistics = json['canRefreshStatistics'] == true,
+        elements = (json['elements'] as List? ?? [])
+            .whereType<Map>()
+            .map((item) => ElementScoreStatistic.fromJson(item))
+            .toList();
+  final bool canRefreshStatistics;
+  final List<ElementScoreStatistic> elements;
   final String status;
   final Map<String, dynamic> results;
 
@@ -80,6 +90,19 @@ class StoredNikkeScores {
     }
     return NikkeScoreResult.fromJson(Map<String, dynamic>.from(item));
   }
+}
+
+class ElementScoreStatistic {
+  ElementScoreStatistic.fromJson(Map json)
+      : key = json['key'] as String,
+        name = json['name'] as String,
+        score = (json['score'] as num?)?.toDouble(),
+        average = (json['average'] as num?)?.toDouble(),
+        topPercent = (json['topPercent'] as num?)?.toDouble(),
+        sampleCount = (json['sampleCount'] as num?)?.toInt() ?? 0;
+  final String key, name;
+  final double? score, average, topPercent;
+  final int sampleCount;
 }
 
 class NikkeScoreService {

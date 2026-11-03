@@ -26,42 +26,57 @@ function createScoreApi(db, apiKey = () => process.env.DILDORO_API_KEY, transpor
   return async function calculate(nameCode, items) {
     if (!apiKey()) throw new ScoreError('not_configured', '스코어 계산 서비스를 준비 중입니다.', 503);
     if (!items.length || items.length > 100) throw new ScoreError('bad_request', '계산 요청은 1~100건이어야 합니다.', 400);
-    return withLease(db, 'api_lock', 75000, async () => {
-      const body = JSON.stringify(requestBody(nameCode, items));
-      let response;
-      try {
-        response = await transport.post(ENDPOINT, body, {
-          timeout: 60000, maxRedirects: 0,
-          headers: { 'X-Api-Key': apiKey(), 'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(body), 'User-Agent': 'Mozilla/5.0 (compatible; Mimir/1.0)',
-            Accept: 'application/json' },
-          validateStatus: () => true,
-        });
-      } catch (_) {
-        // Axios errors contain the API key and growth payload; never log them.
-        throw new ScoreError('upstream_timeout', '계산 서버 응답이 지연되고 있습니다. 다시 측정해 주세요.', 504);
-      }
-      if (response.status !== 200) {
-        const retry = Number(response.headers?.['retry-after']);
-        const busy = [429, 503].includes(response.status);
-        throw new ScoreError(busy ? 'busy' : 'upstream_error',
-          busy ? '계산 서버가 혼잡합니다. 잠시 후 다시 측정해 주세요.' : '계산 서비스 연결에 실패했습니다.',
-          busy ? response.status : 502, busy ? (Number.isFinite(retry) && retry > 0 ? Math.ceil(retry) : 5) : null);
-      }
-      const result = response.data;
-      if (typeof result?.calc_version !== 'string' || !result.calc_version.length
-        || !Array.isArray(result.items) || result.items.length !== items.length) {
-        throw new ScoreError('invalid_response', '계산 응답 형식이 올바르지 않습니다.', 502);
-      }
-      const seen = new Set();
-      const expected = new Set(items.map(item => item.id));
-      for (const item of result.items) {
-        if (!expected.has(item?.id) || seen.has(item.id)
-          || (!item.error && (!Number.isSafeInteger(item.damage) || item.damage < 0))) {
-          throw new ScoreError('invalid_response', '계산 결과가 요청과 일치하지 않습니다.', 502);
+    return withLease(db, 'api_lock', 150000, async () => {
+      const scenarios = [];
+      for (const coreSize of [0, 100]) {
+        const body = JSON.stringify(requestBody(nameCode, items, coreSize));
+        let response;
+        try {
+          response = await transport.post(ENDPOINT, body, {
+            timeout: 60000, maxRedirects: 0,
+            headers: { 'X-Api-Key': apiKey(), 'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(body), 'User-Agent': 'Mozilla/5.0 (compatible; Mimir/1.0)',
+              Accept: 'application/json' },
+            validateStatus: () => true,
+          });
+        } catch (_) {
+          // Axios errors contain the API key and growth payload; never log them.
+          throw new ScoreError('upstream_timeout', '계산 서버 응답이 지연되고 있습니다. 다시 측정해 주세요.', 504);
         }
-        seen.add(item.id);
+        if (response.status !== 200) {
+          const retry = Number(response.headers?.['retry-after']);
+          const busy = [429, 503].includes(response.status);
+          throw new ScoreError(busy ? 'busy' : 'upstream_error',
+            busy ? '계산 서버가 혼잡합니다. 잠시 후 다시 측정해 주세요.' : '계산 서비스 연결에 실패했습니다.',
+            busy ? response.status : 502, busy ? (Number.isFinite(retry) && retry > 0 ? Math.ceil(retry) : 5) : null);
+        }
+        const result = response.data;
+        if (typeof result?.calc_version !== 'string' || !result.calc_version.length
+          || !Array.isArray(result.items) || result.items.length !== items.length) {
+          throw new ScoreError('invalid_response', '계산 응답 형식이 올바르지 않습니다.', 502);
+        }
+        const seen = new Set();
+        const expected = new Set(items.map(item => item.id));
+        for (const item of result.items) {
+          if (!expected.has(item?.id) || seen.has(item.id)
+            || (!item.error && (!Number.isSafeInteger(item.damage) || item.damage < 0))) {
+            throw new ScoreError('invalid_response', '계산 결과가 요청과 일치하지 않습니다.', 502);
+          }
+          seen.add(item.id);
+        }
+        scenarios.push(result);
       }
+      if (scenarios[0].calc_version !== scenarios[1].calc_version) {
+        throw new ScoreError('invalid_response', '계산 중 버전이 변경됐습니다. 다음 동기화에서 다시 계산합니다.', 502);
+      }
+      const coreItems = new Map(scenarios[1].items.map(item => [item.id, item]));
+      const result = { calc_version: scenarios[0].calc_version,
+        items: scenarios[0].items.map(item => {
+          const coreItem = coreItems.get(item.id);
+          if (item.error) return item;
+          if (coreItem.error) return coreItem;
+          return { id: item.id, damage: Math.round(item.damage / 2 + coreItem.damage / 2) };
+        }) };
       await db.collection('nikke_score_state').doc('version').set({ calcVersion: result.calc_version, observedAtMs: Date.now() });
       return result;
     });

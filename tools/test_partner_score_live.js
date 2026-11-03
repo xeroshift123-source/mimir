@@ -2,13 +2,25 @@
 // Synthetic-only smoke test. Set DILDORO_API_KEY in this process, never in source.
 const fs = require('node:fs');
 const path = require('node:path');
-const axios = require('../functions/node_modules/axios');
-const { TARGETS, buildScoreItem, requestBody } = require('../functions/nikkeScoreAdapter');
+const { createScoreApi } = require('../functions/nikkeScoreApi');
+const { TARGETS, buildScoreItem } = require('../functions/nikkeScoreAdapter');
 const standards = require('../functions/nikkeScoreStandards.json');
 
 async function main() {
   const key = process.env.DILDORO_API_KEY;
   if (!key) throw Error('DILDORO_API_KEY is required');
+  // Synthetic smoke tests use an in-memory lease store, never production profiles.
+  const state = new Map();
+  const db = {
+    collection: collection => ({ doc: id => {
+      const path = `${collection}/${id}`;
+      return { get: async () => ({ data: () => state.get(path) }),
+        set: async value => state.set(path, value), delete: async () => state.delete(path) };
+    } }),
+    runTransaction: async work => work({ get: ref => ref.get(),
+      set: (ref, value) => ref.set(value), delete: ref => ref.delete() }),
+  };
+  const calculate = createScoreApi(db);
   const results = [];
   for (const [code, target] of TARGETS) {
     if (process.env.SCORE_TEST_KEYS && !process.env.SCORE_TEST_KEYS.split(',').includes(code)) continue;
@@ -28,20 +40,14 @@ async function main() {
         { id: '7001001', function_details: [{ function_type: 'StatChargeTime', function_value: -198 }] });
       items.push(buildScoreItem(commander, code, 'synthetic-signed-options'));
     }
-    const body = JSON.stringify(requestBody(code, items));
-    const response = await axios.post('https://dildoro.com/api/partner/v1/damage', body, {
-      timeout: 60000, maxRedirects: 0, validateStatus: () => true,
-      headers: { 'X-Api-Key': key, 'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(body), 'User-Agent': 'Mozilla/5.0 (compatible; Mimir/1.0)' },
-    });
-    const payload = response.data;
+    const payload = await calculate(code, items);
     const row = { profileKey: code, nameCode: target.nameCode, name: target.name, weakness: target.weakness,
-      httpStatus: response.status, calcVersion: payload?.calc_version,
+      httpStatus: 200, calcVersion: payload?.calc_version,
       items: payload?.items || [],
     };
     results.push(row);
     console.log(JSON.stringify(row));
-    if (response.status !== 200 || !Array.isArray(payload?.items)
+    if (!Array.isArray(payload?.items)
       || payload.items.length !== items.length || payload.items.some(i => i.error)) {
       process.exitCode = 1;
     }

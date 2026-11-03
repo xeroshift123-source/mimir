@@ -42,8 +42,14 @@ for target in selection['profiles']:
             'equip_skills': {'atk_pct': 22.22, 'element_bonus': 88.6,
                              'max_ammo_pct': 129.64, 'charge_speed_pct': 0},
         })
+        # Keep dummy Liberalio above the evaluated attacker for buff selection.
+        if code == 5156:
+            growth = {**growth, 'breakthrough': 3, 'core_enhancement': 7,
+                      'equip_skills': {**growth['equip_skills'], 'atk_pct': 58.52}}
         slot_options = [[] for _ in range(4)]
         for key, (function_type, lines) in option_types.items():
+            if code == 5156 and key == 'atk_pct':
+                lines = 4
             total = round(growth['equip_skills'][key] * 100)
             if not total:
                 continue

@@ -1,5 +1,6 @@
 'use strict';
 const { ScoreError, resolveTarget, POLICY_HASH, compareScore } = require('./nikkeScoreAdapter');
+const { ELEMENTS, compareElements } = require('./nikkeScoreElements');
 
 // The legacy calculation URL is also read-only, so old clients cannot compute
 // on navigation. Only the sync handler can create or replace stored scores.
@@ -40,13 +41,22 @@ function createReadHandler({ functions, db, getAuthenticatedUid }, all) {
         const key = keys[i], item = saved[key];
         if (!item) continue;
         results[key] = item.status !== 'complete' ? item : { ...item,
+          canRefreshStatistics: userData.isAdmin === true,
           ...compareScore(item.policyHash === POLICY_HASH ? distributions[i].data() : null,
             item.damage, item.calcVersion),
           calculatedAt: new Date(item.calculatedAtMs).toISOString() };
       }
-      if (all) return res.status(200).json({ success: true, data: {
-        syncId: snapshot?.syncId || null, status: snapshot?.status || 'not_saved', results,
-      } });
+      if (all) {
+        const [commander, ...elementDocs] = await db.getAll(
+          db.collection('commanders').doc(openId),
+          ...Object.keys(ELEMENTS).map(key => db.collection('nikke_score_distributions').doc(`element-${key}`)));
+        return res.status(200).json({ success: true, data: {
+          syncId: snapshot?.syncId || null, status: snapshot?.status || 'not_saved', results,
+          canRefreshStatistics: userData.isAdmin === true,
+          elements: compareElements(snapshot, commander.data(), Object.fromEntries(
+            Object.keys(ELEMENTS).map((key, i) => [key, elementDocs[i].data()]))),
+        } });
+      }
       const item = results[keys[0]];
       if (!item) throw new ScoreError('score_not_saved',
         ['pending', 'running'].includes(snapshot?.status)

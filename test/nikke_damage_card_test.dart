@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mimir/services/nikke_score_service.dart';
 import 'package:mimir/widgets/nikke_damage_card.dart';
+import 'package:mimir/utils/ranking_color.dart';
 
 NikkeScoreResult result(
         {double score = 101.5, double? top = 12.3, int count = 100}) =>
@@ -55,7 +56,7 @@ void main() {
     expect(NikkeScoreService.supports(5002), isTrue);
     expect(NikkeScoreService.supports(5185), isTrue);
     expect(NikkeScoreService.supports(1019), isFalse);
-    expect(NikkeScoreService.supports(5155), isFalse);
+    expect(NikkeScoreService.supports(5155), isTrue);
     expect(NikkeScoreService.supports(5137), isTrue);
     expect(NikkeScoreService.supports(5045), isTrue);
     expect(NikkeScoreService.profilesFor(5129).map((p) => p.weakness),
@@ -105,6 +106,12 @@ void main() {
     pending.complete(result());
     await tester.pumpAndSettle();
     expect(find.text('101.50점'), findsOneWidget);
+    expect(
+        tester
+            .widget<LinearProgressIndicator>(
+                find.byType(LinearProgressIndicator))
+            .color,
+        rankingColor(100 - 12.3));
     expect(find.text('상위 12.3%'), findsOneWidget);
     expect(find.byIcon(Icons.help_outline_rounded), findsOneWidget);
     expect(find.textContaining('대상은 내 육성'), findsNothing);

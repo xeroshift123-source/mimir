@@ -17,7 +17,8 @@ const OPTION_TYPES = { elementDamage: 'IncElementDmg', hitRate: 'StatAccuracyCir
   maxAmmo: 'StatAmmoLoad', attack: 'StatAtk', chargeDamage: 'StatChargeDamage',
   chargeSpeed: 'StatChargeTime', criticalRate: 'StatCritical',
   criticalDamage: 'StatCriticalDamage', defense: 'StatDef' };
-const POLICY = { schema: 2, duration: 180, level: 400, boss: { def: 31784, core_size: 0 },
+const POLICY = { schema: 3, duration: 180, level: 400, boss: { def: 31784, core_size: 0 },
+  coreScenarios: [{ core_size: 0, weight: 0.5 }, { core_size: 100, weight: 0.5 }],
   burst: { burst_switch_delay: 0.1 }, partyGrowth: 'target-user-teammates-fixed',
   research: 'user-shared-by-party', cube: 'equipped-or-reload15',
   dummyFavorite: 'maximum-available-stage', targets, standards };
@@ -116,9 +117,9 @@ function buildScoreItem(commander, profileKey, id) {
       state_effects: [...effects.values()].sort((a, b) => a.id - b.id),
       outpost_info: { recycle_room_researches: researches } } };
 }
-function requestBody(nameCode, items) {
+function requestBody(nameCode, items, coreSize = 0) {
   return { duration: POLICY.duration, level: POLICY.level, weakness: resolveTarget(nameCode).weakness,
-    boss: POLICY.boss, burst: POLICY.burst, items };
+    boss: { ...POLICY.boss, core_size: coreSize }, burst: POLICY.burst, items };
 }
 function inputHash(item, profileKey) { const { id, ...input } = item; return digest({ policy: POLICY_HASH,
   profile: resolveTarget(profileKey ?? item.target).key, input }); }

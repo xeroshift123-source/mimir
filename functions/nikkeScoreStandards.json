@@ -9416,7 +9416,7 @@
         ]
       },
       {
-        "name_code": 5007,
+        "name_code": 5142,
         "grade": 3,
         "core": 0,
         "bondLevel": 30,
@@ -9426,8 +9426,8 @@
           "burst": 10
         },
         "favoriteItem": {
-          "tid": 201401,
-          "level": 2
+          "tid": 100102,
+          "level": 15
         },
         "harmonyCube": {
           "tid": 1000303,
@@ -9485,7 +9485,7 @@
         ]
       },
       {
-        "name_code": 5099,
+        "name_code": 5007,
         "grade": 3,
         "core": 0,
         "bondLevel": 30,
@@ -9495,8 +9495,8 @@
           "burst": 10
         },
         "favoriteItem": {
-          "tid": 100402,
-          "level": 15
+          "tid": 201401,
+          "level": 2
         },
         "harmonyCube": {
           "tid": 1000303,
@@ -18643,7 +18643,7 @@
       {
         "name_code": 5156,
         "grade": 3,
-        "core": 0,
+        "core": 7,
         "bondLevel": 30,
         "skills": {
           "skill1": 10,
@@ -18693,7 +18693,7 @@
             "overloadOptions": [
               900000028,
               900000032,
-              0
+              900000036
             ]
           },
           {
@@ -18704,7 +18704,7 @@
             "overloadOptions": [
               900000029,
               900000033,
-              0
+              900000037
             ]
           }
         ]
@@ -18738,8 +18738,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000036,
-              900000040,
+              900000038,
+              900000042,
               0
             ]
           },
@@ -18749,8 +18749,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000037,
-              900000041,
+              900000039,
+              900000043,
               0
             ]
           },
@@ -18760,8 +18760,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000038,
-              900000042,
+              900000040,
+              900000044,
               0
             ]
           },
@@ -18771,8 +18771,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000039,
-              900000043,
+              900000041,
+              900000045,
               0
             ]
           }
@@ -19019,7 +19019,7 @@
         "function_details": [
           {
             "function_type": "StatAtk",
-            "function_value": 1111
+            "function_value": 1463
           }
         ]
       },
@@ -19028,7 +19028,7 @@
         "function_details": [
           {
             "function_type": "StatAtk",
-            "function_value": 1111
+            "function_value": 1463
           }
         ]
       },
@@ -19036,8 +19036,8 @@
         "id": 900000028,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1463
           }
         ]
       },
@@ -19045,8 +19045,8 @@
         "id": 900000029,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1463
           }
         ]
       },
@@ -19072,8 +19072,8 @@
         "id": 900000032,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -19081,8 +19081,8 @@
         "id": 900000033,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -19090,8 +19090,8 @@
         "id": 900000034,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -19099,8 +19099,8 @@
         "id": 900000035,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -19108,8 +19108,8 @@
         "id": 900000036,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -19117,8 +19117,8 @@
         "id": 900000037,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -19126,8 +19126,8 @@
         "id": 900000038,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -19135,8 +19135,8 @@
         "id": 900000039,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -19162,13 +19162,31 @@
         "id": 900000042,
         "function_details": [
           {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000043,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000044,
+        "function_details": [
+          {
             "function_type": "StatAmmoLoad",
             "function_value": 6482
           }
         ]
       },
       {
-        "id": 900000043,
+        "id": 900000045,
         "function_details": [
           {
             "function_type": "StatAmmoLoad",
@@ -24940,7 +24958,7 @@
       {
         "name_code": 5156,
         "grade": 3,
-        "core": 0,
+        "core": 7,
         "bondLevel": 30,
         "skills": {
           "skill1": 10,
@@ -24990,7 +25008,7 @@
             "overloadOptions": [
               900000010,
               900000014,
-              0
+              900000018
             ]
           },
           {
@@ -25001,7 +25019,7 @@
             "overloadOptions": [
               900000011,
               900000015,
-              0
+              900000019
             ]
           }
         ]
@@ -25035,8 +25053,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000018,
-              900000022,
+              900000020,
+              900000024,
               0
             ]
           },
@@ -25046,8 +25064,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000019,
-              900000023,
+              900000021,
+              900000025,
               0
             ]
           },
@@ -25057,8 +25075,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000020,
-              900000024,
+              900000022,
+              900000026,
               0
             ]
           },
@@ -25068,8 +25086,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000021,
-              900000025,
+              900000023,
+              900000027,
               0
             ]
           }
@@ -25104,9 +25122,9 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000026,
-              900000030,
-              900000034
+              900000028,
+              900000032,
+              900000036
             ]
           },
           {
@@ -25115,9 +25133,9 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000027,
-              900000031,
-              900000035
+              900000029,
+              900000033,
+              900000037
             ]
           },
           {
@@ -25126,8 +25144,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000028,
-              900000032,
+              900000030,
+              900000034,
               0
             ]
           },
@@ -25137,8 +25155,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000029,
-              900000033,
+              900000031,
+              900000035,
               0
             ]
           }
@@ -25173,8 +25191,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000036,
-              900000040,
+              900000038,
+              900000042,
               0
             ]
           },
@@ -25184,8 +25202,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000037,
-              900000041,
+              900000039,
+              900000043,
               0
             ]
           },
@@ -25195,8 +25213,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000038,
-              900000042,
+              900000040,
+              900000044,
               0
             ]
           },
@@ -25206,8 +25224,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000039,
-              900000043,
+              900000041,
+              900000045,
               0
             ]
           }
@@ -25292,7 +25310,7 @@
         "function_details": [
           {
             "function_type": "StatAtk",
-            "function_value": 1111
+            "function_value": 1463
           }
         ]
       },
@@ -25301,7 +25319,7 @@
         "function_details": [
           {
             "function_type": "StatAtk",
-            "function_value": 1111
+            "function_value": 1463
           }
         ]
       },
@@ -25309,8 +25327,8 @@
         "id": 900000010,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1463
           }
         ]
       },
@@ -25318,8 +25336,8 @@
         "id": 900000011,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1463
           }
         ]
       },
@@ -25345,8 +25363,8 @@
         "id": 900000014,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -25354,8 +25372,8 @@
         "id": 900000015,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -25363,8 +25381,8 @@
         "id": 900000016,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -25372,8 +25390,8 @@
         "id": 900000017,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -25381,8 +25399,8 @@
         "id": 900000018,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -25390,8 +25408,8 @@
         "id": 900000019,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -25399,8 +25417,8 @@
         "id": 900000020,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -25408,8 +25426,8 @@
         "id": 900000021,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -25435,8 +25453,8 @@
         "id": 900000024,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -25444,8 +25462,8 @@
         "id": 900000025,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -25453,8 +25471,8 @@
         "id": 900000026,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -25462,8 +25480,8 @@
         "id": 900000027,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -25471,8 +25489,8 @@
         "id": 900000028,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -25480,8 +25498,8 @@
         "id": 900000029,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -25507,8 +25525,8 @@
         "id": 900000032,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -25516,8 +25534,8 @@
         "id": 900000033,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -25525,8 +25543,8 @@
         "id": 900000034,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -25534,8 +25552,8 @@
         "id": 900000035,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -25543,8 +25561,8 @@
         "id": 900000036,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -25552,8 +25570,8 @@
         "id": 900000037,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -25561,8 +25579,8 @@
         "id": 900000038,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -25570,8 +25588,8 @@
         "id": 900000039,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -25597,13 +25615,31 @@
         "id": 900000042,
         "function_details": [
           {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000043,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000044,
+        "function_details": [
+          {
             "function_type": "StatAmmoLoad",
             "function_value": 6482
           }
         ]
       },
       {
-        "id": 900000043,
+        "id": 900000045,
         "function_details": [
           {
             "function_type": "StatAmmoLoad",
@@ -25687,7 +25723,7 @@
       {
         "name_code": 5156,
         "grade": 3,
-        "core": 0,
+        "core": 7,
         "bondLevel": 30,
         "skills": {
           "skill1": 10,
@@ -25737,7 +25773,7 @@
             "overloadOptions": [
               900000010,
               900000014,
-              0
+              900000018
             ]
           },
           {
@@ -25748,7 +25784,7 @@
             "overloadOptions": [
               900000011,
               900000015,
-              0
+              900000019
             ]
           }
         ]
@@ -25782,8 +25818,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000018,
-              900000022,
+              900000020,
+              900000024,
               0
             ]
           },
@@ -25793,8 +25829,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000019,
-              900000023,
+              900000021,
+              900000025,
               0
             ]
           },
@@ -25804,8 +25840,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000020,
-              900000024,
+              900000022,
+              900000026,
               0
             ]
           },
@@ -25815,8 +25851,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000021,
-              900000025,
+              900000023,
+              900000027,
               0
             ]
           }
@@ -25851,9 +25887,9 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000026,
-              900000030,
-              900000034
+              900000028,
+              900000032,
+              900000036
             ]
           },
           {
@@ -25862,9 +25898,9 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000027,
-              900000031,
-              900000035
+              900000029,
+              900000033,
+              900000037
             ]
           },
           {
@@ -25873,8 +25909,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000028,
-              900000032,
+              900000030,
+              900000034,
               0
             ]
           },
@@ -25884,8 +25920,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000029,
-              900000033,
+              900000031,
+              900000035,
               0
             ]
           }
@@ -25920,8 +25956,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000036,
-              900000040,
+              900000038,
+              900000042,
               0
             ]
           },
@@ -25931,8 +25967,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000037,
-              900000041,
+              900000039,
+              900000043,
               0
             ]
           },
@@ -25942,8 +25978,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000038,
-              900000042,
+              900000040,
+              900000044,
               0
             ]
           },
@@ -25953,8 +25989,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000039,
-              900000043,
+              900000041,
+              900000045,
               0
             ]
           }
@@ -26039,7 +26075,7 @@
         "function_details": [
           {
             "function_type": "StatAtk",
-            "function_value": 1111
+            "function_value": 1463
           }
         ]
       },
@@ -26048,7 +26084,7 @@
         "function_details": [
           {
             "function_type": "StatAtk",
-            "function_value": 1111
+            "function_value": 1463
           }
         ]
       },
@@ -26056,8 +26092,8 @@
         "id": 900000010,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1463
           }
         ]
       },
@@ -26065,8 +26101,8 @@
         "id": 900000011,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1463
           }
         ]
       },
@@ -26092,8 +26128,8 @@
         "id": 900000014,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -26101,8 +26137,8 @@
         "id": 900000015,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -26110,8 +26146,8 @@
         "id": 900000016,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -26119,8 +26155,8 @@
         "id": 900000017,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -26128,8 +26164,8 @@
         "id": 900000018,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -26137,8 +26173,8 @@
         "id": 900000019,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -26146,8 +26182,8 @@
         "id": 900000020,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -26155,8 +26191,8 @@
         "id": 900000021,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -26182,8 +26218,8 @@
         "id": 900000024,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -26191,8 +26227,8 @@
         "id": 900000025,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -26200,8 +26236,8 @@
         "id": 900000026,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -26209,8 +26245,8 @@
         "id": 900000027,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -26218,8 +26254,8 @@
         "id": 900000028,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -26227,8 +26263,8 @@
         "id": 900000029,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -26254,8 +26290,8 @@
         "id": 900000032,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -26263,8 +26299,8 @@
         "id": 900000033,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -26272,8 +26308,8 @@
         "id": 900000034,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -26281,8 +26317,8 @@
         "id": 900000035,
         "function_details": [
           {
-            "function_type": "StatChargeTime",
-            "function_value": -463
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
@@ -26290,8 +26326,8 @@
         "id": 900000036,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -26299,8 +26335,8 @@
         "id": 900000037,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "StatChargeTime",
+            "function_value": -463
           }
         ]
       },
@@ -26308,8 +26344,8 @@
         "id": 900000038,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -26317,8 +26353,8 @@
         "id": 900000039,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -26344,13 +26380,31 @@
         "id": 900000042,
         "function_details": [
           {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000043,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000044,
+        "function_details": [
+          {
             "function_type": "StatAmmoLoad",
             "function_value": 6482
           }
         ]
       },
       {
-        "id": 900000043,
+        "id": 900000045,
         "function_details": [
           {
             "function_type": "StatAmmoLoad",
@@ -30629,7 +30683,7 @@
   "5137:wind": {
     "characters": [
       {
-        "name_code": 5065,
+        "name_code": 5155,
         "grade": 3,
         "core": 0,
         "bondLevel": 30,
@@ -30639,7 +30693,7 @@
           "burst": 10
         },
         "favoriteItem": {
-          "tid": 100202,
+          "tid": 100502,
           "level": 15
         },
         "harmonyCube": {
@@ -30698,7 +30752,7 @@
         ]
       },
       {
-        "name_code": 5133,
+        "name_code": 5175,
         "grade": 3,
         "core": 0,
         "bondLevel": 30,
@@ -30836,7 +30890,7 @@
         ]
       },
       {
-        "name_code": 5132,
+        "name_code": 5007,
         "grade": 3,
         "core": 0,
         "bondLevel": 30,
@@ -30846,8 +30900,8 @@
           "burst": 10
         },
         "favoriteItem": {
-          "tid": 100202,
-          "level": 15
+          "tid": 201401,
+          "level": 2
         },
         "harmonyCube": {
           "tid": 1000303,
@@ -30887,7 +30941,7 @@
             "corporationType": 0,
             "overloadOptions": [
               900000026,
-              900000030,
+              0,
               0
             ]
           },
@@ -30898,14 +30952,14 @@
             "corporationType": 0,
             "overloadOptions": [
               900000027,
-              900000031,
+              0,
               0
             ]
           }
         ]
       },
       {
-        "name_code": 5007,
+        "name_code": 5163,
         "grade": 3,
         "core": 0,
         "bondLevel": 30,
@@ -30915,8 +30969,8 @@
           "burst": 10
         },
         "favoriteItem": {
-          "tid": 201401,
-          "level": 2
+          "tid": 100602,
+          "level": 15
         },
         "harmonyCube": {
           "tid": 1000303,
@@ -30933,8 +30987,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000032,
-              900000036,
+              900000030,
+              900000034,
               0
             ]
           },
@@ -30944,8 +30998,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000033,
-              900000037,
+              900000031,
+              900000035,
               0
             ]
           },
@@ -30955,8 +31009,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000034,
-              900000038,
+              900000032,
+              900000036,
               0
             ]
           },
@@ -30966,8 +31020,8 @@
             "level": 5,
             "corporationType": 0,
             "overloadOptions": [
-              900000035,
-              900000039,
+              900000033,
+              900000037,
               0
             ]
           }
@@ -31249,8 +31303,8 @@
         "id": 900000030,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -31258,8 +31312,8 @@
         "id": 900000031,
         "function_details": [
           {
-            "function_type": "StatAmmoLoad",
-            "function_value": 6482
+            "function_type": "StatAtk",
+            "function_value": 1111
           }
         ]
       },
@@ -31267,8 +31321,8 @@
         "id": 900000032,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -31276,8 +31330,8 @@
         "id": 900000033,
         "function_details": [
           {
-            "function_type": "StatAtk",
-            "function_value": 1111
+            "function_type": "IncElementDmg",
+            "function_value": 2215
           }
         ]
       },
@@ -31303,13 +31357,391 @@
         "id": 900000036,
         "function_details": [
           {
-            "function_type": "IncElementDmg",
-            "function_value": 2215
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
           }
         ]
       },
       {
         "id": 900000037,
+        "function_details": [
+          {
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
+          }
+        ]
+      }
+    ]
+  },
+  "5155:wind": {
+    "characters": [
+      {
+        "name_code": 5155,
+        "grade": 3,
+        "core": 0,
+        "bondLevel": 30,
+        "skills": {
+          "skill1": 10,
+          "skill2": 10,
+          "burst": 10
+        },
+        "favoriteItem": {
+          "tid": 100502,
+          "level": 15
+        },
+        "harmonyCube": {
+          "tid": 1000303,
+          "level": 15
+        },
+        "growthDataQuality": {
+          "schemaVersion": 1,
+          "complete": true
+        },
+        "equipment": [
+          {
+            "slot": "head",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000000,
+              900000004,
+              0
+            ]
+          },
+          {
+            "slot": "torso",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000001,
+              900000005,
+              0
+            ]
+          },
+          {
+            "slot": "arm",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000002,
+              900000006,
+              0
+            ]
+          },
+          {
+            "slot": "leg",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000003,
+              900000007,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "name_code": 5175,
+        "grade": 3,
+        "core": 0,
+        "bondLevel": 30,
+        "skills": {
+          "skill1": 10,
+          "skill2": 10,
+          "burst": 10
+        },
+        "favoriteItem": {
+          "tid": 100202,
+          "level": 15
+        },
+        "harmonyCube": {
+          "tid": 1000303,
+          "level": 15
+        },
+        "growthDataQuality": {
+          "schemaVersion": 1,
+          "complete": true
+        },
+        "equipment": [
+          {
+            "slot": "head",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000008,
+              900000012,
+              0
+            ]
+          },
+          {
+            "slot": "torso",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000009,
+              900000013,
+              0
+            ]
+          },
+          {
+            "slot": "arm",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000010,
+              900000014,
+              0
+            ]
+          },
+          {
+            "slot": "leg",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000011,
+              900000015,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "name_code": 5137,
+        "grade": 3,
+        "core": 0,
+        "bondLevel": 30,
+        "skills": {
+          "skill1": 10,
+          "skill2": 10,
+          "burst": 10
+        },
+        "favoriteItem": {
+          "tid": 100502,
+          "level": 15
+        },
+        "harmonyCube": {
+          "tid": 1000303,
+          "level": 15
+        },
+        "growthDataQuality": {
+          "schemaVersion": 1,
+          "complete": true
+        },
+        "equipment": [
+          {
+            "slot": "head",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000016,
+              900000020,
+              0
+            ]
+          },
+          {
+            "slot": "torso",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000017,
+              900000021,
+              0
+            ]
+          },
+          {
+            "slot": "arm",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000018,
+              900000022,
+              0
+            ]
+          },
+          {
+            "slot": "leg",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000019,
+              900000023,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "name_code": 5007,
+        "grade": 3,
+        "core": 0,
+        "bondLevel": 30,
+        "skills": {
+          "skill1": 10,
+          "skill2": 10,
+          "burst": 10
+        },
+        "favoriteItem": {
+          "tid": 201401,
+          "level": 2
+        },
+        "harmonyCube": {
+          "tid": 1000303,
+          "level": 15
+        },
+        "growthDataQuality": {
+          "schemaVersion": 1,
+          "complete": true
+        },
+        "equipment": [
+          {
+            "slot": "head",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000024,
+              900000028,
+              0
+            ]
+          },
+          {
+            "slot": "torso",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000025,
+              900000029,
+              0
+            ]
+          },
+          {
+            "slot": "arm",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000026,
+              0,
+              0
+            ]
+          },
+          {
+            "slot": "leg",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000027,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "name_code": 5163,
+        "grade": 3,
+        "core": 0,
+        "bondLevel": 30,
+        "skills": {
+          "skill1": 10,
+          "skill2": 10,
+          "burst": 10
+        },
+        "favoriteItem": {
+          "tid": 100602,
+          "level": 15
+        },
+        "harmonyCube": {
+          "tid": 1000303,
+          "level": 15
+        },
+        "growthDataQuality": {
+          "schemaVersion": 1,
+          "complete": true
+        },
+        "equipment": [
+          {
+            "slot": "head",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000030,
+              900000034,
+              0
+            ]
+          },
+          {
+            "slot": "torso",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000031,
+              900000035,
+              0
+            ]
+          },
+          {
+            "slot": "arm",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000032,
+              900000036,
+              0
+            ]
+          },
+          {
+            "slot": "leg",
+            "tier": 10,
+            "level": 5,
+            "corporationType": 0,
+            "overloadOptions": [
+              900000033,
+              900000037,
+              0
+            ]
+          }
+        ]
+      }
+    ],
+    "stateEffects": [
+      {
+        "id": 900000000,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000001,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000002,
         "function_details": [
           {
             "function_type": "IncElementDmg",
@@ -31318,7 +31750,34 @@
         ]
       },
       {
-        "id": 900000038,
+        "id": 900000003,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000004,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000005,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000006,
         "function_details": [
           {
             "function_type": "StatAmmoLoad",
@@ -31327,7 +31786,277 @@
         ]
       },
       {
-        "id": 900000039,
+        "id": 900000007,
+        "function_details": [
+          {
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
+          }
+        ]
+      },
+      {
+        "id": 900000008,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000009,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000010,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000011,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000012,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000013,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000014,
+        "function_details": [
+          {
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
+          }
+        ]
+      },
+      {
+        "id": 900000015,
+        "function_details": [
+          {
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
+          }
+        ]
+      },
+      {
+        "id": 900000016,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000017,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000018,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000019,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000020,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000021,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000022,
+        "function_details": [
+          {
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
+          }
+        ]
+      },
+      {
+        "id": 900000023,
+        "function_details": [
+          {
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
+          }
+        ]
+      },
+      {
+        "id": 900000024,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000025,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000026,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000027,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000028,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000029,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000030,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000031,
+        "function_details": [
+          {
+            "function_type": "StatAtk",
+            "function_value": 1111
+          }
+        ]
+      },
+      {
+        "id": 900000032,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000033,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000034,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000035,
+        "function_details": [
+          {
+            "function_type": "IncElementDmg",
+            "function_value": 2215
+          }
+        ]
+      },
+      {
+        "id": 900000036,
+        "function_details": [
+          {
+            "function_type": "StatAmmoLoad",
+            "function_value": 6482
+          }
+        ]
+      },
+      {
+        "id": 900000037,
         "function_details": [
           {
             "function_type": "StatAmmoLoad",
