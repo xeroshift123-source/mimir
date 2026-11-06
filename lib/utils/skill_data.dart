@@ -1,4 +1,5 @@
 class SkillData {
+  static const List<double> scarletGoddeathBurst = [0, 0.66, 0.72, 0.78, 0.84, 0.90, 0.96, 1.02, 1.08, 1.14, 1.20];
   static const List<double> mirandaBurst = [0, 0.2387, 0.2571, 0.2755, 0.2938, 0.3122, 0.3306, 0.3489, 0.3673, 0.3857, 0.4040];
   static const List<double> adaS1 = [0, 0.3546, 0.3819, 0.4092, 0.4364, 0.4637, 0.4910, 0.5183, 0.5456, 0.5728, 0.6000];
   static const List<double> adaBurst = [0, 0.2363, 0.2545, 0.2727, 0.2909, 0.3090, 0.3272, 0.3454, 0.3636, 0.3818, 0.4000];

@@ -42,25 +42,26 @@ class _MatchaGakseolCalculatorFormState
   // 슬롯 1 개별 스킬 레벨
   int _nikke1MatchaS2Level = 10;
   int _nikke1GakseolS2Level = 10;
+  int _nikke1ScarletGoddeathBurstLevel = 10;
   int _nikke1AdaS1Level = 10;
   int _nikke1AdaBurstLevel = 10;
 
   // 슬롯 2 개별 스킬 레벨
   int _nikke2MatchaS2Level = 10;
   int _nikke2GakseolS2Level = 10;
+  int _nikke2ScarletGoddeathBurstLevel = 10;
   int _nikke2AdaS1Level = 10;
   int _nikke2AdaBurstLevel = 10;
 
-  double resNikke1FinalOnAdaB = 0;
-  double resNikke1FinalOnOtherB = 0;
-  double resNikke2FinalOnAdaB = 0;
-  double resNikke2FinalOnOtherB = 0;
+  double resNikke1FinalOnNikke1B = 0;
+  double resNikke1FinalOnNikke2B = 0;
+  double resNikke2FinalOnNikke1B = 0;
+  double resNikke2FinalOnNikke2B = 0;
   double resNayutaFinal = 0;
 
   bool nayutaHasMiranda = false;
 
   List<String> bufferedNikkes = []; // 파워업(버스트) 수혜자 (상위 2기)
-  String wakeupS2RecipientName = ''; // 웨이크업(S2) 크리확 수혜자 (최종공 1위)
 
   String resultMessage = "니케 1과 니케 2를 선택하고 계산하기를 눌러주세요.";
   String needOverloadMessage = "";
@@ -69,7 +70,7 @@ class _MatchaGakseolCalculatorFormState
 
   bool _isSyncing = false;
 
-  final Set<String> allowed7NikkeNames = {
+  final Set<String> allowedNikkeNames = {
     '마르차나 : 마린 스터디',
     '스노우 화이트 : 헤비암즈',
     '미하라 : 본딩 체인',
@@ -77,6 +78,7 @@ class _MatchaGakseolCalculatorFormState
     '에이다',
     '디젤 : 윈터 스위츠',
     '프리바티',
+    '홍련 : 신살',
   };
 
   @override
@@ -299,6 +301,8 @@ class _MatchaGakseolCalculatorFormState
           _nikke1MatchaS2Level = skills['skill2'] ?? 10;
         } else if (_nikke1!.name == '스노우 화이트 : 헤비암즈') {
           _nikke1GakseolS2Level = skills['skill2'] ?? 10;
+        } else if (_nikke1!.name == '홍련 : 신살') {
+          _nikke1ScarletGoddeathBurstLevel = skills['burst'] ?? 10;
         } else if (_nikke1!.name == '에이다') {
           _nikke1AdaS1Level = skills['skill1'] ?? 10;
           _nikke1AdaBurstLevel = skills['burst'] ?? 10;
@@ -311,6 +315,8 @@ class _MatchaGakseolCalculatorFormState
           _nikke2MatchaS2Level = skills['skill2'] ?? 10;
         } else if (_nikke2!.name == '스노우 화이트 : 헤비암즈') {
           _nikke2GakseolS2Level = skills['skill2'] ?? 10;
+        } else if (_nikke2!.name == '홍련 : 신살') {
+          _nikke2ScarletGoddeathBurstLevel = skills['burst'] ?? 10;
         } else if (_nikke2!.name == '에이다') {
           _nikke2AdaS1Level = skills['skill1'] ?? 10;
           _nikke2AdaBurstLevel = skills['burst'] ?? 10;
@@ -361,11 +367,10 @@ class _MatchaGakseolCalculatorFormState
         resultMessage = "니케 1과 니케 2를 모두 선택해 주세요.";
         needOverloadMessage = "";
         bufferedNikkes = [];
-        wakeupS2RecipientName = '';
-        resNikke1FinalOnAdaB = 0;
-        resNikke1FinalOnOtherB = 0;
-        resNikke2FinalOnAdaB = 0;
-        resNikke2FinalOnOtherB = 0;
+        resNikke1FinalOnNikke1B = 0;
+        resNikke1FinalOnNikke2B = 0;
+        resNikke2FinalOnNikke1B = 0;
+        resNikke2FinalOnNikke2B = 0;
         resNayutaFinal = 0;
         nayutaHasMiranda = false;
       });
@@ -388,6 +393,8 @@ class _MatchaGakseolCalculatorFormState
       } else if (n1Name == '스노우 화이트 : 헤비암즈') {
         n1TargetSkill = SkillData.gakseolS2[_nikke1GakseolS2Level];
         n1BattleSkillSelf = n1TargetSkill;
+      } else if (n1Name == '홍련 : 신살') {
+        n1BattleSkillSelf = SkillData.scarletGoddeathBurst[_nikke1ScarletGoddeathBurstLevel];
       } else if (n1Name == '에이다') {
         n1TargetSkill = 0.0; // 사전 타겟팅: 에이다 1스/버스트 미반영
         n1BattleSkillSelf = 0.0;
@@ -408,6 +415,8 @@ class _MatchaGakseolCalculatorFormState
       } else if (n2Name == '스노우 화이트 : 헤비암즈') {
         n2TargetSkill = SkillData.gakseolS2[_nikke2GakseolS2Level];
         n2BattleSkillSelf = n2TargetSkill;
+      } else if (n2Name == '홍련 : 신살') {
+        n2BattleSkillSelf = SkillData.scarletGoddeathBurst[_nikke2ScarletGoddeathBurstLevel];
       } else if (n2Name == '에이다') {
         n2TargetSkill = 0.0;
         n2BattleSkillSelf = 0.0;
@@ -462,90 +471,41 @@ class _MatchaGakseolCalculatorFormState
         adaBuffAtkAmount = n2Base * SkillData.adaS1[_nikke2AdaS1Level];
       }
 
-      // <에이다 버스트 시>
-      // 에이다 본인: 기본공 * (1 + 오버공증 + 미란다 + 1스% + 버스트%)
-      double n1FinalOnAda = n1Base * (1 + n1Over + n1BattleSkillSelf + (n1HasMiranda ? mirandaVal : 0));
-      if (isN1Ada) {
-        n1FinalOnAda = n1Base * (1 + n1Over + (n1HasMiranda ? mirandaVal : 0) + SkillData.adaS1[_nikke1AdaS1Level] + SkillData.adaBurst[_nikke1AdaBurstLevel]);
-      }
-      resNikke1FinalOnAdaB = n1FinalOnAda;
-
-      double n2FinalOnAda = n2Base * (1 + n2Over + n2BattleSkillSelf + (n2HasMiranda ? mirandaVal : 0));
-      if (isN2Ada) {
-        n2FinalOnAda = n2Base * (1 + n2Over + (n2HasMiranda ? mirandaVal : 0) + SkillData.adaS1[_nikke2AdaS1Level] + SkillData.adaBurst[_nikke2AdaBurstLevel]);
-      }
-      resNikke2FinalOnAdaB = n2FinalOnAda;
-
-      // <다른 니케 버스트 시>
-      // 에이다 본인: 기본공 * (1 + 오버공증 + 미란다)
-      // 버스트 니케: 본인 전투공격력 + 에이다 1스 버프액(adaBuffAtkAmount)
-      if (isN1Ada) {
-        resNikke1FinalOnOtherB = n1Base * (1 + n1Over + (n1HasMiranda ? mirandaVal : 0));
-        resNikke2FinalOnOtherB = n2Base * (1 + n2Over + n2BattleSkillSelf + (n2HasMiranda ? mirandaVal : 0)) + adaBuffAtkAmount;
-      } else if (isN2Ada) {
-        resNikke1FinalOnOtherB = n1Base * (1 + n1Over + n1BattleSkillSelf + (n1HasMiranda ? mirandaVal : 0)) + adaBuffAtkAmount;
-        resNikke2FinalOnOtherB = n2Base * (1 + n2Over + (n2HasMiranda ? mirandaVal : 0));
-      } else {
-        resNikke1FinalOnOtherB = n1Base * (1 + n1Over + n1BattleSkillSelf + (n1HasMiranda ? mirandaVal : 0));
-        resNikke2FinalOnOtherB = n2Base * (1 + n2Over + n2BattleSkillSelf + (n2HasMiranda ? mirandaVal : 0));
+      // 각 버스트 사용자의 자공증과 에이다 버프를 독립적으로 계산한다.
+      double finalAttack(int slot, int burstSlot) {
+        final name = slot == 1 ? n1Name : n2Name;
+        final base = slot == 1 ? n1Base : n2Base;
+        final over = slot == 1 ? n1Over : n2Over;
+        final hasMiranda = slot == 1 ? n1HasMiranda : n2HasMiranda;
+        double self = slot == 1 ? n1BattleSkillSelf : n2BattleSkillSelf;
+        if (name == '홍련 : 신살' && slot != burstSlot) self = 0;
+        if (name == '에이다' && slot == burstSlot) {
+          self = SkillData.adaS1[slot == 1 ? _nikke1AdaS1Level : _nikke2AdaS1Level] +
+              SkillData.adaBurst[slot == 1 ? _nikke1AdaBurstLevel : _nikke2AdaBurstLevel];
+        }
+        final adaBuff = name != '에이다' && slot == burstSlot ? adaBuffAtkAmount : 0.0;
+        return base * (1 + over + self + (hasMiranda ? mirandaVal : 0)) + adaBuff;
       }
 
+      resNikke1FinalOnNikke1B = finalAttack(1, 1);
+      resNikke2FinalOnNikke1B = finalAttack(2, 1);
+      resNikke1FinalOnNikke2B = finalAttack(1, 2);
+      resNikke2FinalOnNikke2B = finalAttack(2, 2);
       resNayutaFinal = nayutaBase * (1 + nayutaOver + nayutaSkill2 + (nayutaHasMiranda ? mirandaVal : 0));
 
-      // ── STEP 2: 웨이크업(S2) 타겟팅 ──
-      // 파워업 적용 이후의 최종 공격력 기준 1위 1기에게 크리확 85.42% 1발
-      List<Map<String, dynamic>> s2Ranking = [
-        {'name': n1Name, 'val': resNikke1FinalOnOtherB, 'base': n1Base},
-        {'name': n2Name, 'val': resNikke2FinalOnOtherB, 'base': n2Base},
-      ];
-      if (_useNayuta) {
-        s2Ranking.add({'name': '나유타', 'val': resNayutaFinal, 'base': nayutaBase});
+      String recipients(double val1, double val2) {
+        final highest = _useNayuta ? max(max(val1, val2), resNayutaFinal) : max(val1, val2);
+        return [
+          if (val1 == highest) n1Name,
+          if (val2 == highest) n2Name,
+          if (_useNayuta && resNayutaFinal == highest) '나유타',
+        ].join(', ');
       }
-      s2Ranking.sort((a, b) => (b['val'] as double).compareTo(a['val'] as double));
-
-      wakeupS2RecipientName = s2Ranking[0]['name'] as String;
-      // 동점 처리: 1위와 동점이면 n1도 수혜
-      bool n1HasWakeup = (wakeupS2RecipientName == n1Name) ||
-          (s2Ranking.length > 1 &&
-              s2Ranking[0]['val'] == s2Ranking[1]['val'] &&
-              s2Ranking[1]['name'] == n1Name);
-
-      // S2 2위 정보 (여유 수치 계산)
-      String s2SecondName = s2Ranking.length > 1 ? (s2Ranking[1]['name'] as String) : '';
-      double s2SecondVal = s2Ranking.length > 1 ? (s2Ranking[1]['val'] as double) : 0;
-      double s2SecondBase = s2Ranking.length > 1 ? (s2Ranking[1]['base'] as double) : 0;
-
-      // ── 판정 메시지: S2 웨이크업 기준 ──
-      if (!n1HasWakeup) {
-        isError = true;
-        resultMessage = "❌ 경고: $n1Name이(가) 최종공 1위가 아닙니다! ($wakeupS2RecipientName이(가) 크리확 버프 수령 중)";
-        double s2FirstVal = s2Ranking[0]['val'] as double;
-        double s2FirstBase = s2Ranking[0]['base'] as double;
-        double margin = s2FirstVal - resNikke1FinalOnOtherB;
-        double neededIncrease = (n1Base > 0) ? (margin / n1Base) * 100 : 0;
-        double winnerAllowedDecrease = (s2FirstBase > 0) ? (margin / s2FirstBase) * 100 : 0;
-        needOverloadMessage =
-            "• $n1Name 오버공증이 최소 ${neededIncrease.toStringAsFixed(2)}% 더 있어야 크리확 버프를 받습니다.\n"
-            "• 또는 $wakeupS2RecipientName 오버공증이 ${winnerAllowedDecrease.toStringAsFixed(2)}% 낮아지면 역전됩니다.";
-      } else {
-        isError = false;
-        resultMessage = "✅ 정상: $n1Name이(가) 최종공 1위로 크리확 85.42% 버프를 수령합니다!";
-        List<String> details = [];
-
-        if (resNikke1FinalOnOtherB == s2SecondVal) {
-          resultMessage = "✅ $n1Name과(와) $s2SecondName의 최종 공격력이 동일합니다. (동점 처리)";
-        } else {
-          double margin = resNikke1FinalOnOtherB - s2SecondVal;
-          double n1AllowedDecrease = (n1Base > 0) ? (margin / n1Base) * 100 : 0;
-          double s2SecondNeededIncrease = (s2SecondBase > 0) ? (margin / s2SecondBase) * 100 : 0;
-
-          details.add("💡 현재 상태 기준 여유 수치 (최종공 기준)");
-          details.add("• $n1Name 오버공증: ${n1AllowedDecrease.toStringAsFixed(2)}% 더 낮아도 1위 유지됩니다.");
-          details.add("• $s2SecondName 오버공증: ${s2SecondNeededIncrease.toStringAsFixed(2)}% 더 높아지면 1위를 탈취합니다.");
-        }
-
-        needOverloadMessage = details.join("\n");
-      }
+      isError = false;
+      resultMessage = '크리확 버프 수혜자\n'
+          '니케 1 ($n1Name) 버스트: ${recipients(resNikke1FinalOnNikke1B, resNikke2FinalOnNikke1B)}\n'
+          '니케 2 ($n2Name) 버스트: ${recipients(resNikke1FinalOnNikke2B, resNikke2FinalOnNikke2B)}';
+      needOverloadMessage = '';
     });
   }
 
@@ -584,6 +544,18 @@ class _MatchaGakseolCalculatorFormState
             }
           });
         })
+      ]);
+    } else if (name == '홍련 : 신살') {
+      _showSettingDialog("$name 스킬 설정", (setDialogState) => [
+        _buildSliderField("버스트 (자공증)", slotIndex == 1 ? _nikke1ScarletGoddeathBurstLevel : _nikke2ScarletGoddeathBurstLevel, (v) {
+          setDialogState(() {
+            if (slotIndex == 1) {
+              _nikke1ScarletGoddeathBurstLevel = v;
+            } else {
+              _nikke2ScarletGoddeathBurstLevel = v;
+            }
+          });
+        }),
       ]);
     } else if (name == '에이다') {
       _showSettingDialog("$name 스킬 설정", (setDialogState) => [
@@ -630,7 +602,7 @@ class _MatchaGakseolCalculatorFormState
     }
 
     final filtered7Nikkes = rawNikkes
-        .where((n) => allowed7NikkeNames.contains(n.name))
+        .where((n) => allowedNikkeNames.contains(n.name))
         .toList();
 
     showModalBottomSheet(
@@ -813,8 +785,8 @@ class _MatchaGakseolCalculatorFormState
 
   @override
   Widget build(BuildContext context) {
-    bool hasSkillSettings1 = _nikke1?.name == '마르차나 : 마린 스터디' || _nikke1?.name == '스노우 화이트 : 헤비암즈' || _nikke1?.name == '에이다';
-    bool hasSkillSettings2 = _nikke2?.name == '마르차나 : 마린 스터디' || _nikke2?.name == '스노우 화이트 : 헤비암즈' || _nikke2?.name == '에이다';
+    bool hasSkillSettings1 = _nikke1?.name == '마르차나 : 마린 스터디' || _nikke1?.name == '스노우 화이트 : 헤비암즈' || _nikke1?.name == '에이다' || _nikke1?.name == '홍련 : 신살';
+    bool hasSkillSettings2 = _nikke2?.name == '마르차나 : 마린 스터디' || _nikke2?.name == '스노우 화이트 : 헤비암즈' || _nikke2?.name == '에이다' || _nikke2?.name == '홍련 : 신살';
 
     return Column(
       children: [
@@ -1096,7 +1068,7 @@ class _MatchaGakseolCalculatorFormState
                         : Colors.grey.shade300))));
   }
 
-  String _buildNikkeNote(String name, {required int slotIndex, required bool isAdaBurstCard}) {
+  String _buildNikkeNote(String name, {required int slotIndex, required int burstSlot}) {
     if (name == '나유타') {
       List<String> parts = [];
       if (nayutaHasMiranda) {
@@ -1126,7 +1098,7 @@ class _MatchaGakseolCalculatorFormState
       adaS1Lv = adaSlotIndex == 1 ? _nikke1AdaS1Level : _nikke2AdaS1Level;
     }
 
-    bool receivesAdaBuff = !isCurrentNikkeAda && (isN1Ada || isN2Ada) && !isAdaBurstCard;
+    bool receivesAdaBuff = !isCurrentNikkeAda && (isN1Ada || isN2Ada) && slotIndex == burstSlot;
 
     List<String> multParts = [];
     if (bufferedNikkes.contains(name)) {
@@ -1139,8 +1111,13 @@ class _MatchaGakseolCalculatorFormState
       multParts.add("2스(Lv.$gakseolS2Lv)");
     }
 
+    if (name == '홍련 : 신살' && slotIndex == burstSlot) {
+      final burstLv = slotIndex == 1 ? _nikke1ScarletGoddeathBurstLevel : _nikke2ScarletGoddeathBurstLevel;
+      multParts.add("버스트(Lv.$burstLv)");
+    }
+
     if (isCurrentNikkeAda) {
-      if (isAdaBurstCard) {
+      if (slotIndex == burstSlot) {
         multParts.add("1스(Lv.$adaS1Lv)");
         multParts.add("버스트(Lv.$adaBurstLv)");
       }
@@ -1183,72 +1160,23 @@ class _MatchaGakseolCalculatorFormState
       );
     }
 
-    final n1Name = _nikke1!.name;
-    final n2Name = _nikke2!.name;
-    bool isN1Ada = (n1Name == '에이다');
-    bool isN2Ada = (n2Name == '에이다');
-
-    if (isN1Ada || isN2Ada) {
-      String otherName = isN1Ada ? n2Name : n1Name;
-
-      List<String> notesAdaB = [
-        _buildNikkeNote(n1Name, slotIndex: 1, isAdaBurstCard: true),
-        _buildNikkeNote(n2Name, slotIndex: 2, isAdaBurstCard: true),
-      ];
-      if (_useNayuta) {
-        notesAdaB.add(_buildNikkeNote('나유타', slotIndex: 0, isAdaBurstCard: true));
-      }
-
-      List<String> notesOtherB = [
-        _buildNikkeNote(n1Name, slotIndex: 1, isAdaBurstCard: false),
-        _buildNikkeNote(n2Name, slotIndex: 2, isAdaBurstCard: false),
-      ];
-      if (_useNayuta) {
-        notesOtherB.add(_buildNikkeNote('나유타', slotIndex: 0, isAdaBurstCard: false));
-      }
-
-      return Column(
-        children: [
-          _buildSingleResultCard(
-            "<에이다 버스트 시>",
-            resNikke1FinalOnAdaB,
-            resNikke2FinalOnAdaB,
-            resNayutaFinal,
-            notesAdaB,
-            winColor1: isN1Ada ? Colors.orange : Colors.purple,
-            winColor2: isN2Ada ? Colors.orange : Colors.blue,
-          ),
-          const SizedBox(height: 12),
-          _buildSingleResultCard(
-            "<$otherName 버스트 시>",
-            resNikke1FinalOnOtherB,
-            resNikke2FinalOnOtherB,
-            resNayutaFinal,
-            notesOtherB,
-            winColor1: isN1Ada ? Colors.purple : Colors.orange,
-            winColor2: isN2Ada ? Colors.blue : Colors.orange,
-          ),
-        ],
-      );
-    } else {
-      List<String> notes = [
-        _buildNikkeNote(n1Name, slotIndex: 1, isAdaBurstCard: false),
-        _buildNikkeNote(n2Name, slotIndex: 2, isAdaBurstCard: false),
-      ];
-      if (_useNayuta) {
-        notes.add(_buildNikkeNote('나유타', slotIndex: 0, isAdaBurstCard: false));
-      }
-
-      return _buildSingleResultCard(
-        "최종 공격력 결과 (파워업 적용 후)",
-        resNikke1FinalOnOtherB,
-        resNikke2FinalOnOtherB,
-        resNayutaFinal,
-        notes,
-        winColor1: Colors.purple,
-        winColor2: Colors.blue,
-      );
-    }
+    final names = [_nikke1!.name, _nikke2!.name];
+    return Column(children: [
+      for (final burstSlot in [1, 2]) ...[
+        if (burstSlot == 2) const SizedBox(height: 12),
+        _buildSingleResultCard(
+          '니케 $burstSlot: ${names[burstSlot - 1]} 버스트 시',
+          burstSlot == 1 ? resNikke1FinalOnNikke1B : resNikke1FinalOnNikke2B,
+          burstSlot == 1 ? resNikke2FinalOnNikke1B : resNikke2FinalOnNikke2B,
+          resNayutaFinal,
+          [
+            _buildNikkeNote(names[0], slotIndex: 1, burstSlot: burstSlot),
+            _buildNikkeNote(names[1], slotIndex: 2, burstSlot: burstSlot),
+            if (_useNayuta) _buildNikkeNote('나유타', slotIndex: 0, burstSlot: burstSlot),
+          ],
+        ),
+      ],
+    ]);
   }
 
   Widget _buildSingleResultCard(
@@ -1303,7 +1231,7 @@ class _MatchaGakseolCalculatorFormState
 
   Widget _resRow(String name, String val, bool win, Color winColor, bool hasMiranda) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final hasWakeup = name == wakeupS2RecipientName;
+    final hasWakeup = win;
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Row(
         children: [

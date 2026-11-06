@@ -166,4 +166,14 @@ final List<RaidInfo> raidHistory = [
       UnionBossInfo(element: "풍압", name: "리빌드 빅 암즈", keyword: ["코어"]),
     ],
   ),
+  const RaidInfo(
+    type: RaidType.solo,
+    seasonName: "SEASON 43",
+    bossName: "승리의 여신",
+    period: " 11/12(목) 12:00 ~ 11/19(목) 4:59",
+    imagePath: "assets/images/raids/goddess_of_victory.png",
+    bossElement: "풍압",
+    weakness: "작열",
+    keyword: ["코어", "???"],
+  ),
 ];
